@@ -1,0 +1,1217 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+
+<project>
+  <fileVersion>2</fileVersion>
+  <fileChecksum>3968160337</fileChecksum>
+  <configuration>
+    <name>Debug</name>
+    <outputs>
+      <file>$PROJ_DIR$\..\Project.hex</file>
+      <file>$PROJ_DIR$\Debug\List\ISRList.lst</file>
+      <file>$PROJ_DIR$\Debug\Obj\ISRList.r90</file>
+      <file>$PROJ_DIR$\Debug\Obj\mbfuncdisc.pbi</file>
+      <file>$PROJ_DIR$\..\MainUnit.cpp</file>
+      <file>$PROJ_DIR$\Debug\Obj\MainUnit.pbi</file>
+      <file>$PROJ_DIR$\..\MCU.h</file>
+      <file>$TOOLKIT_DIR$\inc\dlib\c\stdio.h</file>
+      <file>$TOOLKIT_DIR$\inc\dlib\c\ysizet.h</file>
+      <file>$TOOLKIT_DIR$\inc\intrinsics.h</file>
+      <file>$PROJ_DIR$\..\MCU.cpp</file>
+      <file>$PROJ_DIR$\Debug\List\mbfunccoils.s90</file>
+      <file>$PROJ_DIR$\Debug\Obj\mbfunccoils.pbi</file>
+      <file>$PROJ_DIR$\Debug\List\porttimer.lst</file>
+      <file>$PROJ_DIR$\Debug\List\portserial.lst</file>
+      <file>$PROJ_DIR$\Debug\Obj\portserial.r90</file>
+      <file>$PROJ_DIR$\Debug\List\mbascii.lst</file>
+      <file>$PROJ_DIR$\Debug\Obj\mb.pbi</file>
+      <file>$PROJ_DIR$\Debug\List\mbfuncdisc.s90</file>
+      <file>$PROJ_DIR$\Debug\Obj\mbfuncdiag.r90</file>
+      <file>$PROJ_DIR$\..\modbus\functions\mbfuncdiag.cpp</file>
+      <file>$PROJ_DIR$\Debug\List\mbascii.s90</file>
+      <file>$PROJ_DIR$\Debug\Obj\mbtcp.r90</file>
+      <file>$PROJ_DIR$\Debug\Obj\mbfuncdiag.pbi</file>
+      <file>$PROJ_DIR$\..\modbus\functions\mbfuncdisc.cpp</file>
+      <file>$PROJ_DIR$\..\modbus\functions\mbfunccoils.cpp</file>
+      <file>$PROJ_DIR$\..\modbus\functions\mbfuncholding.cpp</file>
+      <file>$PROJ_DIR$\..\modbus\include\mbfunc.h</file>
+      <file>$PROJ_DIR$\Debug\Obj\mbtcp.pbi</file>
+      <file>$TOOLKIT_DIR$\inc\dlib\c\stdlib.h</file>
+      <file>$PROJ_DIR$\Debug\Obj\mbascii.r90</file>
+      <file>$PROJ_DIR$\..\windows.h</file>
+      <file>$PROJ_DIR$\Debug\List\MainUnit.s90</file>
+      <file>$PROJ_DIR$\..\Defines.h</file>
+      <file>$TOOLKIT_DIR$\inc\dlib\c\string.h</file>
+      <file>$TOOLKIT_DIR$\inc\iom16.h</file>
+      <file>$TOOLKIT_DIR$\inc\dlib\c\xencoding_limits.h</file>
+      <file>$TOOLKIT_DIR$\lib\dlib\dlAVR-3s-ec_mul-sf-n.h</file>
+      <file>$TOOLKIT_DIR$\inc\dlib\c\DLib_Defaults.h</file>
+      <file>$TOOLKIT_DIR$\inc\dlib\c\ystdio.h</file>
+      <file>$PROJ_DIR$\Debug\Obj\MCU.pbi</file>
+      <file>$PROJ_DIR$\..\port\portevent.cpp</file>
+      <file>$PROJ_DIR$\Debug\List\ISRList.s90</file>
+      <file>$PROJ_DIR$\Debug\Obj\mbascii.pbi</file>
+      <file>$PROJ_DIR$\..\modbus\functions\mbutils.cpp</file>
+      <file>$PROJ_DIR$\..\modbus\include\mbproto.h</file>
+      <file>$PROJ_DIR$\..\modbus\include\mbframe.h</file>
+      <file>$PROJ_DIR$\Debug\List\mbfuncdiag.lst</file>
+      <file>$PROJ_DIR$\Debug\List\mbfuncinput.lst</file>
+      <file>$PROJ_DIR$\Debug\List\mb.lst</file>
+      <file>$TOOLKIT_DIR$\inc\inavr.h</file>
+      <file>$PROJ_DIR$\..\ISRList.cpp</file>
+      <file>$TOOLKIT_DIR$\src\template\cfgm16.xcl</file>
+      <file>$PROJ_DIR$\Debug\List\Project.html</file>
+      <file>$PROJ_DIR$\..\Configuration.h</file>
+      <file>$TOOLKIT_DIR$\inc\dlib\c\pgmspace.h</file>
+      <file>$TOOLKIT_DIR$\inc\dlib\c\DLib_Product.h</file>
+      <file>$PROJ_DIR$\Debug\Obj\mbfuncother.r90</file>
+      <file>$PROJ_DIR$\Debug\Obj\mbfuncholding.pbi</file>
+      <file>$PROJ_DIR$\..\modbus\include\mbport.h</file>
+      <file>$PROJ_DIR$\Debug\List\mbfuncdiag.s90</file>
+      <file>$PROJ_DIR$\Debug\List\mbcrc.s90</file>
+      <file>$PROJ_DIR$\..\port\port.h</file>
+      <file>$PROJ_DIR$\..\modbus\include\mb.h</file>
+      <file>$PROJ_DIR$\Debug\Obj\mbfunccoils.r90</file>
+      <file>$PROJ_DIR$\Debug\List\mbfuncholding.lst</file>
+      <file>$PROJ_DIR$\..\iccout_ubrof8.d90</file>
+      <file>$PROJ_DIR$\..\port\porttimer.cpp</file>
+      <file>$PROJ_DIR$\Debug\Obj\mbutils.r90</file>
+      <file>$PROJ_DIR$\Debug\List\mbutils.s90</file>
+      <file>$PROJ_DIR$\Debug\Obj\porttimer.r90</file>
+      <file>$PROJ_DIR$\Debug\List\mbtcp.lst</file>
+      <file>$PROJ_DIR$\Debug\List\MCU.lst</file>
+      <file>$PROJ_DIR$\Debug\Obj\mbutils.pbi</file>
+      <file>$PROJ_DIR$\Debug\List\mbcrc.lst</file>
+      <file>$PROJ_DIR$\..\modbus\include\mbconfig.h</file>
+      <file>$PROJ_DIR$\Debug\Obj\mbcrc.pbi</file>
+      <file>$PROJ_DIR$\Debug\Obj\mbfuncinput.r90</file>
+      <file>$PROJ_DIR$\Debug\Obj\MCU.r90</file>
+      <file>$PROJ_DIR$\Debug\List\mbutils.lst</file>
+      <file>$PROJ_DIR$\..\modbus\tcp\mbtcp.cpp</file>
+      <file>$TOOLKIT_DIR$\src\template\cfg3soim.xcl</file>
+      <file>$PROJ_DIR$\Debug\Obj\MainUnit.r90</file>
+      <file>$TOOLKIT_DIR$\inc\dlib\c\DLib_Threads.h</file>
+      <file>$TOOLKIT_DIR$\inc\dlib\c\stdint.h</file>
+      <file>$PROJ_DIR$\Debug\Obj\Project.pbd</file>
+      <file>$TOOLKIT_DIR$\inc\bitdefinitions\iom16.inc</file>
+      <file>$TOOLKIT_DIR$\inc\comp_a90.h</file>
+      <file>$TOOLKIT_DIR$\inc\dlib\c\yvals.h</file>
+      <file>$TOOLKIT_DIR$\inc\dlib\c\stdarg.h</file>
+      <file>$PROJ_DIR$\Debug\Obj\mb.r90</file>
+      <file>$PROJ_DIR$\Debug\List\MCU.s90</file>
+      <file>$PROJ_DIR$\Debug\Obj\ISRList.pbi</file>
+      <file>$PROJ_DIR$\Debug\List\MainUnit.lst</file>
+      <file>$PROJ_DIR$\..\Version.h</file>
+      <file>$PROJ_DIR$\..\MainUnit.h</file>
+      <file>$TOOLKIT_DIR$\inc\dlib\c\ycheck.h</file>
+      <file>$PROJ_DIR$\Debug\List\mbfuncinput.s90</file>
+      <file>$PROJ_DIR$\..\modbus\rtu\mbcrc.cpp</file>
+      <file>$PROJ_DIR$\..\modbus\functions\mbfuncinput.cpp</file>
+      <file>$PROJ_DIR$\..\modbus\ascii\mbascii.h</file>
+      <file>$PROJ_DIR$\Debug\Obj\mbfuncdisc.r90</file>
+      <file>$PROJ_DIR$\Debug\Obj\mbfuncother.pbi</file>
+      <file>$PROJ_DIR$\..\modbus\rtu\mbrtu.cpp</file>
+      <file>$PROJ_DIR$\Debug\List\portevent.lst</file>
+      <file>$PROJ_DIR$\Debug\List\mbfuncdisc.lst</file>
+      <file>$PROJ_DIR$\Debug\Obj\mbrtu.r90</file>
+      <file>$TOOLKIT_DIR$\inc\ina90.h</file>
+      <file>$PROJ_DIR$\Debug\List\porttimer.s90</file>
+      <file>$PROJ_DIR$\Debug\List\mbtcp.s90</file>
+      <file>$PROJ_DIR$\Debug\List\mbrtu.s90</file>
+      <file>$PROJ_DIR$\..\modbus\tcp\mbtcp.h</file>
+      <file>$PROJ_DIR$\Debug\Obj\mbcrc.r90</file>
+      <file>$PROJ_DIR$\Debug\List\portserial.s90</file>
+      <file>$PROJ_DIR$\Debug\Obj\portevent.r90</file>
+      <file>$PROJ_DIR$\Debug\Obj\portevent.pbi</file>
+      <file>$PROJ_DIR$\Debug\Obj\mbfuncinput.pbi</file>
+      <file>$PROJ_DIR$\..\modbus\functions\mbfuncother.cpp</file>
+      <file>$PROJ_DIR$\Debug\Obj\mbrtu.pbi</file>
+      <file>$PROJ_DIR$\..\modbus\rtu\mbrtu.h</file>
+      <file>$PROJ_DIR$\Debug\Obj\porttimer.pbi</file>
+      <file>$PROJ_DIR$\Debug\List\mb.s90</file>
+      <file>$PROJ_DIR$\Debug\List\mbfuncother.s90</file>
+      <file>$PROJ_DIR$\Debug\List\mbrtu.lst</file>
+      <file>$PROJ_DIR$\Debug\Obj\mbfuncholding.r90</file>
+      <file>$PROJ_DIR$\..\port\portserial.cpp</file>
+      <file>$PROJ_DIR$\Debug\List\mbfunccoils.lst</file>
+      <file>$PROJ_DIR$\Debug\List\mbfuncholding.s90</file>
+      <file>$PROJ_DIR$\..\modbus\mb.cpp</file>
+      <file>$PROJ_DIR$\..\modbus\ascii\mbascii.cpp</file>
+      <file>$TOOLKIT_DIR$\inc\iomacro.h</file>
+      <file>$TOOLKIT_DIR$\lib\dlib\dlAVR-3s-ec_mul-sf-n.r90</file>
+      <file>$PROJ_DIR$\Debug\List\portevent.s90</file>
+      <file>$PROJ_DIR$\Debug\Obj\portserial.pbi</file>
+      <file>$PROJ_DIR$\..\modbus\rtu\mbcrc.h</file>
+      <file>$PROJ_DIR$\Debug\List\mbfuncother.lst</file>
+    </outputs>
+    <file>
+      <name>$PROJ_DIR$\..\Project.hex</name>
+      <outputs>
+        <tool>
+          <name>XLINK</name>
+          <file> 53 66</file>
+        </tool>
+      </outputs>
+      <inputs>
+        <tool>
+          <name>XLINK</name>
+          <file> 52 81 2 78 82 90 30 112 64 19 101 124 77 57 106 22 68 114 15 70 131</file>
+        </tool>
+      </inputs>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\..\MainUnit.cpp</name>
+      <outputs>
+        <tool>
+          <name>ICCAVR</name>
+          <file> 32 93 82</file>
+        </tool>
+        <tool>
+          <name>BICOMP</name>
+          <file> 5</file>
+        </tool>
+      </outputs>
+      <inputs>
+        <tool>
+          <name>ICCAVR</name>
+          <file> 33 9 84 96 88 38 37 56 36 83 55 34 8 7 39 89 29 35 130 86 107 50 87 31 54 6 95</file>
+        </tool>
+      </inputs>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\..\MCU.cpp</name>
+      <outputs>
+        <tool>
+          <name>ICCAVR</name>
+          <file> 91 72 78</file>
+        </tool>
+        <tool>
+          <name>BICOMP</name>
+          <file> 40</file>
+        </tool>
+      </outputs>
+      <inputs>
+        <tool>
+          <name>ICCAVR</name>
+          <file> 33 9 84 96 88 38 37 56 36 83 55 34 8 7 39 89 29 35 130 86 107 50 87 31 54 94 63 62 59 45 6</file>
+        </tool>
+      </inputs>
+    </file>
+    <file>
+      <name>[ROOT_NODE]</name>
+      <outputs>
+        <tool>
+          <name>XLINK</name>
+          <file> 0 53 66</file>
+        </tool>
+      </outputs>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\..\modbus\functions\mbfuncdiag.cpp</name>
+      <outputs>
+        <tool>
+          <name>ICCAVR</name>
+          <file> 60 47 19</file>
+        </tool>
+        <tool>
+          <name>BICOMP</name>
+          <file> 23</file>
+        </tool>
+      </outputs>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\..\modbus\functions\mbfuncdisc.cpp</name>
+      <outputs>
+        <tool>
+          <name>ICCAVR</name>
+          <file> 18 105 101</file>
+        </tool>
+        <tool>
+          <name>BICOMP</name>
+          <file> 3</file>
+        </tool>
+      </outputs>
+      <inputs>
+        <tool>
+          <name>ICCAVR</name>
+          <file> 29 96 88 38 37 56 36 83 8 34 62 33 9 84 55 7 39 89 35 130 86 107 50 87 31 63 59 45 46 75</file>
+        </tool>
+        <tool>
+          <name>BICOMP</name>
+          <file> 29 96 88 38 56 36 83 8 34 62 33 9 84 55 7 39 89 35 130 86 107 50 87 31 63 59 45 46 75</file>
+        </tool>
+      </inputs>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\..\modbus\functions\mbfunccoils.cpp</name>
+      <outputs>
+        <tool>
+          <name>ICCAVR</name>
+          <file> 11 126 64</file>
+        </tool>
+        <tool>
+          <name>BICOMP</name>
+          <file> 12</file>
+        </tool>
+      </outputs>
+      <inputs>
+        <tool>
+          <name>ICCAVR</name>
+          <file> 29 96 88 38 37 56 36 83 8 34 62 33 9 84 55 7 39 89 35 130 86 107 50 87 31 63 59 45 46 75</file>
+        </tool>
+        <tool>
+          <name>BICOMP</name>
+          <file> 29 96 88 38 56 36 83 8 34 62 33 9 84 55 7 39 89 35 130 86 107 50 87 31 63 59 45 46 75</file>
+        </tool>
+      </inputs>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\..\modbus\functions\mbfuncholding.cpp</name>
+      <outputs>
+        <tool>
+          <name>ICCAVR</name>
+          <file> 127 65 124</file>
+        </tool>
+        <tool>
+          <name>BICOMP</name>
+          <file> 58</file>
+        </tool>
+      </outputs>
+      <inputs>
+        <tool>
+          <name>ICCAVR</name>
+          <file> 29 96 88 38 37 56 36 83 8 34 62 33 9 84 55 7 39 89 35 130 86 107 50 87 31 63 59 45 46 75</file>
+        </tool>
+        <tool>
+          <name>BICOMP</name>
+          <file> 29 96 88 38 56 36 83 8 34 62 33 9 84 55 7 39 89 35 130 86 107 50 87 31 63 59 45 46 75</file>
+        </tool>
+      </inputs>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\..\port\portevent.cpp</name>
+      <outputs>
+        <tool>
+          <name>ICCAVR</name>
+          <file> 132 104 114</file>
+        </tool>
+        <tool>
+          <name>BICOMP</name>
+          <file> 115</file>
+        </tool>
+      </outputs>
+      <inputs>
+        <tool>
+          <name>ICCAVR</name>
+          <file> 63 62 33 9 84 96 88 38 37 56 36 83 55 34 8 7 39 89 29 35 130 86 107 50 87 31 59 45</file>
+        </tool>
+      </inputs>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\..\modbus\functions\mbutils.cpp</name>
+      <outputs>
+        <tool>
+          <name>ICCAVR</name>
+          <file> 69 79 68</file>
+        </tool>
+        <tool>
+          <name>BICOMP</name>
+          <file> 73</file>
+        </tool>
+      </outputs>
+      <inputs>
+        <tool>
+          <name>ICCAVR</name>
+          <file> 29 96 88 38 37 56 36 83 8 34 62 33 9 84 55 7 39 89 35 130 86 107 50 87 31 63 59 45</file>
+        </tool>
+        <tool>
+          <name>BICOMP</name>
+          <file> 29 96 88 38 56 36 83 8 34 62 33 9 84 55 7 39 89 35 130 86 107 50 87 31 63 59 45</file>
+        </tool>
+      </inputs>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\..\ISRList.cpp</name>
+      <outputs>
+        <tool>
+          <name>ICCAVR</name>
+          <file> 42 1 2</file>
+        </tool>
+        <tool>
+          <name>BICOMP</name>
+          <file> 92</file>
+        </tool>
+      </outputs>
+      <inputs>
+        <tool>
+          <name>ICCAVR</name>
+          <file> 33 9 84 96 88 38 37 56 36 83 55 34 8 7 39 89 29 35 130 86 107 50 87 31 54 6</file>
+        </tool>
+      </inputs>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\..\port\porttimer.cpp</name>
+      <outputs>
+        <tool>
+          <name>ICCAVR</name>
+          <file> 108 13 70</file>
+        </tool>
+        <tool>
+          <name>BICOMP</name>
+          <file> 120</file>
+        </tool>
+      </outputs>
+      <inputs>
+        <tool>
+          <name>ICCAVR</name>
+          <file> 33 9 84 96 88 38 37 56 36 83 55 34 8 7 39 89 29 35 130 86 107 50 87 31 54 62 63 59 45</file>
+        </tool>
+      </inputs>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\..\modbus\tcp\mbtcp.cpp</name>
+      <outputs>
+        <tool>
+          <name>ICCAVR</name>
+          <file> 109 71 22</file>
+        </tool>
+        <tool>
+          <name>BICOMP</name>
+          <file> 28</file>
+        </tool>
+      </outputs>
+      <inputs>
+        <tool>
+          <name>ICCAVR</name>
+          <file> 29 96 88 38 37 56 36 83 8 34 62 33 9 84 55 7 39 89 35 130 86 107 50 87 31 63 59 45 75 111 46</file>
+        </tool>
+      </inputs>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\..\modbus\rtu\mbcrc.cpp</name>
+      <outputs>
+        <tool>
+          <name>ICCAVR</name>
+          <file> 61 74 112</file>
+        </tool>
+        <tool>
+          <name>BICOMP</name>
+          <file> 76</file>
+        </tool>
+      </outputs>
+      <inputs>
+        <tool>
+          <name>ICCAVR</name>
+          <file> 62 33 9 84 96 88 38 37 56 36 83 55 34 8 7 39 89 29 35 130 86 107 50 87 31</file>
+        </tool>
+        <tool>
+          <name>BICOMP</name>
+          <file> 62 33 9 84 96 88 38 56 36 83 55 34 8 7 39 89 29 35 130 86 107 50 87 31</file>
+        </tool>
+      </inputs>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\..\modbus\functions\mbfuncinput.cpp</name>
+      <outputs>
+        <tool>
+          <name>ICCAVR</name>
+          <file> 97 48 77</file>
+        </tool>
+        <tool>
+          <name>BICOMP</name>
+          <file> 116</file>
+        </tool>
+      </outputs>
+      <inputs>
+        <tool>
+          <name>ICCAVR</name>
+          <file> 29 96 88 38 37 56 36 83 8 34 62 33 9 84 55 7 39 89 35 130 86 107 50 87 31 63 59 45 46 75</file>
+        </tool>
+        <tool>
+          <name>BICOMP</name>
+          <file> 29 96 88 38 56 36 83 8 34 62 33 9 84 55 7 39 89 35 130 86 107 50 87 31 63 59 45 46 75</file>
+        </tool>
+      </inputs>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\..\modbus\rtu\mbrtu.cpp</name>
+      <outputs>
+        <tool>
+          <name>ICCAVR</name>
+          <file> 110 123 106</file>
+        </tool>
+        <tool>
+          <name>BICOMP</name>
+          <file> 118</file>
+        </tool>
+      </outputs>
+      <inputs>
+        <tool>
+          <name>ICCAVR</name>
+          <file> 29 96 88 38 37 56 36 83 8 34 62 33 9 84 55 7 39 89 35 130 86 107 50 87 31 63 59 45 119 46 134</file>
+        </tool>
+        <tool>
+          <name>BICOMP</name>
+          <file> 29 96 88 38 56 36 83 8 34 62 33 9 84 55 7 39 89 35 130 86 107 50 87 31 63 59 45 119 46 134</file>
+        </tool>
+      </inputs>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\..\modbus\functions\mbfuncother.cpp</name>
+      <outputs>
+        <tool>
+          <name>ICCAVR</name>
+          <file> 122 135 57</file>
+        </tool>
+        <tool>
+          <name>BICOMP</name>
+          <file> 102</file>
+        </tool>
+      </outputs>
+      <inputs>
+        <tool>
+          <name>ICCAVR</name>
+          <file> 29 96 88 38 37 56 36 83 8 34 62 33 9 84 55 7 39 89 35 130 86 107 50 87 31 63 59 45 46 75</file>
+        </tool>
+        <tool>
+          <name>BICOMP</name>
+          <file> 29 96 88 38 56 36 83 8 34 62 33 9 84 55 7 39 89 35 130 86 107 50 87 31 63 59 45 46 75</file>
+        </tool>
+      </inputs>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\..\port\portserial.cpp</name>
+      <outputs>
+        <tool>
+          <name>ICCAVR</name>
+          <file> 113 14 15</file>
+        </tool>
+        <tool>
+          <name>BICOMP</name>
+          <file> 133</file>
+        </tool>
+      </outputs>
+      <inputs>
+        <tool>
+          <name>ICCAVR</name>
+          <file> 33 9 84 96 88 38 37 56 36 83 55 34 8 7 39 89 29 35 130 86 107 50 87 31 54 62 63 59 45</file>
+        </tool>
+      </inputs>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\..\modbus\mb.cpp</name>
+      <outputs>
+        <tool>
+          <name>ICCAVR</name>
+          <file> 121 49 90</file>
+        </tool>
+        <tool>
+          <name>BICOMP</name>
+          <file> 17</file>
+        </tool>
+      </outputs>
+      <inputs>
+        <tool>
+          <name>ICCAVR</name>
+          <file> 29 96 88 38 37 56 36 83 8 34 33 9 84 55 7 39 89 35 130 86 107 50 87 31 62 63 59 45 75 46 27 119 100</file>
+        </tool>
+      </inputs>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\..\modbus\ascii\mbascii.cpp</name>
+      <outputs>
+        <tool>
+          <name>ICCAVR</name>
+          <file> 21 16 30</file>
+        </tool>
+        <tool>
+          <name>BICOMP</name>
+          <file> 43</file>
+        </tool>
+      </outputs>
+      <inputs>
+        <tool>
+          <name>ICCAVR</name>
+          <file> 29 96 88 38 37 56 36 83 8 34 62 33 9 84 55 7 39 89 35 130 86 107 50 87 31 63 59 45 75 100 46 134</file>
+        </tool>
+        <tool>
+          <name>BICOMP</name>
+          <file> 29 96 88 38 56 36 83 8 34 62 33 9 84 55 7 39 89 35 130 86 107 50 87 31 63 59 45 75 100 46 134</file>
+        </tool>
+      </inputs>
+    </file>
+  </configuration>
+  <configuration>
+    <name>Release</name>
+    <outputs>
+      <file>$PROJ_DIR$\Release\Obj\MainUnit.r90</file>
+      <file>$PROJ_DIR$\UserInterfaceUnit.h</file>
+      <file>$PROJ_DIR$\ADCUnit.h</file>
+      <file>$PROJ_DIR$\Release\Obj\RelayUnit.r90</file>
+      <file>$PROJ_DIR$\Release\Obj\ModBusRegisterInputCoil.r90</file>
+      <file>$TOOLKIT_DIR$\inc\dlib\stdarg.h</file>
+      <file>$PROJ_DIR$\Release\Obj\RelayUnit.pbi</file>
+      <file>$PROJ_DIR$\MainArchive.cpp</file>
+      <file>$PROJ_DIR$\SystemUnit.h</file>
+      <file>$PROJ_DIR$\Release\Obj\DigitalInputUnit.r90</file>
+      <file>$PROJ_DIR$\ModBusRegisterDigital.cpp</file>
+      <file>$PROJ_DIR$\ModBusUnit.h</file>
+      <file>$PROJ_DIR$\SettingsUnit.h</file>
+      <file>$PROJ_DIR$\Release\Obj\MainArchive.r90</file>
+      <file>$PROJ_DIR$\SinchronizeMemoryUnit.cpp</file>
+      <file>$PROJ_DIR$\Release\Obj\ModBusUnit.pbi</file>
+      <file>$PROJ_DIR$\Release\Obj\UserInterfaceUnit.r90</file>
+      <file>$TOOLKIT_DIR$\inc\dlib\math.h</file>
+      <file>$PROJ_DIR$\initsubs.cpp</file>
+      <file>$PROJ_DIR$\DisplayUnit.cpp</file>
+      <file>$PROJ_DIR$\Defines.h</file>
+      <file>$PROJ_DIR$\UserInterfaceFunctionUnit.cpp</file>
+      <file>$PROJ_DIR$\Release\Obj\SettingsUnit.pbi</file>
+      <file>$PROJ_DIR$\ModBusUnit.cpp</file>
+      <file>$TOOLKIT_DIR$\inc\intrinsics.h</file>
+      <file>$PROJ_DIR$\ModBusRegisterCoil.cpp</file>
+      <file>$PROJ_DIR$\StringExtended.cpp</file>
+      <file>$PROJ_DIR$\Release\Obj\ExternFlashUnit.pbi</file>
+      <file>$PROJ_DIR$\Release\Obj\ModBusRegisterCoil.r90</file>
+      <file>$PROJ_DIR$\MMCCardUnit.cpp</file>
+      <file>$PROJ_DIR$\Release\Obj\ModBusRegisterDigital.r90</file>
+      <file>$PROJ_DIR$\TimeChipUnit.h</file>
+      <file>$PROJ_DIR$\Release\Obj\MMCCardUnit.r90</file>
+      <file>$PROJ_DIR$\Release\Obj\I2CUnit.pbi</file>
+      <file>$PROJ_DIR$\Release\Obj\ADCUnit.pbi</file>
+      <file>$PROJ_DIR$\Release\Obj\DisplayUnit.pbi</file>
+      <file>$PROJ_DIR$\TimeChipUnit.cpp</file>
+      <file>$TOOLKIT_DIR$\inc\dlib\ycheck.h</file>
+      <file>$PROJ_DIR$\MainUnit.cpp</file>
+      <file>$TOOLKIT_DIR$\inc\dlib\xencoding_limits.h</file>
+      <file>$PROJ_DIR$\MainArchive.h</file>
+      <file>$PROJ_DIR$\Release\Obj\IV5IV6Unit.r90</file>
+      <file>$PROJ_DIR$\SoftTimers.h</file>
+      <file>$PROJ_DIR$\Release\Obj\SettingsUnit.r90</file>
+      <file>$TOOLKIT_DIR$\inc\dlib\string.h</file>
+      <file>$PROJ_DIR$\Release\Obj\SystemUnit.pbi</file>
+      <file>$PROJ_DIR$\RelayUnit.cpp</file>
+      <file>$PROJ_DIR$\Release\Obj\SoftTimers.r90</file>
+      <file>$PROJ_DIR$\Release\Obj\ModBusRegisterCoil.pbi</file>
+      <file>$PROJ_DIR$\Release\Obj\I2CUnit.r90</file>
+      <file>$PROJ_DIR$\Release\Obj\DisplayUnit.r90</file>
+      <file>$PROJ_DIR$\StringsTable.h</file>
+      <file>$PROJ_DIR$\DisplayUnit.h</file>
+      <file>$PROJ_DIR$\Release\Obj\ExternFlashUnit.r90</file>
+      <file>$PROJ_DIR$\ArchivesUnit.h</file>
+      <file>$PROJ_DIR$\Release\Obj\SinchronizeMemoryUnit.pbi</file>
+      <file>$PROJ_DIR$\Release\Obj\ArchivesUnit.pbi</file>
+      <file>$PROJ_DIR$\SinchronizeMemoryUnit.h</file>
+      <file>$PROJ_DIR$\StringExtended.h</file>
+      <file>$PROJ_DIR$\Release\Obj\ModBusArchives.r90</file>
+      <file>$TOOLKIT_DIR$\inc\inavr.h</file>
+      <file>$PROJ_DIR$\Release\Obj\MainArchive.pbi</file>
+      <file>$PROJ_DIR$\initsubs.h</file>
+      <file>$TOOLKIT_DIR$\inc\bitdefinitions\iom128.inc</file>
+      <file>$PROJ_DIR$\Release\Obj\MenuClassesUnit.pbi</file>
+      <file>$TOOLKIT_DIR$\inc\dlib\ymath.h</file>
+      <file>$TOOLKIT_DIR$\inc\dlib\stdint.h</file>
+      <file>$PROJ_DIR$\Release\Obj\TimeChipUnit.pbi</file>
+      <file>$PROJ_DIR$\Release\Obj\ModBusRegisterInputCoil.pbi</file>
+      <file>$PROJ_DIR$\Release\Obj\StringExtended.pbi</file>
+      <file>$PROJ_DIR$\MenuClassesUnit.cpp</file>
+      <file>$PROJ_DIR$\Release\Obj\AnalogChannelFormulUnit.pbi</file>
+      <file>$PROJ_DIR$\ModBusRegisterInputCoil.cpp</file>
+      <file>$PROJ_DIR$\Release\Obj\ArchivesUnit.r90</file>
+      <file>$PROJ_DIR$\SoftTimers.cpp</file>
+      <file>$PROJ_DIR$\Release\Obj\StringExtended.r90</file>
+      <file>$PROJ_DIR$\UserInterfaceUnit.cpp</file>
+      <file>$TOOLKIT_DIR$\inc\iom128.h</file>
+      <file>$PROJ_DIR$\Release\Exe\bl_mva_8.a90</file>
+      <file>$PROJ_DIR$\Release\Obj\AnalogChannelFormulUnit.r90</file>
+      <file>$PROJ_DIR$\SettingsUnit.cpp</file>
+      <file>$PROJ_DIR$\Release\Obj\MainUnit.pbi</file>
+      <file>$PROJ_DIR$\SystemUnit.cpp</file>
+      <file>$TOOLKIT_DIR$\inc\dlib\DLib_Product.h</file>
+      <file>$PROJ_DIR$\AnalogChannelFormulUnit.h</file>
+      <file>$PROJ_DIR$\MenuClassesUnit.h</file>
+      <file>$PROJ_DIR$\Release\Obj\IV5IV6Unit.pbi</file>
+      <file>$TOOLKIT_DIR$\inc\dlib\ysizet.h</file>
+      <file>$TOOLKIT_DIR$\inc\comp_a90.h</file>
+      <file>$PROJ_DIR$\DigitalInputUnit.cpp</file>
+      <file>$PROJ_DIR$\Release\Obj\TimeChipUnit.r90</file>
+      <file>$PROJ_DIR$\MMCCardUnit.h</file>
+      <file>$PROJ_DIR$\Release\Obj\MMCCardUnit.pbi</file>
+      <file>$PROJ_DIR$\Release\Obj\UserInterfaceUnit.pbi</file>
+      <file>$PROJ_DIR$\DigitalInputUnit.h</file>
+      <file>$PROJ_DIR$\Release\Obj\UserInterfaceFunctionUnit.pbi</file>
+      <file>$PROJ_DIR$\ExternFlashUnit.h</file>
+      <file>$PROJ_DIR$\Release\Obj\ModBusUnit.r90</file>
+      <file>$PROJ_DIR$\IV5IV6Unit.cpp</file>
+      <file>$TOOLKIT_DIR$\inc\dlib\stdio.h</file>
+      <file>$PROJ_DIR$\resource.h</file>
+      <file>$PROJ_DIR$\MainUnit.h</file>
+      <file>$PROJ_DIR$\IV5IV6Unit.h</file>
+      <file>$PROJ_DIR$\UserInterfaceFunctionUnit.h</file>
+      <file>$TOOLKIT_DIR$\inc\dlib\DLib_Threads.h</file>
+      <file>$PROJ_DIR$\Release\Obj\DigitalInputUnit.pbi</file>
+      <file>$TOOLKIT_DIR$\inc\ina90.h</file>
+      <file>$PROJ_DIR$\Release\Obj\initsubs.pbi</file>
+      <file>$PROJ_DIR$\I2CUnit.cpp</file>
+      <file>$PROJ_DIR$\RelayUnit.h</file>
+      <file>$PROJ_DIR$\ADCUnit.cpp</file>
+      <file>$PROJ_DIR$\Release\Obj\SinchronizeMemoryUnit.r90</file>
+      <file>$PROJ_DIR$\I2CUnit.h</file>
+      <file>$PROJ_DIR$\Release\Obj\ModBusRegisterDigital.pbi</file>
+      <file>$PROJ_DIR$\Release\Obj\ADCUnit.r90</file>
+      <file>$PROJ_DIR$\Release\Obj\SystemUnit.r90</file>
+      <file>$PROJ_DIR$\ArchivesUnit.cpp</file>
+      <file>$PROJ_DIR$\Release\Obj\UserInterfaceFunctionUnit.r90</file>
+      <file>$PROJ_DIR$\Release\Obj\MenuClassesUnit.r90</file>
+      <file>$PROJ_DIR$\ExternFlashUnit.cpp</file>
+      <file>$TOOLKIT_DIR$\inc\dlib\yvals.h</file>
+      <file>$PROJ_DIR$\Release\Obj\bl_mva_8.pbd</file>
+      <file>$PROJ_DIR$\AnalogChannelFormulUnit.cpp</file>
+      <file>$PROJ_DIR$\Release\Obj\ModBusArchives.pbi</file>
+      <file>$PROJ_DIR$\Release\Obj\SoftTimers.pbi</file>
+      <file>$PROJ_DIR$\ModBusArchives.cpp</file>
+      <file>$PROJ_DIR$\Release\Obj\initsubs.r90</file>
+      <file>$TOOLKIT_DIR$\inc\dlib\DLib_Defaults.h</file>
+      <file>$TOOLKIT_DIR$\inc\iomacro.h</file>
+    </outputs>
+    <file>
+      <name>$PROJ_DIR$\MainArchive.cpp</name>
+      <outputs>
+        <tool>
+          <name>ICCAVR</name>
+          <file> 13</file>
+        </tool>
+        <tool>
+          <name>BICOMP</name>
+          <file> 61</file>
+        </tool>
+      </outputs>
+      <inputs>
+        <tool>
+          <name>BICOMP</name>
+          <file> 20 66 37 120 127 83 39 104 77 128 63 106 60 24 88 100 40 31 54 91 96 12 84 94 109 44 87</file>
+        </tool>
+      </inputs>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\ModBusRegisterDigital.cpp</name>
+      <outputs>
+        <tool>
+          <name>ICCAVR</name>
+          <file> 30</file>
+        </tool>
+        <tool>
+          <name>BICOMP</name>
+          <file> 113</file>
+        </tool>
+      </outputs>
+      <inputs>
+        <tool>
+          <name>BICOMP</name>
+          <file> 20 66 37 120 127 83 39 104 77 128 63 106 60 24 88 100 11 31 12 84 54 44 87</file>
+        </tool>
+      </inputs>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\SinchronizeMemoryUnit.cpp</name>
+      <outputs>
+        <tool>
+          <name>ICCAVR</name>
+          <file> 111</file>
+        </tool>
+        <tool>
+          <name>BICOMP</name>
+          <file> 55</file>
+        </tool>
+      </outputs>
+      <inputs>
+        <tool>
+          <name>BICOMP</name>
+          <file> 20 66 37 120 127 83 39 104 77 128 63 106 60 24 88 100 57 96 31 44 87</file>
+        </tool>
+      </inputs>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\initsubs.cpp</name>
+      <outputs>
+        <tool>
+          <name>ICCAVR</name>
+          <file> 126</file>
+        </tool>
+        <tool>
+          <name>BICOMP</name>
+          <file> 107</file>
+        </tool>
+      </outputs>
+      <inputs>
+        <tool>
+          <name>BICOMP</name>
+          <file> 20 66 37 120 127 83 39 104 77 128 63 106 60 24 88 100 62</file>
+        </tool>
+      </inputs>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\DisplayUnit.cpp</name>
+      <outputs>
+        <tool>
+          <name>ICCAVR</name>
+          <file> 50</file>
+        </tool>
+        <tool>
+          <name>BICOMP</name>
+          <file> 35</file>
+        </tool>
+      </outputs>
+      <inputs>
+        <tool>
+          <name>BICOMP</name>
+          <file> 20 66 37 120 127 83 39 104 77 128 63 106 60 24 88 100 52 8</file>
+        </tool>
+      </inputs>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\UserInterfaceFunctionUnit.cpp</name>
+      <outputs>
+        <tool>
+          <name>ICCAVR</name>
+          <file> 117</file>
+        </tool>
+        <tool>
+          <name>BICOMP</name>
+          <file> 95</file>
+        </tool>
+      </outputs>
+      <inputs>
+        <tool>
+          <name>BICOMP</name>
+          <file> 20 66 37 120 127 83 39 104 77 128 63 106 60 24 88 100 1 85 103 52 31 84 96 12 54 2 102 109 11 94 17 65 99 87 58 44 91</file>
+        </tool>
+      </inputs>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\ModBusUnit.cpp</name>
+      <outputs>
+        <tool>
+          <name>ICCAVR</name>
+          <file> 97</file>
+        </tool>
+        <tool>
+          <name>BICOMP</name>
+          <file> 15</file>
+        </tool>
+      </outputs>
+      <inputs>
+        <tool>
+          <name>BICOMP</name>
+          <file> 20 66 37 120 127 83 39 104 77 128 63 106 60 24 88 100 11 12</file>
+        </tool>
+      </inputs>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\ModBusRegisterCoil.cpp</name>
+      <outputs>
+        <tool>
+          <name>ICCAVR</name>
+          <file> 28</file>
+        </tool>
+        <tool>
+          <name>BICOMP</name>
+          <file> 48</file>
+        </tool>
+      </outputs>
+      <inputs>
+        <tool>
+          <name>BICOMP</name>
+          <file> 20 66 37 120 127 83 39 104 77 128 63 106 60 24 88 100 11 12 109</file>
+        </tool>
+      </inputs>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\StringExtended.cpp</name>
+      <outputs>
+        <tool>
+          <name>ICCAVR</name>
+          <file> 75</file>
+        </tool>
+        <tool>
+          <name>BICOMP</name>
+          <file> 69</file>
+        </tool>
+      </outputs>
+      <inputs>
+        <tool>
+          <name>BICOMP</name>
+          <file> 20 66 37 120 127 83 39 104 77 128 63 106 60 24 88 100 58 44 87 99 5</file>
+        </tool>
+      </inputs>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\MMCCardUnit.cpp</name>
+      <outputs>
+        <tool>
+          <name>ICCAVR</name>
+          <file> 32</file>
+        </tool>
+        <tool>
+          <name>BICOMP</name>
+          <file> 92</file>
+        </tool>
+      </outputs>
+      <inputs>
+        <tool>
+          <name>BICOMP</name>
+          <file> 20 66 37 120 127 83 39 104 77 128 63 106 60 24 88 100 91 96 8</file>
+        </tool>
+      </inputs>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\TimeChipUnit.cpp</name>
+      <outputs>
+        <tool>
+          <name>ICCAVR</name>
+          <file> 90</file>
+        </tool>
+        <tool>
+          <name>BICOMP</name>
+          <file> 67</file>
+        </tool>
+      </outputs>
+      <inputs>
+        <tool>
+          <name>BICOMP</name>
+          <file> 20 66 37 120 127 83 39 104 77 128 63 106 60 24 88 100 31 44 87</file>
+        </tool>
+      </inputs>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\MainUnit.cpp</name>
+      <outputs>
+        <tool>
+          <name>ICCAVR</name>
+          <file> 0</file>
+        </tool>
+        <tool>
+          <name>BICOMP</name>
+          <file> 81</file>
+        </tool>
+      </outputs>
+      <inputs>
+        <tool>
+          <name>BICOMP</name>
+          <file> 20 66 37 120 127 83 39 104 77 128 63 106 60 24 88 100 101 8 102 31 91 96 2 52 12 84 109 44 87</file>
+        </tool>
+      </inputs>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\RelayUnit.cpp</name>
+      <outputs>
+        <tool>
+          <name>ICCAVR</name>
+          <file> 3</file>
+        </tool>
+        <tool>
+          <name>BICOMP</name>
+          <file> 6</file>
+        </tool>
+      </outputs>
+      <inputs>
+        <tool>
+          <name>BICOMP</name>
+          <file> 20 66 37 120 127 83 39 104 77 128 63 106 60 24 88 100 109 44 87</file>
+        </tool>
+      </inputs>
+    </file>
+    <file>
+      <name>[ROOT_NODE]</name>
+      <outputs>
+        <tool>
+          <name>XLINK</name>
+          <file> 78</file>
+        </tool>
+      </outputs>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\MenuClassesUnit.cpp</name>
+      <outputs>
+        <tool>
+          <name>ICCAVR</name>
+          <file> 118</file>
+        </tool>
+        <tool>
+          <name>BICOMP</name>
+          <file> 64</file>
+        </tool>
+      </outputs>
+      <inputs>
+        <tool>
+          <name>BICOMP</name>
+          <file> 20 66 37 120 127 83 39 104 77 128 63 106 60 24 88 100 85 52 102 12 17 65 99 87</file>
+        </tool>
+      </inputs>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\ModBusRegisterInputCoil.cpp</name>
+      <outputs>
+        <tool>
+          <name>ICCAVR</name>
+          <file> 4</file>
+        </tool>
+        <tool>
+          <name>BICOMP</name>
+          <file> 68</file>
+        </tool>
+      </outputs>
+      <inputs>
+        <tool>
+          <name>BICOMP</name>
+          <file> 20 66 37 120 127 83 39 104 77 128 63 106 60 24 88 100 11 12 94 84</file>
+        </tool>
+      </inputs>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\SoftTimers.cpp</name>
+      <outputs>
+        <tool>
+          <name>ICCAVR</name>
+          <file> 47</file>
+        </tool>
+        <tool>
+          <name>BICOMP</name>
+          <file> 124</file>
+        </tool>
+      </outputs>
+      <inputs>
+        <tool>
+          <name>BICOMP</name>
+          <file> 20 66 37 120 127 83 39 104 77 128 63 106 60 24 88 100 42</file>
+        </tool>
+      </inputs>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\UserInterfaceUnit.cpp</name>
+      <outputs>
+        <tool>
+          <name>ICCAVR</name>
+          <file> 16</file>
+        </tool>
+        <tool>
+          <name>BICOMP</name>
+          <file> 93</file>
+        </tool>
+      </outputs>
+      <inputs>
+        <tool>
+          <name>BICOMP</name>
+          <file> 20 66 37 120 127 83 39 104 77 128 63 106 60 24 88 100 51 1 85 103 17 65 99 87</file>
+        </tool>
+      </inputs>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\SettingsUnit.cpp</name>
+      <outputs>
+        <tool>
+          <name>ICCAVR</name>
+          <file> 43</file>
+        </tool>
+        <tool>
+          <name>BICOMP</name>
+          <file> 22</file>
+        </tool>
+      </outputs>
+      <inputs>
+        <tool>
+          <name>BICOMP</name>
+          <file> 20 66 37 120 127 83 39 104 77 128 63 106 60 24 88 100 12 57 96 84 91 17 65</file>
+        </tool>
+      </inputs>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\SystemUnit.cpp</name>
+      <outputs>
+        <tool>
+          <name>ICCAVR</name>
+          <file> 115</file>
+        </tool>
+        <tool>
+          <name>BICOMP</name>
+          <file> 45</file>
+        </tool>
+      </outputs>
+      <inputs>
+        <tool>
+          <name>BICOMP</name>
+          <file> 20 66 37 120 127 83 39 104 77 128 63 106 60 24 88 100 8 52 31 102 109 12 94 2 11 85 103 84 57 54</file>
+        </tool>
+      </inputs>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\DigitalInputUnit.cpp</name>
+      <outputs>
+        <tool>
+          <name>ICCAVR</name>
+          <file> 9</file>
+        </tool>
+        <tool>
+          <name>BICOMP</name>
+          <file> 105</file>
+        </tool>
+      </outputs>
+      <inputs>
+        <tool>
+          <name>BICOMP</name>
+          <file> 20 66 37 120 127 83 39 104 77 128 63 106 60 24 88 100 94 12</file>
+        </tool>
+      </inputs>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\IV5IV6Unit.cpp</name>
+      <outputs>
+        <tool>
+          <name>ICCAVR</name>
+          <file> 41</file>
+        </tool>
+        <tool>
+          <name>BICOMP</name>
+          <file> 86</file>
+        </tool>
+      </outputs>
+      <inputs>
+        <tool>
+          <name>BICOMP</name>
+          <file> 20 66 37 120 127 83 39 104 77 128 63 106 60 24 88 100 102 44 87</file>
+        </tool>
+      </inputs>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\I2CUnit.cpp</name>
+      <outputs>
+        <tool>
+          <name>ICCAVR</name>
+          <file> 49</file>
+        </tool>
+        <tool>
+          <name>BICOMP</name>
+          <file> 33</file>
+        </tool>
+      </outputs>
+      <inputs>
+        <tool>
+          <name>BICOMP</name>
+          <file> 20 66 37 120 127 83 39 104 77 128 63 106 60 24 88 100 112</file>
+        </tool>
+      </inputs>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\ADCUnit.cpp</name>
+      <outputs>
+        <tool>
+          <name>ICCAVR</name>
+          <file> 114</file>
+        </tool>
+        <tool>
+          <name>BICOMP</name>
+          <file> 34</file>
+        </tool>
+      </outputs>
+      <inputs>
+        <tool>
+          <name>BICOMP</name>
+          <file> 20 66 37 120 127 83 39 104 77 128 63 106 60 24 88 100 2 12 54 31</file>
+        </tool>
+      </inputs>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\ArchivesUnit.cpp</name>
+      <outputs>
+        <tool>
+          <name>ICCAVR</name>
+          <file> 73</file>
+        </tool>
+        <tool>
+          <name>BICOMP</name>
+          <file> 56</file>
+        </tool>
+      </outputs>
+      <inputs>
+        <tool>
+          <name>BICOMP</name>
+          <file> 20 66 37 120 127 83 39 104 77 128 63 106 60 24 88 100 54 31 40 91 96 12 84 94 109 44 87</file>
+        </tool>
+      </inputs>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\ExternFlashUnit.cpp</name>
+      <outputs>
+        <tool>
+          <name>ICCAVR</name>
+          <file> 53</file>
+        </tool>
+        <tool>
+          <name>BICOMP</name>
+          <file> 27</file>
+        </tool>
+      </outputs>
+      <inputs>
+        <tool>
+          <name>BICOMP</name>
+          <file> 20 66 37 120 127 83 39 104 77 128 63 106 60 24 88 100 96 8</file>
+        </tool>
+      </inputs>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\Release\Obj\bl_mva_8.pbd</name>
+      <inputs>
+        <tool>
+          <name>BILINK</name>
+          <file> 34 71 56 105 35 27 33 86 92 61 81 64 123 48 113 68 15 6 22 55 124 69 45 67 95 93 107</file>
+        </tool>
+      </inputs>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\AnalogChannelFormulUnit.cpp</name>
+      <outputs>
+        <tool>
+          <name>ICCAVR</name>
+          <file> 79</file>
+        </tool>
+        <tool>
+          <name>BICOMP</name>
+          <file> 71</file>
+        </tool>
+      </outputs>
+      <inputs>
+        <tool>
+          <name>BICOMP</name>
+          <file> 20 66 37 120 127 83 39 104 77 128 63 106 60 24 88 100 84 12 109 17 65 58 44 87 99 102</file>
+        </tool>
+      </inputs>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\ModBusArchives.cpp</name>
+      <outputs>
+        <tool>
+          <name>ICCAVR</name>
+          <file> 59</file>
+        </tool>
+        <tool>
+          <name>BICOMP</name>
+          <file> 123</file>
+        </tool>
+      </outputs>
+      <inputs>
+        <tool>
+          <name>BICOMP</name>
+          <file> 20 66 37 120 127 83 39 104 77 128 63 106 60 24 88 100 11 54 31 44 87</file>
+        </tool>
+      </inputs>
+    </file>
+    <forcedrebuild>
+      <name>[MULTI_TOOL]</name>
+      <tool>XLINK</tool>
+    </forcedrebuild>
+    <forcedrebuild>
+      <name>[REBUILD_ALL]</name>
+    </forcedrebuild>
+  </configuration>
+</project>
+
+
