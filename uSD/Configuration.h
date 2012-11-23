@@ -24,12 +24,8 @@
     //#define __DEBUG__
 #endif
 
-
-#define REG_INPUT_START 1000
-#define REG_INPUT_NREGS 4
-
 // Скорость работы внутреннего USART
-//#define BAUD 9600
+#define BAUD 57600UL
 
 
 /**
@@ -45,12 +41,11 @@
  * одновременно в нескольких местах проекта.
  */
 
-
 //#define External_Interrupt_Request_0
 //#define External_Interrupt_Request_1
 //#define External_Interrupt_Request_2
 
-#define Timer_Counter0_Overflow
+//#define Timer_Counter0_Overflow
 //#define Timer_Counter0_Compare_Match
 
 //#define Timer_Counter1_Overflow
@@ -62,7 +57,7 @@
 //#define Timer_Counter2_Overflow
 //#define Timer_Counter2_Compare_Match
 
-//#define USART_Rx_Complete
+#define USART_Rx_Complete
 //#define USART_Tx_Complete
 //#define USART_Data_Register_Empty
 
