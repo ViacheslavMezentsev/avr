@@ -8,13 +8,15 @@
 #include "Defines.h"
 #include "Configuration.h"
 #include "Version.h"
-
-// Modbus
-#include "mb.h"
-#include "mbport.h"
-
+#include "Console.h"
 #include "MCU.h"
 
+
+struct divmod10_t {
+
+    uint32_t quot;
+    uint8_t rem;
+};
 
 // -=[ Внешние ссылки ]=-
 
@@ -24,17 +26,22 @@
 
 // -=[ Переменные в ОЗУ ]=-
 
-uint16_t Counter10ms = 0;
-uint16_t Counter100ms = 0;
-uint16_t Counter500ms = 0;
-uint16_t Counter1s = 0;
-uint16_t Counter5s = 0;
+// Версия программы
+FRESULT res;
 
-uint16_t Value1 = 0;
-uint16_t Value2 = 0;
+char Version[16];
+char buffer[16];
 
-static USHORT usRegInputStart = REG_INPUT_START;
-static USHORT usRegInputBuf[ REG_INPUT_NREGS ];
+char read_buf[ 129 ] = {};
+char write_buf[ 128 ] = { 'w', 'r', 'i', 't', 'e', ' ', 'o', 'k', '\r', '\n', 0x00 };
+
+PR_BEGIN_EXTERN_C
+    extern FIFO( 16 ) uart_rx_fifo;
+PR_END_EXTERN_C
+
+FILINFO fno;
+DIR dir;
+FATFS fs;
 
 
 /***********************
@@ -43,53 +50,370 @@ static USHORT usRegInputBuf[ REG_INPUT_NREGS ];
 ************************/
 
 
-eMBErrorCode eMBRegInputCB( UCHAR * pucRegBuffer, USHORT usAddress, USHORT usNRegs ) {
+divmod10_t divmodu10( uint32_t n ) {
 
-    int iRegIndex;
-    eMBErrorCode eStatus = MB_ENOERR;
+    divmod10_t res;
 
-    if( ( usAddress >= REG_INPUT_START )
-        && ( usAddress + usNRegs <= REG_INPUT_START + REG_INPUT_NREGS ) ) {
+    // умножаем на 0.8
+    res.quot = n >> 1;
+    res.quot += res.quot >> 1;
+    res.quot += res.quot >> 4;
+    res.quot += res.quot >> 8;
+    res.quot += res.quot >> 16;
+    uint32_t qq = res.quot;
 
-        iRegIndex = ( int )( usAddress - usRegInputStart );
+    // делим на 8
+    res.quot >>= 3;
 
-        while( usNRegs > 0 ) {
+    // вычисляем остаток
+    res.rem = uint8_t( n - ( ( res.quot << 1 ) + ( qq & ~7ul ) ) );
 
-            *pucRegBuffer++ = ( unsigned char )( usRegInputBuf[iRegIndex] >> 8 );
-            *pucRegBuffer++ = ( unsigned char )( usRegInputBuf[iRegIndex] & 0xFF );
+    // корректируем остаток и частное
+    if ( res.rem > 9 ) {
 
-            iRegIndex++;
-            usNRegs--;
+        res.rem -= 10;
+        res.quot++;
+    }
+
+    return res;
+
+}
+
+
+char * utoa_fast_div( uint32_t value, char * buffer ) {
+
+    buffer += 11;
+    * --buffer = 0;
+
+    do {
+
+        divmod10_t res = divmodu10( value );
+        * --buffer = res.rem + '0';
+        value = res.quot;
+    
+    } while ( value != 0 );
+
+    return buffer;
+
+}
+
+
+/**
+ * Просмотр папки
+ */
+FRESULT CMCU::ScanFiles( char * path ) {
+ 
+    FLASHSTR_DECLARE( char, szDirContent, " Содержимое папки: " );
+    FLASHSTR_DECLARE( char, szHexChars, "0123456789ABCDEF" );
+
+    uint8_t i;   
+
+    // Монтирование FAT32
+    res = pf_mount( & fs );
+
+    res = pf_opendir( & dir, path );
+
+    if ( res == FR_OK ) {
+
+        CConsole::WriteString( szDirContent, CConsole::cp1251 );
+        CConsole::WriteString( path, CConsole::cp1251 );
+        CConsole::WriteString( "\r\n" );
+
+        for (;;) {
+                         
+            res = pf_readdir( & dir, & fno );
+                         
+            if ( res != FR_OK || fno.fname[0] == 0 ) break;
+            
+            i = 4;
+
+            do {
+
+                i--;
+                CConsole::PutChar( szHexChars[ ( fno.fdate >> ( i * 4 ) ) & 0xF ] );
+
+            } while ( i > 0 );
+
+            CConsole::PutChar( ' ' );
+
+            i = 4;
+
+            do {
+
+                i--;
+                CConsole::PutChar( szHexChars[ ( fno.ftime >> ( i * 4 ) ) & 0xF ] );
+
+            } while ( i > 0 );
+
+            // if object is a DIR
+            if ( fno.fattrib & AM_DIR ) {
+                                                    
+                CConsole::WriteString( " <DIR> ", CConsole::cp1251 );
+                CConsole::WriteString( fno.fname, CConsole::cp1251 );
+
+            // if object is a file
+            } else {		
+                                                    
+                CConsole::WriteString( "       ", CConsole::cp1251 );
+                CConsole::WriteString( fno.fname, CConsole::cp1251 );
+
+            }
+
+            CConsole::WriteString( "\r\n" );
 
         }
 
-    } else {
-
-        eStatus = MB_ENOREG;
+        // Отмонтируем FatFs
+        res = pf_mount(0);
 
     }
 
-    return eStatus;
-
-}
-
-eMBErrorCode eMBRegHoldingCB( UCHAR * pucRegBuffer, USHORT usAddress, USHORT usNRegs, eMBRegisterMode eMode ) {
-
-    return MB_ENOREG;
+    return res;
 
 }
 
 
-eMBErrorCode eMBRegCoilsCB( UCHAR * pucRegBuffer, USHORT usAddress, USHORT usNCoils, eMBRegisterMode eMode ) {
+/**
+ * Вывод сообщения: OK | FAIL
+ */
+void CMCU::ShowStatusMessage( FRESULT Result ) {
+        
+    FLASHSTR_DECLARE( char, szOK, "OK\r\n" );
+    FLASHSTR_DECLARE( char, szFAIL, "FAIL(" );
 
-    return MB_ENOREG;
+    if ( Result == 0x00 ) {
+
+        CConsole::SetTextAttr( GREEN );
+        CConsole::WriteString( szOK );
+
+    } else {
+
+        CConsole::SetTextAttr( LIGHTRED );
+        CConsole::WriteString( szFAIL );
+        CConsole::PutChar( Result + '0' );
+        CConsole::WriteString( ")\r\n" );
+
+    }
+
+    CConsole::SetTextAttr( WHITE );
 
 }
 
 
-eMBErrorCode eMBRegDiscreteCB( UCHAR * pucRegBuffer, USHORT usAddress, USHORT usNDiscrete ) {
+/**
+ * Тест драйвера Petit FAT File System
+ */
+void CMCU::TestDriver() {
 
-    return MB_ENOREG;
+    FLASHSTR_DECLARE( char, szMountFAT, "Монтирование FAT32 " );
+    FLASHSTR_DECLARE( char, szOpenFile1, "Открываю MainUnit.cpp " );
+    FLASHSTR_DECLARE( char, szSetPointer1, "Устанавливаем указатель на начало файла MainUnit.cpp " );
+    FLASHSTR_DECLARE( char, szReadFile1, "Читаем первые 128 байт из файла MainUnit.cpp " );
+    FLASHSTR_DECLARE( char, szData1, "Содержимое файла MainUnit.cpp:\r\n" );
+    FLASHSTR_DECLARE( char, szOpenFile2, "Открываю write.txt " );
+    FLASHSTR_DECLARE( char, szWriteToFile, "Записывам \"write ok\" в файл write.txt " );
+    FLASHSTR_DECLARE( char, szFinalizing, "Окончание записи в write.txt " );
+    FLASHSTR_DECLARE( char, szSetPointer2, "Устанавливаем указатель на начало файла write.txt " );
+    FLASHSTR_DECLARE( char, szReadFile2, "Читаем первые 128 байт из файла write.txt " );
+    FLASHSTR_DECLARE( char, szData2, "Содержимое файла write.txt:\r\n" );
+    FLASHSTR_DECLARE( char, szUnmounting, "Отмонтирование FAT32 " );
+
+    WORD s1;  
+  
+    // Монтирование FAT32
+    res = pf_mount( & fs );
+ 
+    CConsole::WriteString( szMountFAT, CConsole::cp1251 );
+
+    // Если монтирование было успешным
+    if ( res == 0x00 ) {		
+        
+        ShowStatusMessage( res );
+
+        // Открываем файл MainUnit.cpp
+        res = pf_open( "/MainUnit.cpp" );
+
+        CConsole::WriteString( szOpenFile1, CConsole::cp1251 );
+
+        ShowStatusMessage( res );
+
+        // Устанваливаем указатель на начало файла MainUnit.cpp
+        res = pf_lseek(0);
+
+        CConsole::WriteString( szSetPointer1, CConsole::cp1251 );
+
+        ShowStatusMessage( res );
+
+        // Читаем первые 128 байт из файла MainUnit.cpp
+        res = pf_read( read_buf, 128, & s1 );	
+
+        CConsole::WriteString( szReadFile1, CConsole::cp1251 );
+
+        ShowStatusMessage( res );
+
+        CConsole::WriteString( szData1, CConsole::cp1251 );
+
+        // Отображаем содержимое буфера
+        CConsole::WriteString( read_buf, CConsole::cp1251 );	
+
+        CConsole::WriteString( "\r\n" );
+
+        res = pf_open( "/write.txt" );
+
+        // Открываем файл write.txt
+        CConsole::WriteString( szOpenFile2, CConsole::cp1251 );	
+
+        ShowStatusMessage( res );
+
+        // Записываем содержимое буфера в файл write.txt
+        res = pf_write( write_buf, strlen( write_buf ), & s1 );	
+
+        CConsole::WriteString( szWriteToFile, CConsole::cp1251 );
+
+        ShowStatusMessage( res );
+
+        // Финализируем запись в  write.txt
+        res = pf_write( 0, 0, & s1 );
+
+        CConsole::WriteString( szFinalizing, CConsole::cp1251 );
+
+        ShowStatusMessage( res );
+
+        // Устанваливаем указатель на начало файла write.txt
+        res = pf_lseek(0);
+
+        CConsole::WriteString( szSetPointer2, CConsole::cp1251 );
+
+        ShowStatusMessage( res );
+
+        // Очищаем буфер
+        read_buf[0] = 0;
+
+        // Читаем первые 128 байт из файла write.txt
+        res = pf_read( read_buf, 128, & s1 );
+
+        CConsole::WriteString( szReadFile2, CConsole::cp1251 );
+
+        ShowStatusMessage( res );
+
+        CConsole::WriteString( szData2, CConsole::cp1251 );	
+
+        // Читаем первые 128 байт из файла write.txt
+        CConsole::WriteString( read_buf );
+
+        // Отмонтируем FatFs
+        res = pf_mount(0);
+
+        CConsole::WriteString( szUnmounting, CConsole::cp1251 );
+
+        ShowStatusMessage( res );
+
+    } else {
+        
+        ShowStatusMessage( res );
+    }
+
+}
+
+
+/**
+ * Командная оболочка
+ */
+void CMCU::CommandShell() {
+
+    FLASHSTR_DECLARE( char, szInterpreterName, "Командная оболочка, версия " );
+    FLASHSTR_DECLARE( char, szBuildDate, "Дата сборки проекта: " );
+    FLASHSTR_DECLARE( char, szInterpreterAuthor, "\r\nАвтор: Мезенцев Вячеслав (unihomelab@ya.ru)\r\n\r\n" );
+    FLASHSTR_DECLARE( char, szCommandPrompt, "[ATmega16]$ " );
+    FLASHSTR_DECLARE( char, szAvailableCommands, "\r\nДоступные команды:\r\n" );
+    FLASHSTR_DECLARE( char, szHelpDescription, " - (help) вывод подсказки.\r\n" );
+    FLASHSTR_DECLARE( char, szTestDescription, " - (test) тест драйвера Petit FAT File System.\r\n" );
+    FLASHSTR_DECLARE( char, szScanDescription, " - (dir) просмотр папки.\r\n" );
+    FLASHSTR_DECLARE( char, szCommandIsNotSupported, "\r\nКоманда не поддерживается. Введите " );
+    FLASHSTR_DECLARE( char, szForHelp, " (help) для помощи.\r\n" );
+
+    char * cmd;
+
+    CConsole::SetTextAttr( LIGHTGRAY );
+    CConsole::ClearScreen();
+
+    CConsole::GotoXY( 1, 25 );
+
+    CConsole::WriteString( szInterpreterName, CConsole::cp1251 );
+    CConsole::WriteString( Version );
+    CConsole::WriteString( "\r\n" );
+
+    CConsole::WriteString( szBuildDate, CConsole::cp1251 );
+    CConsole::WriteString( CVersion::GetBuildDateString(), CConsole::cp1251 );
+
+    CConsole::WriteString( szInterpreterAuthor, CConsole::cp1251 );
+
+    while ( true ) {
+
+        // Выводим приглашение
+        CConsole::SetTextAttr( GREEN );
+        CConsole::WriteString( szCommandPrompt );
+
+        // Считываем ввод пользователя
+        CConsole::SetTextAttr( LIGHTGRAY );
+        cmd = CConsole::ReadString( buffer );
+
+        // Если пустая команда, то переходим на следующую строку
+        if ( cmd[0] == 0 ) {
+
+            CConsole::WriteString( "\r\n" );
+
+        // Выводим справку
+        } else if ( ( cmd[0] == 'h' ) && ( cmd[1] == 0 ) ) {
+
+            CConsole::SetTextAttr( WHITE );
+            CConsole::WriteString( szAvailableCommands, CConsole::cp1251 );
+
+            CConsole::SetTextAttr( LIGHTRED );
+            CConsole::PutChar( 'h' );
+
+            CConsole::SetTextAttr( WHITE );
+            CConsole::WriteString( szHelpDescription, CConsole::cp1251 );
+
+            CConsole::SetTextAttr( LIGHTRED );
+            CConsole::PutChar( 't' );
+
+            CConsole::SetTextAttr( WHITE );
+            CConsole::WriteString( szTestDescription, CConsole::cp1251 );
+
+            CConsole::SetTextAttr( LIGHTRED );
+            CConsole::PutChar( 'd' );
+
+            CConsole::SetTextAttr( WHITE );
+            CConsole::WriteString( szScanDescription, CConsole::cp1251 );
+
+        // Тестирование драйвера
+        } else if ( ( cmd[0] == 't' ) && ( cmd[1] == 0 ) ) {
+
+            CConsole::WriteString( "\r\n" );
+            TestDriver();
+
+        // Промотр папки
+        } else if ( ( cmd[0] == 'd' ) && ( cmd[1] == 0 ) ) {
+
+            CConsole::WriteString( "\r\n" );
+            ShowStatusMessage( ScanFiles( "/" ) );            
+
+        // Выводим сообщение о неподдерживаемой команде
+        } else {
+
+            CConsole::SetTextAttr( WHITE );
+            CConsole::WriteString( szCommandIsNotSupported, CConsole::cp1251 );
+
+            CConsole::SetTextAttr( LIGHTRED );
+            CConsole::WriteString( "h" );
+
+            CConsole::SetTextAttr( WHITE );
+            CConsole::WriteString( szForHelp, CConsole::cp1251 );
+
+        }
+
+    }
 
 }
 
@@ -99,37 +423,26 @@ eMBErrorCode eMBRegDiscreteCB( UCHAR * pucRegBuffer, USHORT usAddress, USHORT us
  */
 HRESULT CMCU::MainThreadProcedure(){
 
-    const UCHAR ucSlaveID[] = { 0xAA, 0xBB, 0xCC };
-    eMBErrorCode eStatus;
+    // Вычисление строки с версией программы
+    strcat( Version, utoa_fast_div( CVersion::GetMajor(), buffer ) );
+    strcat( Version, "." );
 
-    // Настраиваем последовательный порт
-    eStatus = eMBInit( ::MB_RTU, 0x0A, 0, 9600, ::MB_PAR_NONE );
+    strcat( Version, utoa_fast_div( CVersion::GetMinor(), buffer ) );
+    strcat( Version, "." );
 
-    // Задание параметров для работы протокола
-    eStatus = eMBSetSlaveID( 0x34, TRUE, ucSlaveID, 3 );
+    strcat( Version, utoa_fast_div( CVersion::GetRevision(), buffer ) );
+    strcat( Version, "." );
+
+    strcat( Version, utoa_fast_div( CVersion::GetBuild(), buffer ) );
 
     // Разрешаем прерывания
     __enable_interrupt();
 
-    // Запускаем стек протокола modbus
-    eStatus = eMBEnable();
+    // Запускаем командрую оболочку
+    CommandShell();
 
-    // Сохраняем номер ревизии
-    usRegInputBuf[2] = ( USHORT ) CVersion::GetRevision();
-
-    // Сохраняем номер сборки
-    usRegInputBuf[3] = ( USHORT ) CVersion::GetBuild();
-
-    do {
-
-        eMBPoll();
-
-        // Обновляем значения первых двух регистров
-        usRegInputBuf[0] = Value1;
-        usRegInputBuf[1] = Value2;
-
-
-    } while ( true );
+    // Размонтируем
+    pf_mount( NULL );
 
     // Все проверки прошли успешно, объект в рабочем состоянии
     return NO_ERROR;
@@ -149,7 +462,7 @@ void CMCU::Initialization(){
     //ADCInit();
 
     // Настройка таймера/счётчика 0 [ATmega16]
-    Timer0Init();
+    //Timer0Init();
 
     // Настройка таймера/счётчика 1 [ATmega16]
     //Timer1Init();
@@ -161,7 +474,7 @@ void CMCU::Initialization(){
     //InternalWDTInit();
 
     // Настройка внутреннего USART [ATmega16]
-    //USARTInit();
+    USARTInit();
 
     // Настройка последовательного интерфейса TWI [ATmega16]
     //TWIInit();
@@ -209,7 +522,7 @@ void CMCU::ControlRegistersInit(){
     // General Interrupt Control Register
     // [ Общий регистр управлением прерываниями ][ATmega16]
     //          00000000 - Initial Value
-    GICR = BIN8(00000000);
+    //GICR = BIN8(00000000);
     //          ||||||||
     //          |||||||+- 0, rw, IVCE:  -
     //          ||||||+-- 1, rw, IVSEL: -
@@ -225,7 +538,7 @@ void CMCU::ControlRegistersInit(){
     // Timer/Counter Interrupt Mask Register
     // [ Регистр маски прерываний от таймеров/счётчиков ][ATmega16]
     //           00000000 - Initial Value
-    TIMSK = BIN8(00000001); // BIN8() не зависит от уровня оптимизации
+    //TIMSK = BIN8(00000000); // BIN8() не зависит от уровня оптимизации
     //           ||||||||
     //           |||||||+- 0, rw, TOIE0:  - Timer/Counter0 Overflow Interrupt Enable
     //           ||||||+-- 1, rw, OCIE0:  - OCIE0: Timer/Counter0 Output Compare Match Interrupt Enable
@@ -616,7 +929,7 @@ void CMCU::USARTInit(){
     // USART Control and Status Register A
     // [ Регистр управления UCSRA ][ATmega16]
     //           00100000 - Initial Value
-    //UCSRA = BIN8(00100000); // BIN8() не зависит от уровня оптимизации
+    UCSRA = BIN8(00100000); // BIN8() не зависит от уровня оптимизации
     //           ||||||||
     //           |||||||+- 0, rw, MPCM: - Multi-processor Communication Mode
     //           ||||||+-- 1, rw, U2X:  - Double the USART Transmission Speed
@@ -628,16 +941,17 @@ void CMCU::USARTInit(){
     //           +-------- 7, r, RXC:   - USART Receive Complete
     // Примечание:
 
-    //UCSRB = 0x00; // отключаем, пока настраиваем скорость
+
+    UCSRB = 0x00; // отключаем, пока настраиваем скорость
 
     // Определение BAUD см. в файле: "Configuration.h"
-    //UBRRL = ( uint8_t ) ( F_CPU / ( 16UL * BAUD ) - 1UL ); // устанавливаем скорость
-    //UBRRH = ( uint8_t ) ( ( F_CPU / ( 16UL * BAUD ) - 1UL ) >> 8 );
+    UBRRL = ( uint8_t ) ( F_CPU / ( 16UL * BAUD ) - 1UL ); // устанавливаем скорость
+    UBRRH = ( uint8_t ) ( ( F_CPU / ( 16UL * BAUD ) - 1UL ) >> 8 );
 
     // USART Control and Status Register B
     // [ Регистр управления UCSRB ][ATmega16]
     //           00000000 - Initial Value
-    //UCSRB = BIN8(00000000); // BIN8() не зависит от уровня оптимизации
+    UCSRB = BIN8(10011000); // BIN8() не зависит от уровня оптимизации
     //           ||||||||
     //           |||||||+- 0, rw, TXB8:  - Transmit Data Bit 8
     //           ||||||+-- 1, r,  RXB8:  - Receive Data Bit 8
@@ -649,10 +963,11 @@ void CMCU::USARTInit(){
     //           +-------- 7, rw, RXCIE: - RX Complete Interrupt Enable
     // Примечание:
 
+
     // USART Control and Status Register C
     // [ Регистр управления UCSRC ][ATmega16]
     //           10000110 - Initial Value
-    //UCSRC = BIN8(10100110); // BIN8() не зависит от уровня оптимизации
+    UCSRC = BIN8(10000110); // BIN8() не зависит от уровня оптимизации
     //           ||||||||
     //           |||||||+- 0, rw, UCPOL:    - Clock Polarity
     //           ||||||+-- 1, rw, UCSZ0: -+ - Character Size
@@ -754,16 +1069,16 @@ void CMCU::PortsInit(){
     // Port B Data Direction Register
     // [ Регистр направления порта B ][ATmega16]
     //          00000000 - Initial Value
-    DDRB = BIN8(00000000); // BIN8() не зависит от уровня оптимизации
+    DDRB = BIN8(10110011); // BIN8() не зависит от уровня оптимизации
     //          ||||||||
-    //          |||||||+- 0, rw, DDB0: (XCK/T0)    -
-    //          ||||||+-- 1, rw, DDB1: (T1)        -
+    //          |||||||+- 0, rw, DDB0: (XCK/T0)    - CD
+    //          ||||||+-- 1, rw, DDB1: (T1)        - WP
     //          |||||+--- 2, rw, DDB2: (INT2/AIN0) -
     //          ||||+---- 3, rw, DDB3: (OC0/AIN1)  -
-    //          |||+----- 4, rw, DDB4: (~SS)       -
-    //          ||+------ 5, rw, DDB5: (MOSI)      -
-    //          |+------- 6, rw, DDB6: (MISO)      -
-    //          +-------- 7, rw, DDB7: (SCK)       -
+    //          |||+----- 4, rw, DDB4: (~SS)       - SD_CS
+    //          ||+------ 5, rw, DDB5: (MOSI)      - SD_DI
+    //          |+------- 6, rw, DDB6: (MISO)      - SD_DO
+    //          +-------- 7, rw, DDB7: (SCK)       - SD_CLK
     // Примечание:
 
     // Port C Data Direction Register
@@ -784,7 +1099,7 @@ void CMCU::PortsInit(){
     // Port D Data Direction Register
     // [ Регистр направления порта D ][ATmega16]
     //          00000000 - Initial Value
-    DDRD = BIN8(00000010); // BIN8() не зависит от уровня оптимизации
+    DDRD = BIN8(00000001); // BIN8() не зависит от уровня оптимизации
     //          ||||||||
     //          |||||||+- 0, rw, DDD0: (RXD)  - RXD
     //          ||||||+-- 1, rw, DDD1: (TXD)  - TXD
@@ -815,16 +1130,16 @@ void CMCU::PortsInit(){
     // Port B Data Register
     // [ Регистр данных порта B ][ATmega16]
     //           00000000 - Initial Value
-    PORTB = BIN8(00000000); // BIN8() не зависит от уровня оптимизации
+    PORTB = BIN8(01000000); // BIN8() не зависит от уровня оптимизации
     //           ||||||||
-    //           |||||||+- 0, rw, PORTB0: (XCK/T0)    -
-    //           ||||||+-- 1, rw, PORTB1: (T1)        -
+    //           |||||||+- 0, rw, PORTB0: (XCK/T0)    - CD
+    //           ||||||+-- 1, rw, PORTB1: (T1)        - WP
     //           |||||+--- 2, rw, PORTB2: (INT2/AIN0) -
     //           ||||+---- 3, rw, PORTB3: (OC0/AIN1)  -
-    //           |||+----- 4, rw, PORTB4: (~SS)       -
-    //           ||+------ 5, rw, PORTB5: (MOSI)      -
-    //           |+------- 6, rw, PORTB6: (MISO)      -
-    //           +-------- 7, rw, PORTB7: (SCK)       -
+    //           |||+----- 4, rw, PORTB4: (~SS)       - SD_CS
+    //           ||+------ 5, rw, PORTB5: (MOSI)      - SD_DI
+    //           |+------- 6, rw, PORTB6: (MISO)      - SD_DO
+    //           +-------- 7, rw, PORTB7: (SCK)       - SD_CLK
     // Примечание:
 
     // Port C Data Register
@@ -1056,49 +1371,6 @@ void CMCU::OnTimerCounter0CompareMatch(){
  */
 void CMCU::OnTimerCounter0Overflow(){
 
-    Counter10ms++;
-    Counter100ms++;
-    Counter500ms++;
-    Counter1s++;
-    Counter5s++;
-
-    // Восстанавливаем счётчик
-    TCNT0 = 0xFF - F_CPU / 64000UL;
-
-    if ( Counter10ms == 10 ) {
-
-        Counter10ms = 0;
-
-    }
-
-    if ( Counter100ms == 100 ) {
-
-        Counter100ms = 0;
-
-    }
-
-    if ( Counter500ms == 500 ) {
-
-        Counter500ms = 0;
-
-    }
-
-    if ( Counter1s == 1000 ) {
-
-        Counter1s = 0;
-
-        Value1++;
-
-    }
-
-    if ( Counter5s == 5000 ) {
-
-        Counter5s = 0;
-
-        Value2++;
-
-    }
-
 }
 
 
@@ -1114,6 +1386,11 @@ void CMCU::OnSPISerialTransferComplete(){
  * USART, Rx Complete
  */
 void CMCU::OnUSARTRxComplete( uint8_t data ){
+
+    if ( !FIFO_IS_FULL( uart_rx_fifo ) ) {
+        
+        FIFO_PUSH( uart_rx_fifo, data );
+    }
 
 }
 

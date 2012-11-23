@@ -1,9 +1,9 @@
 ========================================================================
 
-        Проект: ATmega16 + FreeModbus
+        Проект: ATmega16 + Petit FAT File System Module
         Контроллер: ATmega16 @ 16 МГц
 
-        Хранилище проекта: https://mysvn.ru/avr/examples/freemodbus/
+        Хранилище проекта: https://mysvn.ru/avr/examples/uSD/
 
         Автор: Мезенцев В. Н.
         Почта: mailto:unihomelab@ya.ru
