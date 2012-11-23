@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="windows-1251"?>
 <VisualStudioProject
 	ProjectType="Visual C++"
-	Version="9.00"
+	Version="9,00"
 	Name="freemodbus"
 	ProjectGUID="{EF6C05B2-C418-4920-A89C-7451431457D3}"
 	RootNamespace="freemodbus"
@@ -24,8 +24,8 @@
 			>
 			<Tool
 				Name="VCNMakeTool"
-				BuildCommandLine="C:\WinAVR-20100110\utils\bin\make.exe build"
-				ReBuildCommandLine="C:\WinAVR-20100110\utils\bin\make.exe build all"
+				BuildCommandLine="C:\WinAVR-20100110\utils\bin\make.exe build 2&gt;&amp;1 | C:\WinAVR-20100110\utils\bin\sed.exe -e &apos;s/\(\w\+\):\([0-9]\+\):/\1(\2):/&apos;"
+				ReBuildCommandLine="C:\WinAVR-20100110\utils\bin\make.exe build all 2&gt;&amp;1 | C:\WinAVR-20100110\utils\bin\sed.exe -e &apos;s/\(\w\+\):\([0-9]\+\):/\1(\2):/&apos;"
 				CleanCommandLine="C:\WinAVR-20100110\utils\bin\make.exe clean"
 				Output=""
 				PreprocessorDefinitions="__GNUC__;__AVR_ATmega16__;__DEBUG__;WIN32;_DEBUG"
@@ -44,8 +44,8 @@
 			>
 			<Tool
 				Name="VCNMakeTool"
-				BuildCommandLine="C:\WinAVR-20100110\utils\bin\make.exe build"
-				ReBuildCommandLine="C:\WinAVR-20100110\utils\bin\make.exe build all"
+				BuildCommandLine="C:\WinAVR-20100110\utils\bin\make.exe build 2&gt;&amp;1 | C:\WinAVR-20100110\utils\bin\sed.exe -e &apos;s/\(\w\+\):\([0-9]\+\):/\1(\2):/&apos;"
+				ReBuildCommandLine="C:\WinAVR-20100110\utils\bin\make.exe build all 2&gt;&amp;1 | C:\WinAVR-20100110\utils\bin\sed.exe -e &apos;s/\(\w\+\):\([0-9]\+\):/\1(\2):/&apos;"
 				CleanCommandLine="C:\WinAVR-20100110\utils\bin\make.exe clean"
 				Output=""
 				PreprocessorDefinitions="__GNUC__;__AVR_ATmega16__;WIN32;NDEBUG"

@@ -936,7 +936,7 @@ void UIMain() {
 
     FLASHSTR_DECLARE( char, szTitle, "Pinboard II, MicroVGA, ATmega16 @ 16 МГц, версия сборки: " );
     FLASHSTR_DECLARE( char, szAuthor, "Автор сборки: Мезенцев В. Н. (unihomelab@ya.ru)" );
-    FLASHSTR_DECLARE( char, szProjectURL, "Проект: https://mysvn.ru/avr/templates/uVGA/" );
+    FLASHSTR_DECLARE( char, szProjectURL, "Проект: https://mysvn.ru/avr/examples/uVGA/" );
     FLASHSTR_DECLARE( char, szGCC, " (gnu)" );
     FLASHSTR_DECLARE( char, szIAR, " (iar)" );
 

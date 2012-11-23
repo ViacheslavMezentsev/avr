@@ -3,7 +3,7 @@
         Проект: ATmega16 + MicroVGA conio/user interface library
         Контроллер: ATmega16 @ 16 МГц
 
-        Хранилище проекта: https://mysvn.ru/avr/templates/uVGA/
+        Хранилище проекта: https://mysvn.ru/avr/examples/uVGA/
 
         Автор: Мезенцев В. Н.
         Почта: mailto:unihomelab@ya.ru
@@ -73,6 +73,14 @@
 build: C:\WinAVR-20100110\utils\bin\make.exe build
 clean: C:\WinAVR-20100110\utils\bin\make.exe clean
 build all: C:\WinAVR-20100110\utils\bin\make.exe build all
+
+Для того, чтобы можно было в VS2008 (или аналогичных) автоматически прыгать на
+строку с ошибкой, нужно пропустить вывод через потоковый фильтр (sed). Эта операция
+корректирует вывод gcc компилятора, чтобы VS2008 могла его понять:
+
+build: C:\WinAVR-20100110\utils\bin\make.exe build 2>&1 | C:\WinAVR-20100110\utils\bin\sed.exe -e 's/\(\w\+\):\([0-9]\+\):/\1(\2):/'
+clean: C:\WinAVR-20100110\utils\bin\make.exe clean
+build all: C:\WinAVR-20100110\utils\bin\make.exe build all 2>&1 | C:\WinAVR-20100110\utils\bin\sed.exe -e 's/\(\w\+\):\([0-9]\+\):/\1(\2):/'
 
 Для Atmel Studio 6:
 
