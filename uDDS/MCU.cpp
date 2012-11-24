@@ -8,75 +8,242 @@
 #include "Defines.h"
 #include "Configuration.h"
 #include "Version.h"
-#include "Console.h"
 #include "MCU.h"
 
-
-// Тип, описывающий дату
-// http://elm-chan.org/fsw/ff/en/sfileinfo.html
-typedef struct _SFDATE {
-    
-    uint16_t Day:    5; // Day (1..31)
-    uint16_t Month:  4; // Month (1..12)
-    uint16_t Year:   7; // Year origin from 1980 (0..127)
-    
-} SFDATE;
-
-typedef union _UFDATE {
-    
-    uint16_t Value;
-    SFDATE fdate;    
-    
-} UFDATE;
-
-typedef struct _SFTIME {
-    
-    uint16_t Second:    5; // Second / 2 (0..29)
-    uint16_t Minute:    6; // Minute (0..59)
-    uint16_t Hour:      5; // Hour (0..23)
-    
-} SFTIME;
-
-// Тип, описывающий время
-typedef union _UFTIME {
-    
-    uint16_t Value;
-    SFTIME ftime;    
-    
-} UFTIME;
-
-struct divmod10_t {
-
-    uint32_t quot;
-    uint8_t rem;
-};
 
 // -=[ Внешние ссылки ]=-
 
 
 // -=[ Постоянные во флеш-памяти ]=-
 
+// Таблицы сигналов
+// sine
+#ifdef __ICCAVR__
+    __flash uint8_t SineWave[ 256 ] = {
+#elif defined __GNUC__
+    PROGMEM uint8_t _SineWave[ 256 ] = {
+#endif
+    0x80, 0x83, 0x86, 0x89, 0x8c, 0x8f, 0x92, 0x95, 0x98, 0x9c, 0x9f, 0xa2, 0xa5, 0xa8, 0xab, 0xae, 
+    0xb0, 0xb3, 0xb6, 0xb9, 0xbc, 0xbf, 0xc1, 0xc4, 0xc7, 0xc9, 0xcc, 0xce, 0xd1, 0xd3, 0xd5, 0xd8, 
+    0xda, 0xdc, 0xde, 0xe0, 0xe2, 0xe4, 0xe6, 0xe8, 0xea, 0xec, 0xed, 0xef, 0xf0, 0xf2, 0xf3, 0xf5, 
+    0xf6, 0xf7, 0xf8, 0xf9, 0xfa, 0xfb, 0xfc, 0xfc, 0xfd, 0xfe, 0xfe, 0xff, 0xff, 0xff, 0xff, 0xff, 
+    0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xfe, 0xfe, 0xfd, 0xfc, 0xfc, 0xfb, 0xfa, 0xf9, 0xf8, 0xf7, 
+    0xf6, 0xf5, 0xf3, 0xf2, 0xf0, 0xef, 0xed, 0xec, 0xea, 0xe8, 0xe6, 0xe4, 0xe2, 0xe0, 0xde, 0xdc, 
+    0xda, 0xd8, 0xd5, 0xd3, 0xd1, 0xce, 0xcc, 0xc9, 0xc7, 0xc4, 0xc1, 0xbf, 0xbc, 0xb9, 0xb6, 0xb3, 
+    0xb0, 0xae, 0xab, 0xa8, 0xa5, 0xa2, 0x9f, 0x9c, 0x98, 0x95, 0x92, 0x8f, 0x8c, 0x89, 0x86, 0x83, 
+    0x80, 0x7c, 0x79, 0x76, 0x73, 0x70, 0x6d, 0x6a, 0x67, 0x63, 0x60, 0x5d, 0x5a, 0x57, 0x54, 0x51, 
+    0x4f, 0x4c, 0x49, 0x46, 0x43, 0x40, 0x3e, 0x3b, 0x38, 0x36, 0x33, 0x31, 0x2e, 0x2c, 0x2a, 0x27, 
+    0x25, 0x23, 0x21, 0x1f, 0x1d, 0x1b, 0x19, 0x17, 0x15, 0x13, 0x12, 0x10, 0x0f, 0x0d, 0x0c, 0x0a, 
+    0x09, 0x08, 0x07, 0x06, 0x05, 0x04, 0x03, 0x03, 0x02, 0x01, 0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 
+    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x01, 0x01, 0x02, 0x03, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 
+    0x09, 0x0a, 0x0c, 0x0d, 0x0f, 0x10, 0x12, 0x13, 0x15, 0x17, 0x19, 0x1b, 0x1d, 0x1f, 0x21, 0x23, 
+    0x25, 0x27, 0x2a, 0x2c, 0x2e, 0x31, 0x33, 0x36, 0x38, 0x3b, 0x3e, 0x40, 0x43, 0x46, 0x49, 0x4c, 
+    0x4f, 0x51, 0x54, 0x57, 0x5a, 0x5d, 0x60, 0x63, 0x67, 0x6a, 0x6d, 0x70, 0x73, 0x76, 0x79, 0x7c  
+};
+#ifdef __GNUC__
+    FU08T_PTR SineWave(_SineWave);
+#endif
+
+// square wave
+#ifdef __ICCAVR__
+    __flash uint8_t SquareWave[ 256 ] = {
+#elif defined __GNUC__
+    PROGMEM uint8_t _SquareWave[ 256 ] = {
+#endif
+    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 
+    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 
+    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 
+    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 
+    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 
+    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 
+    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 
+    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 
+    0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 
+    0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 
+    0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 
+    0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 
+    0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 
+    0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 
+    0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 
+    0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff 
+};
+#ifdef __GNUC__
+    FU08T_PTR SquareWave(_SquareWave);
+#endif
+
+// sawtooth wave
+#ifdef __ICCAVR__
+    __flash uint8_t SawToothWave[ 256 ] = {
+#elif defined __GNUC__
+    PROGMEM uint8_t _SawtoothWave[ 256 ] = {
+#endif
+    0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09, 0x0a, 0x0b, 0x0c, 0x0d, 0x0e, 0x0f, 
+    0x10, 0x11, 0x12, 0x13, 0x14, 0x15, 0x16, 0x17, 0x18, 0x19, 0x1a, 0x1b, 0x1c, 0x1d, 0x1e, 0x1f, 
+    0x20, 0x21, 0x22, 0x23, 0x24, 0x25, 0x26, 0x27, 0x28, 0x29, 0x2a, 0x2b, 0x2c, 0x2d, 0x2e, 0x2f, 
+    0x30, 0x31, 0x32, 0x33, 0x34, 0x35, 0x36, 0x37, 0x38, 0x39, 0x3a, 0x3b, 0x3c, 0x3d, 0x3e, 0x3f, 
+    0x40, 0x41, 0x42, 0x43, 0x44, 0x45, 0x46, 0x47, 0x48, 0x49, 0x4a, 0x4b, 0x4c, 0x4d, 0x4e, 0x4f, 
+    0x50, 0x51, 0x52, 0x53, 0x54, 0x55, 0x56, 0x57, 0x58, 0x59, 0x5a, 0x5b, 0x5c, 0x5d, 0x5e, 0x5f, 
+    0x60, 0x61, 0x62, 0x63, 0x64, 0x65, 0x66, 0x67, 0x68, 0x69, 0x6a, 0x6b, 0x6c, 0x6d, 0x6e, 0x6f, 
+    0x70, 0x71, 0x72, 0x73, 0x74, 0x75, 0x76, 0x77, 0x78, 0x79, 0x7a, 0x7b, 0x7c, 0x7d, 0x7e, 0x7f, 
+    0x80, 0x81, 0x82, 0x83, 0x84, 0x85, 0x86, 0x87, 0x88, 0x89, 0x8a, 0x8b, 0x8c, 0x8d, 0x8e, 0x8f, 
+    0x90, 0x91, 0x92, 0x93, 0x94, 0x95, 0x96, 0x97, 0x98, 0x99, 0x9a, 0x9b, 0x9c, 0x9d, 0x9e, 0x9f, 
+    0xa0, 0xa1, 0xa2, 0xa3, 0xa4, 0xa5, 0xa6, 0xa7, 0xa8, 0xa9, 0xaa, 0xab, 0xac, 0xad, 0xae, 0xaf, 
+    0xb0, 0xb1, 0xb2, 0xb3, 0xb4, 0xb5, 0xb6, 0xb7, 0xb8, 0xb9, 0xba, 0xbb, 0xbc, 0xbd, 0xbe, 0xbf, 
+    0xc0, 0xc1, 0xc2, 0xc3, 0xc4, 0xc5, 0xc6, 0xc7, 0xc8, 0xc9, 0xca, 0xcb, 0xcc, 0xcd, 0xce, 0xcf, 
+    0xd0, 0xd1, 0xd2, 0xd3, 0xd4, 0xd5, 0xd6, 0xd7, 0xd8, 0xd9, 0xda, 0xdb, 0xdc, 0xdd, 0xde, 0xdf, 
+    0xe0, 0xe1, 0xe2, 0xe3, 0xe4, 0xe5, 0xe6, 0xe7, 0xe8, 0xe9, 0xea, 0xeb, 0xec, 0xed, 0xee, 0xef, 
+    0xf0, 0xf1, 0xf2, 0xf3, 0xf4, 0xf5, 0xf6, 0xf7, 0xf8, 0xf9, 0xfa, 0xfb, 0xfc, 0xfd, 0xfe, 0xff  
+};
+#ifdef __GNUC__
+    FU08T_PTR SawtoothWave(_SawtoothWave);
+#endif
+
+// reverse sawtooth wave
+#ifdef __ICCAVR__
+    __flash uint8_t RewsawToothWave[ 256 ] = {
+#elif defined __GNUC__
+    PROGMEM uint8_t _RewsawToothWave[ 256 ] = {
+#endif
+    0xff, 0xfe, 0xfd, 0xfc, 0xfb, 0xfa, 0xf9, 0xf8, 0xf7, 0xf6, 0xf5, 0xf4, 0xf3, 0xf2, 0xf1, 0xf0, 
+    0xef, 0xee, 0xed, 0xec, 0xeb, 0xea, 0xe9, 0xe8, 0xe7, 0xe6, 0xe5, 0xe4, 0xe3, 0xe2, 0xe1, 0xe0, 
+    0xdf, 0xde, 0xdd, 0xdc, 0xdb, 0xda, 0xd9, 0xd8, 0xd7, 0xd6, 0xd5, 0xd4, 0xd3, 0xd2, 0xd1, 0xd0, 
+    0xcf, 0xce, 0xcd, 0xcc, 0xcb, 0xca, 0xc9, 0xc8, 0xc7, 0xc6, 0xc5, 0xc4, 0xc3, 0xc2, 0xc1, 0xc0, 
+    0xbf, 0xbe, 0xbd, 0xbc, 0xbb, 0xba, 0xb9, 0xb8, 0xb7, 0xb6, 0xb5, 0xb4, 0xb3, 0xb2, 0xb1, 0xb0, 
+    0xaf, 0xae, 0xad, 0xac, 0xab, 0xaa, 0xa9, 0xa8, 0xa7, 0xa6, 0xa5, 0xa4, 0xa3, 0xa2, 0xa1, 0xa0, 
+    0x9f, 0x9e, 0x9d, 0x9c, 0x9b, 0x9a, 0x99, 0x98, 0x97, 0x96, 0x95, 0x94, 0x93, 0x92, 0x91, 0x90, 
+    0x8f, 0x8e, 0x8d, 0x8c, 0x8b, 0x8a, 0x89, 0x88, 0x87, 0x86, 0x85, 0x84, 0x83, 0x82, 0x81, 0x80, 
+    0x7f, 0x7e, 0x7d, 0x7c, 0x7b, 0x7a, 0x79, 0x78, 0x77, 0x76, 0x75, 0x74, 0x73, 0x72, 0x71, 0x70, 
+    0x6f, 0x6e, 0x6d, 0x6c, 0x6b, 0x6a, 0x69, 0x68, 0x67, 0x66, 0x65, 0x64, 0x63, 0x62, 0x61, 0x60, 
+    0x5f, 0x5e, 0x5d, 0x5c, 0x5b, 0x5a, 0x59, 0x58, 0x57, 0x56, 0x55, 0x54, 0x53, 0x52, 0x51, 0x50, 
+    0x4f, 0x4e, 0x4d, 0x4c, 0x4b, 0x4a, 0x49, 0x48, 0x47, 0x46, 0x45, 0x44, 0x43, 0x42, 0x41, 0x40, 
+    0x3f, 0x3e, 0x3d, 0x3c, 0x3b, 0x3a, 0x39, 0x38, 0x37, 0x36, 0x35, 0x34, 0x33, 0x32, 0x31, 0x30, 
+    0x2f, 0x2e, 0x2d, 0x2c, 0x2b, 0x2a, 0x29, 0x28, 0x27, 0x26, 0x25, 0x24, 0x23, 0x22, 0x21, 0x20, 
+    0x1f, 0x1e, 0x1d, 0x1c, 0x1b, 0x1a, 0x19, 0x18, 0x17, 0x16, 0x15, 0x14, 0x13, 0x12, 0x11, 0x10, 
+    0x0f, 0x0e, 0x0d, 0x0c, 0x0b, 0x0a, 0x09, 0x08, 0x07, 0x06, 0x05, 0x04, 0x03, 0x02, 0x01, 0x00
+};
+#ifdef __GNUC__
+    FU08T_PTR RewsawToothWave(_RewsawToothWave);
+#endif
+
+// triangle wave
+#ifdef __ICCAVR__
+    __flash uint8_t TriangleWave[ 256 ] = {
+#elif defined __GNUC__
+    PROGMEM uint8_t _TriangleWave[ 256 ] = {
+#endif
+    0x00, 0x02, 0x04, 0x06, 0x08, 0x0a, 0x0c, 0x0e, 0x10, 0x12, 0x14, 0x16, 0x18, 0x1a, 0x1c, 0x1e, 
+    0x20, 0x22, 0x24, 0x26, 0x28, 0x2a, 0x2c, 0x2e, 0x30, 0x32, 0x34, 0x36, 0x38, 0x3a, 0x3c, 0x3e, 
+    0x40, 0x42, 0x44, 0x46, 0x48, 0x4a, 0x4c, 0x4e, 0x50, 0x52, 0x54, 0x56, 0x58, 0x5a, 0x5c, 0x5e, 
+    0x60, 0x62, 0x64, 0x66, 0x68, 0x6a, 0x6c, 0x6e, 0x70, 0x72, 0x74, 0x76, 0x78, 0x7a, 0x7c, 0x7e, 
+    0x80, 0x82, 0x84, 0x86, 0x88, 0x8a, 0x8c, 0x8e, 0x90, 0x92, 0x94, 0x96, 0x98, 0x9a, 0x9c, 0x9e, 
+    0xa0, 0xa2, 0xa4, 0xa6, 0xa8, 0xaa, 0xac, 0xae, 0xb0, 0xb2, 0xb4, 0xb6, 0xb8, 0xba, 0xbc, 0xbe, 
+    0xc0, 0xc2, 0xc4, 0xc6, 0xc8, 0xca, 0xcc, 0xce, 0xd0, 0xd2, 0xd4, 0xd6, 0xd8, 0xda, 0xdc, 0xde, 
+    0xe0, 0xe2, 0xe4, 0xe6, 0xe8, 0xea, 0xec, 0xee, 0xf0, 0xf2, 0xf4, 0xf6, 0xf8, 0xfa, 0xfc, 0xfe, 
+    0xff, 0xfd, 0xfb, 0xf9, 0xf7, 0xf5, 0xf3, 0xf1, 0xef, 0xef, 0xeb, 0xe9, 0xe7, 0xe5, 0xe3, 0xe1, 
+    0xdf, 0xdd, 0xdb, 0xd9, 0xd7, 0xd5, 0xd3, 0xd1, 0xcf, 0xcf, 0xcb, 0xc9, 0xc7, 0xc5, 0xc3, 0xc1, 
+    0xbf, 0xbd, 0xbb, 0xb9, 0xb7, 0xb5, 0xb3, 0xb1, 0xaf, 0xaf, 0xab, 0xa9, 0xa7, 0xa5, 0xa3, 0xa1, 
+    0x9f, 0x9d, 0x9b, 0x99, 0x97, 0x95, 0x93, 0x91, 0x8f, 0x8f, 0x8b, 0x89, 0x87, 0x85, 0x83, 0x81, 
+    0x7f, 0x7d, 0x7b, 0x79, 0x77, 0x75, 0x73, 0x71, 0x6f, 0x6f, 0x6b, 0x69, 0x67, 0x65, 0x63, 0x61, 
+    0x5f, 0x5d, 0x5b, 0x59, 0x57, 0x55, 0x53, 0x51, 0x4f, 0x4f, 0x4b, 0x49, 0x47, 0x45, 0x43, 0x41, 
+    0x3f, 0x3d, 0x3b, 0x39, 0x37, 0x35, 0x33, 0x31, 0x2f, 0x2f, 0x2b, 0x29, 0x27, 0x25, 0x23, 0x21, 
+    0x1f, 0x1d, 0x1b, 0x19, 0x17, 0x15, 0x13, 0x11, 0x0f, 0x0f, 0x0b, 0x09, 0x07, 0x05, 0x03, 0x01 
+};
+#ifdef __GNUC__
+    FU08T_PTR TriangleWave(_TriangleWave);
+#endif
+
+// ECG wave
+#ifdef __ICCAVR__
+    __flash uint8_t ECGWave[ 268 ] = {
+#elif defined __GNUC__
+    PROGMEM uint8_t _ECGWave[ 268 ] = {
+#endif
+    73,74,75,75,74,73,73,73,73,72,71,69,68,67,67,67,
+    68,68,67,65,62,61,59,57,56,55,55,54,54,54,55,55,
+    55,55,55,55,54,53,51,50,49,49,52,61,77,101,132,
+    169,207,238,255,254,234,198,154,109,68,37,17,5,
+    0,1,6,13,20,28,36,45,52,57,61,64,65,66,67,68,68,
+    69,70,71,71,71,71,71,71,71,71,72,72,72,73,73,74,
+    75,75,76,77,78,79,80,81,82,83,84,86,88,91,93,96,
+    98,100,102,104,107,109,112,115,118,121,123,125,
+    126,127,127,127,127,127,126,125,124,121,119,116,
+    113,109,105,102,98,95,92,89,87,84,81,79,77,76,75,
+    74,73,72,70,69,68,67,67,67,68,68,68,69,69,69,69,
+    69,69,69,70,71,72,73,73,74,74,75,75,75,75,75,75,
+    74,74,73,73,73,73,72,72,72,71,71,71,71,71,71,71,
+    70,70,70,69,69,69,69,69,70,70,70,69,68,68,67,67,
+    67,67,66,66,66,65,65,65,65,65,65,65,65,64,64,63,
+    63,64,64,65,65,65,65,65,65,65,64,64,64,64,64,64,
+    64,64,65,65,65,66,67,68,69,71,72,73
+};
+#ifdef __GNUC__
+    FU08T_PTR ECGWave(_ECGWave);
+#endif
+
+// -=[ Постоянные в EEPROM ]=-
+
+// Определение адресов eeprom
+
+EEPROMVAR_DECLARE( uint8_t, Mode );
+EEPROMVAR_DECLARE( uint8_t, Frequency1 );
+EEPROMVAR_DECLARE( uint8_t, Frequency2 );
+EEPROMVAR_DECLARE( uint8_t, Frequency3 );
+EEPROMVAR_DECLARE( uint8_t, Duty );
+EEPROMPTR_DECLARE( uint8_t, Init, ( uint8_t * ) E2END );
+
 
 // -=[ Переменные в ОЗУ ]=-
 
-// Версия программы
-FRESULT res;
+// Элементы меню
+FLASHSTR_DECLARE( char, szMN000, "      Sine      \0" );
+FLASHSTR_DECLARE( char, szMN100, "     Square     \0" );
+FLASHSTR_DECLARE( char, szMN200, "    Triangle    \0" );
+FLASHSTR_DECLARE( char, szMN300, "    SawTooth    \0" );
+FLASHSTR_DECLARE( char, szMN400, "  Rev SawTooth  \0" );
+FLASHSTR_DECLARE( char, szMN500, "      ECG       \0" );
+FLASHSTR_DECLARE( char, szMN600, "    Freq Step   \0" );
+FLASHSTR_DECLARE( char, szMN700, "     Noise      \0" );
+FLASHSTR_DECLARE( char, szMN800, "   High Speed   \0" );
 
-char Version[16];
-char buffer[16];
+// Array of pointers to menu strings stored in flash
+//const uint8_t *MENU[]={
+//		MN000,	//
+//		MN100,	//menu 1 string
+//		MN200,	//menu 2 string
+//		MN300,	//menu 3 string
+//		MN400,	//menu 4 string
+//		MN500,	
+//		MN600,
+//		MN700,
+//		MN800
+//}; 
 
-char read_buf[ 129 ] = {};
-char write_buf[ 128 ] = { 'w', 'r', 'i', 't', 'e', ' ', 'o', 'k', '\r', '\n', 0x00 };
+// Различные строки
+FLASHSTR_DECLARE( char, szMNON,     "ON \0" ); // ON
+FLASHSTR_DECLARE( char, szMNOFF,    "OFF\0" ); // OFF
+FLASHSTR_DECLARE( char, szNA,       "       NA       \0" ); // Clear freq value
+FLASHSTR_DECLARE( char, szCLR,      "                \0" ); // Clear freq value
+FLASHSTR_DECLARE( char, szMNClrfreq, "           \0" ); // Clear freq value
+FLASHSTR_DECLARE( char, szTOEEPROM, "Saving Settings\0" ); // saving to eeprom
+FLASHSTR_DECLARE( char, szONEMHZ,   "      1MHz   \0" ); // saving to eeprom
+FLASHSTR_DECLARE( char, szwelcomeln1, "AVR SIGNAL\0" );
+FLASHSTR_DECLARE( char, szRND,      "    Random\0" );
 
-PR_BEGIN_EXTERN_C
-    extern FIFO( 16 ) uart_rx_fifo;
-PR_END_EXTERN_C
+// variables to control TDA7313
+struct signal {
 
-UFDATE FDate;
-UFTIME FTime;
-FILINFO fno;
-DIR dir;
-FATFS fs;
+    volatile uint8_t mode;		    // signal
+    volatile uint8_t fr1;		    // Frequency [0..7]
+    volatile uint8_t fr2;		    // Frequency [8..15]
+    volatile int8_t fr3;            // Frequency [16..31]
+    volatile uint32_t freq;         // frequency value
+    volatile uint8_t flag;          // if "0"generator is OFF, "1" - ON
+    volatile uint32_t acc;          // accumulator
+    volatile uint8_t ON;
+    volatile uint8_t HSfreq;		// high speed frequency [1...4Mhz]
+    volatile uint32_t deltafreq;    // frequency step value
+
+} SG;
 
 
 /***********************
@@ -85,445 +252,20 @@ FATFS fs;
 ************************/
 
 
-divmod10_t divmodu10( uint32_t n ) {
-
-    divmod10_t res;
-
-    // умножаем на 0.8
-    res.quot = n >> 1;
-    res.quot += res.quot >> 1;
-    res.quot += res.quot >> 4;
-    res.quot += res.quot >> 8;
-    res.quot += res.quot >> 16;
-    uint32_t qq = res.quot;
-
-    // делим на 8
-    res.quot >>= 3;
-
-    // вычисляем остаток
-    res.rem = uint8_t( n - ( ( res.quot << 1 ) + ( qq & ~7ul ) ) );
-
-    // корректируем остаток и частное
-    if ( res.rem > 9 ) {
-
-        res.rem -= 10;
-        res.quot++;
-    }
-
-    return res;
-
-}
-
-
-char * utoa_fast_div( uint32_t value, char * buffer ) {
-
-    buffer += 11;
-    * --buffer = 0;
-
-    do {
-
-        divmod10_t res = divmodu10( value );
-        * --buffer = res.rem + '0';
-        value = res.quot;
-    
-    } while ( value != 0 );
-
-    return buffer;
-
-}
-
-
-/**
- * Просмотр папки
- */
-FRESULT CMCU::ScanFiles( char * path ) {
- 
-    FLASHSTR_DECLARE( char, szDirContent, " Содержимое папки: " );
-
-    uint8_t len;
-
-    // Монтирование FAT32
-    res = pf_mount( & fs );
-
-    res = pf_opendir( & dir, path );
-
-    if ( res == FR_OK ) {
-
-        CConsole::WriteString( szDirContent, CConsole::cp1251 );
-        CConsole::WriteString( path, CConsole::cp1251 );
-        CConsole::WriteString( "\r\n" );
-
-        for (;;) {
-                         
-            res = pf_readdir( & dir, & fno );
-                         
-            if ( res != FR_OK || fno.fname[0] == 0 ) break;
-            
-            // Вывод даты
-            FDate.Value = fno.fdate;
-
-            // Год
-            uint16_t tmp = 1980U + FDate.fdate.Year;
-
-            CConsole::PutChar( ( uint8_t ) ( tmp / 1000U ) + '0' );
-            tmp %= 1000U;
-
-            CConsole::PutChar( ( uint8_t ) ( tmp / 100 ) + '0' );
-            tmp %= 100;
-
-            CConsole::PutChar( ( uint8_t ) ( tmp / 10 ) + '0' );
-
-            CConsole::PutChar( ( uint8_t ) ( tmp % 10 ) + '0' );
-
-            CConsole::PutChar( '.' );
-            
-            // Месяц
-            CConsole::PutChar( FDate.fdate.Month / 10 + '0' );
-            CConsole::PutChar( FDate.fdate.Month % 10 + '0' );
-            CConsole::PutChar( '.' );
-
-            // День
-            CConsole::PutChar( FDate.fdate.Day / 10 + '0' );
-            CConsole::PutChar( FDate.fdate.Day % 10 + '0' );
-
-            CConsole::PutChar( ' ' );
-
-            // Вывод времени
-            FTime.Value = fno.ftime;
-
-            // Часы
-            CConsole::PutChar( FTime.ftime.Hour / 10 + '0' );
-            CConsole::PutChar( FTime.ftime.Hour % 10 + '0' );
-            
-            CConsole::PutChar( ':' );
-
-            // Минуты
-            CConsole::PutChar( FTime.ftime.Minute / 10 + '0' );
-            CConsole::PutChar( FTime.ftime.Minute % 10 + '0' );
-
-            CConsole::PutChar( ':' );
-
-            // Секунды
-            CConsole::PutChar( ( FTime.ftime.Second << 1 ) / 10 + '0' );
-            CConsole::PutChar( ( FTime.ftime.Second << 1 ) % 10 + '0' );
-
-            CConsole::PutChar( ' ' );
-
-            // Если объект - папка
-            if ( fno.fattrib & AM_DIR ) {
-                                                    
-                CConsole::WriteString( " <DIR> ", CConsole::cp1251 );
-                
-                len = 12;
-
-                do CConsole::PutChar( ' ' ); while ( len-- );
-
-                // Имя
-                CConsole::WriteString( fno.fname, CConsole::cp1251 );
-
-            // Если объект - файл
-            } else {		
-                                                    
-                CConsole::WriteString( "       ", CConsole::cp1251 );
-                
-                len = 11 - strlen( utoa_fast_div( fno.fsize, buffer ) );
-
-                do CConsole::PutChar( ' ' ); while ( len-- );
-
-                // Размер
-                CConsole::WriteString( utoa_fast_div( fno.fsize, buffer ) );
-                
-                CConsole::PutChar( ' ' );
-
-                // Имя
-                CConsole::WriteString( fno.fname, CConsole::cp1251 );
-
-            }
-
-            CConsole::WriteString( "\r\n" );
-
-        }
-
-        // Отмонтируем FatFs
-        res = pf_mount(0);
-
-    }
-
-    return res;
-
-}
-
-
-/**
- * Вывод сообщения: OK | FAIL
- */
-void CMCU::ShowStatusMessage( FRESULT Result ) {
-        
-    FLASHSTR_DECLARE( char, szOK, "OK\r\n" );
-    FLASHSTR_DECLARE( char, szFAIL, "FAIL(" );
-
-    if ( Result == 0x00 ) {
-
-        CConsole::SetTextAttr( GREEN );
-        CConsole::WriteString( szOK );
-
-    } else {
-
-        CConsole::SetTextAttr( LIGHTRED );
-        CConsole::WriteString( szFAIL );
-        CConsole::PutChar( Result + '0' );
-        CConsole::WriteString( ")\r\n" );
-
-    }
-
-    CConsole::SetTextAttr( WHITE );
-
-}
-
-
-/**
- * Тест драйвера Petit FAT File System
- */
-void CMCU::TestDriver() {
-
-    FLASHSTR_DECLARE( char, szMountFAT, "Монтирование FAT32 " );
-    FLASHSTR_DECLARE( char, szOpenFile1, "Открываю MainUnit.cpp " );
-    FLASHSTR_DECLARE( char, szSetPointer1, "Устанавливаем указатель на начало файла MainUnit.cpp " );
-    FLASHSTR_DECLARE( char, szReadFile1, "Читаем первые 128 байт из файла MainUnit.cpp " );
-    FLASHSTR_DECLARE( char, szData1, "Содержимое файла MainUnit.cpp:\r\n" );
-    FLASHSTR_DECLARE( char, szOpenFile2, "Открываю write.txt " );
-    FLASHSTR_DECLARE( char, szWriteToFile, "Записывам \"write ok\" в файл write.txt " );
-    FLASHSTR_DECLARE( char, szFinalizing, "Окончание записи в write.txt " );
-    FLASHSTR_DECLARE( char, szSetPointer2, "Устанавливаем указатель на начало файла write.txt " );
-    FLASHSTR_DECLARE( char, szReadFile2, "Читаем первые 128 байт из файла write.txt " );
-    FLASHSTR_DECLARE( char, szData2, "Содержимое файла write.txt:\r\n" );
-    FLASHSTR_DECLARE( char, szUnmounting, "Отмонтирование FAT32 " );
-
-    WORD s1;  
-  
-    // Монтирование FAT32
-    res = pf_mount( & fs );
- 
-    CConsole::WriteString( szMountFAT, CConsole::cp1251 );
-
-    // Если монтирование было успешным
-    if ( res == 0x00 ) {		
-        
-        ShowStatusMessage( res );
-
-        // Открываем файл MainUnit.cpp
-        res = pf_open( "/MainUnit.cpp" );
-
-        CConsole::WriteString( szOpenFile1, CConsole::cp1251 );
-
-        ShowStatusMessage( res );
-
-        // Устанваливаем указатель на начало файла MainUnit.cpp
-        res = pf_lseek(0);
-
-        CConsole::WriteString( szSetPointer1, CConsole::cp1251 );
-
-        ShowStatusMessage( res );
-
-        // Читаем первые 128 байт из файла MainUnit.cpp
-        res = pf_read( read_buf, 128, & s1 );	
-
-        CConsole::WriteString( szReadFile1, CConsole::cp1251 );
-
-        ShowStatusMessage( res );
-
-        CConsole::WriteString( szData1, CConsole::cp1251 );
-
-        // Отображаем содержимое буфера
-        CConsole::WriteString( read_buf, CConsole::cp1251 );	
-
-        CConsole::WriteString( "\r\n" );
-
-        res = pf_open( "/write.txt" );
-
-        // Открываем файл write.txt
-        CConsole::WriteString( szOpenFile2, CConsole::cp1251 );	
-
-        ShowStatusMessage( res );
-
-        // Записываем содержимое буфера в файл write.txt
-        res = pf_write( write_buf, strlen( write_buf ), & s1 );	
-
-        CConsole::WriteString( szWriteToFile, CConsole::cp1251 );
-
-        ShowStatusMessage( res );
-
-        // Финализируем запись в  write.txt
-        res = pf_write( 0, 0, & s1 );
-
-        CConsole::WriteString( szFinalizing, CConsole::cp1251 );
-
-        ShowStatusMessage( res );
-
-        // Устанваливаем указатель на начало файла write.txt
-        res = pf_lseek(0);
-
-        CConsole::WriteString( szSetPointer2, CConsole::cp1251 );
-
-        ShowStatusMessage( res );
-
-        // Очищаем буфер
-        read_buf[0] = 0;
-
-        // Читаем первые 128 байт из файла write.txt
-        res = pf_read( read_buf, 128, & s1 );
-
-        CConsole::WriteString( szReadFile2, CConsole::cp1251 );
-
-        ShowStatusMessage( res );
-
-        CConsole::WriteString( szData2, CConsole::cp1251 );	
-
-        // Читаем первые 128 байт из файла write.txt
-        CConsole::WriteString( read_buf );
-
-        // Отмонтируем FatFs
-        res = pf_mount(0);
-
-        CConsole::WriteString( szUnmounting, CConsole::cp1251 );
-
-        ShowStatusMessage( res );
-
-    } else {
-        
-        ShowStatusMessage( res );
-    }
-
-}
-
-
-/**
- * Командная оболочка
- */
-void CMCU::CommandShell() {
-
-    FLASHSTR_DECLARE( char, szInterpreterName, "Командная оболочка, версия " );
-    FLASHSTR_DECLARE( char, szBuildDate, "Дата сборки проекта: " );
-    FLASHSTR_DECLARE( char, szInterpreterAuthor, "\r\nАвтор: Мезенцев Вячеслав (unihomelab@ya.ru)\r\n\r\n" );
-    FLASHSTR_DECLARE( char, szCommandPrompt, "[ATmega16]$ " );
-    FLASHSTR_DECLARE( char, szAvailableCommands, "\r\nДоступные команды:\r\n" );
-    FLASHSTR_DECLARE( char, szHelpDescription, " - (help) вывод подсказки.\r\n" );
-    FLASHSTR_DECLARE( char, szTestDescription, " - (test) тест драйвера Petit FAT File System.\r\n" );
-    FLASHSTR_DECLARE( char, szScanDescription, " - (dir) просмотр папки.\r\n" );
-    FLASHSTR_DECLARE( char, szCommandIsNotSupported, "\r\nКоманда не поддерживается. Введите " );
-    FLASHSTR_DECLARE( char, szForHelp, " (help) для помощи.\r\n" );
-
-    char * cmd;
-
-    CConsole::SetTextAttr( LIGHTGRAY );
-    CConsole::ClearScreen();
-
-    CConsole::GotoXY( 1, 25 );
-
-    CConsole::WriteString( szInterpreterName, CConsole::cp1251 );
-    CConsole::WriteString( Version );
-    CConsole::WriteString( "\r\n" );
-
-    CConsole::WriteString( szBuildDate, CConsole::cp1251 );
-    CConsole::WriteString( CVersion::GetBuildDateString(), CConsole::cp1251 );
-
-    CConsole::WriteString( szInterpreterAuthor, CConsole::cp1251 );
-
-    while ( true ) {
-
-        // Выводим приглашение
-        CConsole::SetTextAttr( GREEN );
-        CConsole::WriteString( szCommandPrompt );
-
-        // Считываем ввод пользователя
-        CConsole::SetTextAttr( LIGHTGRAY );
-        cmd = CConsole::ReadString( buffer );
-
-        // Если пустая команда, то переходим на следующую строку
-        if ( cmd[0] == 0 ) {
-
-            CConsole::WriteString( "\r\n" );
-
-        // Выводим справку
-        } else if ( ( cmd[0] == 'h' ) && ( cmd[1] == 0 ) ) {
-
-            CConsole::SetTextAttr( WHITE );
-            CConsole::WriteString( szAvailableCommands, CConsole::cp1251 );
-
-            CConsole::SetTextAttr( LIGHTRED );
-            CConsole::PutChar( 'h' );
-
-            CConsole::SetTextAttr( WHITE );
-            CConsole::WriteString( szHelpDescription, CConsole::cp1251 );
-
-            CConsole::SetTextAttr( LIGHTRED );
-            CConsole::PutChar( 't' );
-
-            CConsole::SetTextAttr( WHITE );
-            CConsole::WriteString( szTestDescription, CConsole::cp1251 );
-
-            CConsole::SetTextAttr( LIGHTRED );
-            CConsole::PutChar( 'd' );
-
-            CConsole::SetTextAttr( WHITE );
-            CConsole::WriteString( szScanDescription, CConsole::cp1251 );
-
-        // Тестирование драйвера
-        } else if ( ( cmd[0] == 't' ) && ( cmd[1] == 0 ) ) {
-
-            CConsole::WriteString( "\r\n" );
-            TestDriver();
-
-        // Промотр папки
-        } else if ( ( cmd[0] == 'd' ) && ( cmd[1] == 0 ) ) {
-
-            CConsole::WriteString( "\r\n" );
-            ShowStatusMessage( ScanFiles( "/" ) );            
-
-        // Выводим сообщение о неподдерживаемой команде
-        } else {
-
-            CConsole::SetTextAttr( WHITE );
-            CConsole::WriteString( szCommandIsNotSupported, CConsole::cp1251 );
-
-            CConsole::SetTextAttr( LIGHTRED );
-            CConsole::WriteString( "h" );
-
-            CConsole::SetTextAttr( WHITE );
-            CConsole::WriteString( szForHelp, CConsole::cp1251 );
-
-        }
-
-    }
-
-}
-
-
 /**
  * Главный (основной) поток программы
  */
 HRESULT CMCU::MainThreadProcedure(){
 
-    // Вычисление строки с версией программы
-    strcat( Version, utoa_fast_div( CVersion::GetMajor(), buffer ) );
-    strcat( Version, "." );
-
-    strcat( Version, utoa_fast_div( CVersion::GetMinor(), buffer ) );
-    strcat( Version, "." );
-
-    strcat( Version, utoa_fast_div( CVersion::GetRevision(), buffer ) );
-    strcat( Version, "." );
-
-    strcat( Version, utoa_fast_div( CVersion::GetBuild(), buffer ) );
-
     // Разрешаем прерывания
     __enable_interrupt();
 
-    // Запускаем командрую оболочку
-    CommandShell();
+    * Init = 'T';
 
-    // Размонтируем
-    pf_mount( NULL );
+    do {
+
+
+    } while ( true );
 
     // Все проверки прошли успешно, объект в рабочем состоянии
     return NO_ERROR;
@@ -537,7 +279,7 @@ HRESULT CMCU::MainThreadProcedure(){
 void CMCU::Initialization(){
 
     // Схема соединений (разводка выводов) [ATmega16]
-    PortsInit();
+    //PortsInit();
 
     // Настройка АЦП [ATmega16]
     //ADCInit();
@@ -555,7 +297,7 @@ void CMCU::Initialization(){
     //InternalWDTInit();
 
     // Настройка внутреннего USART [ATmega16]
-    USARTInit();
+    //USARTInit();
 
     // Настройка последовательного интерфейса TWI [ATmega16]
     //TWIInit();
@@ -567,7 +309,7 @@ void CMCU::Initialization(){
     //ExternalInterruptsInit();
 
     // Настройка управляющих регистров контроллера [ATmega16]
-    ControlRegistersInit();
+    //ControlRegistersInit();
 
 }
 
@@ -758,7 +500,7 @@ void CMCU::Timer0Init(){
     // Timer/Counter 0 Control Register
     // [ Регистр управления Таймером/Счётчиком 0 ]
     //           00000000 - Initial Value
-    TCCR0 = BIN8(00000011); // BIN8() не зависит от уровня оптимизации
+    //TCCR0 = BIN8(00000000); // BIN8() не зависит от уровня оптимизации
     //           ||||||||
     //           |||||||+- 0, rw, CS00:  -+ - Управление тактовым сигналом
     //           ||||||+-- 1, rw, CS01:   |
@@ -771,10 +513,10 @@ void CMCU::Timer0Init(){
     // Примечание:
 
     // Устанавливаем значения для счётного регистра
-    TCNT0 = 0xFF - F_CPU / 64000UL;
+    //TCNT0 = 0xFF - F_CPU / 64000UL;
 
     // Timer/Counter0 Output Compare Register
-    OCR0 = 0x00;
+    //OCR0 = 0x00;
 
     // Timer/Counter0 Asynchronous Status Register
     // [ Регистр ... ][ATmega16]
@@ -785,10 +527,10 @@ void CMCU::Timer0Init(){
     //          ||||||+-- 1, r, OCR0UB: - Output Compare Register0 Update Busy
     //          |||||+--- 2, r, TCN0UB: - Timer/Counter0 Update Busy
     //          ||||+---- 3, rw, AS0:   - Asynchronous Timer/Counter0
-    //          |||+----- 4, r, -:
-    //          ||+------ 5, r, -:
-    //          |+------- 6, r, -:
-    //          +-------- 7, r, -:
+    //          |||+----- 4, r: 0
+    //          ||+------ 5, r: 0
+    //          |+------- 6, r: 0
+    //          +-------- 7, r: 0
     // Примечание:
 
 }
@@ -816,10 +558,10 @@ void CMCU::Timer1Init(){
     // Timer/Counter1 Control Register B
     // [ Регистр управления B Таймером/Счётчиком 1 ][ATmega16]
     //            00000000 - Initial Value
-    TCCR1B = BIN8(00000000); // BIN8() не зависит от уровня оптимизации
+    //TCCR1B = BIN8(00000000); // BIN8() не зависит от уровня оптимизации
     //            ||||||||
-    //            |||||||+- 0, rw, CS10:  -+
-    //            ||||||+-- 1, rw, CS11:   | - Управление тактовым сигналом
+    //            |||||||+- 0, rw, CS10:  -+ - Управление тактовым сигналом
+    //            ||||||+-- 1, rw, CS11:   | 
     //            |||||+--- 2, rw, CS12:  _|
     //            ||||+---- 3, rw, WGM12: -+ - Режим работы таймера/счетчика
     //            |||+----- 4, rw, WGM13: _|
@@ -829,8 +571,8 @@ void CMCU::Timer1Init(){
     // Примечание:
 
     // Устанавливаем значения для счётных регистров
-    TCNT1H = 0x00; // ( 0xFFFF - Delay * F_CPU / PrescaleValue ) >> 8
-    TCNT1L = 0x00; // ( 0xFFFF - Delay * F_CPU / PrescaleValue )
+    //TCNT1H = 0x00; // ( 0xFFFF - Delay * F_CPU / PrescaleValue ) >> 8
+    //TCNT1L = 0x00; // ( 0xFFFF - Delay * F_CPU / PrescaleValue )
     /*
     OCR1AH = 0x00;
     OCR1AL = 0x39;
@@ -847,7 +589,7 @@ void CMCU::Timer1Init(){
     // Timer/Counter1 Control Register A
     // [ Регистр управления A Таймером/Счётчиком 1 ][ATmega16]
     //            00000000 - Initial Value
-    TCCR1A = BIN8(00000000); // BIN8() не зависит от уровня оптимизации
+    //TCCR1A = BIN8(00000000); // BIN8() не зависит от уровня оптимизации
     //            ||||||||
     //            |||||||+- 0, rw, WGM10:  -+ - Режим работы таймера/счетчика
     //            ||||||+-- 1, rw, WGM11:  _|
@@ -859,10 +601,10 @@ void CMCU::Timer1Init(){
     //            +-------- 7, rw, COM1A1: _|
     // Примечание: Установлен режим работы ...
 
-    TCCR1B = BIN8(00000000); // BIN8() не зависит от уровня оптимизации
+    //TCCR1B = BIN8(00000000); // BIN8() не зависит от уровня оптимизации
     //            ||||||||
-    //            |||||||+- 0, rw, CS10:  -+
-    //            ||||||+-- 1, rw, CS11:   | - Управление тактовым сигналом
+    //            |||||||+- 0, rw, CS10:  -+ - Управление тактовым сигналом
+    //            ||||||+-- 1, rw, CS11:   | 
     //            |||||+--- 2, rw, CS12:  _|
     //            ||||+---- 3, rw, WGM12: -+ - Режим работы таймера/счетчика
     //            |||+----- 4, rw, WGM13: _|
@@ -883,7 +625,7 @@ void CMCU::Timer2Init(){
     // Timer/Counter2 Control Register
     // [ Регистр управления Таймером/Счётчиком 2 ][ATmega16]
     //           00000000 - Initial Value
-    TCCR2 = BIN8(00000100); // BIN8() не зависит от уровня оптимизации
+    //TCCR2 = BIN8(00000000); // BIN8() не зависит от уровня оптимизации
     //           ||||||||
     //           |||||||+- 0, rw, CS20:  -+ - Clock Select
     //           ||||||+-- 1, rw, CS21:   |
@@ -896,10 +638,10 @@ void CMCU::Timer2Init(){
     // Примечание:
 
     // Устанавливаем значения для счётного регистра
-    TCNT2 =  0xFF - F_CPU / 64000UL;
+    //TCNT2 =  0xFF - F_CPU / 64000UL;
 
     // Timer/Counter2 Output Compare Register
-    OCR2 = 0x00;
+    //OCR2 = 0x00;
 
     // Timer/Counter2 Asynchronous Status Register
     // [ Регистр ... ][ATmega16]
@@ -927,7 +669,7 @@ void CMCU::SPIInit(){
     // SPI Control Register
     // [ Регистр управления SPI ][ATmega16]
     //          00000000 - Initial Value
-    SPCR = BIN8(0000000); // BIN8() не зависит от уровня оптимизации
+    //SPCR = BIN8(0000000); // BIN8() не зависит от уровня оптимизации
     //          ||||||||
     //          |||||||+- 0, rw, SPR0: -+ - Скорость передачи
     //          ||||||+-- 1, rw, SPR1: _|
@@ -942,12 +684,12 @@ void CMCU::SPIInit(){
     // SPI Status Register
     // [ Регистр статуса SPI ][ATmega16]
     //          00000000 - Initial Value
-    SPSR = BIN8(00000000); // BIN8() не зависит от уровня оптимизации
+    //SPSR = BIN8(00000000); // BIN8() не зависит от уровня оптимизации
     //          ||||||||
     //          |||||||+- 0, rw, SPI2X:    - Double SPI Speed Bit
-    //          ||||||+-- 1, r, 0       -+
+    //          ||||||+-- 1, r, 0       -+ - зарезервированы
     //          |||||+--- 2, r, 0        |
-    //          ||||+---- 3, r, 0        | - зарезервированы
+    //          ||||+---- 3, r, 0        | 
     //          |||+----- 4, r, 0        |
     //          ||+------ 5, r, 0       _|
     //          |+------- 6, r, WCOL:      - Write COLlision flag
@@ -988,9 +730,9 @@ void CMCU::TWIInit(){
     //          |||||||+- 0, rw, TWPS0: -+ - TWI Prescaler Bits
     //          ||||||+-- 1, rw, TWPS1: _|
     //          |||||+--- 2, r:            - reserved (will always read as zero)
-    //          ||||+---- 3, r, TWS3:   -+
+    //          ||||+---- 3, r, TWS3:   -+ - TWI Status
     //          |||+----- 4, r, TWS4:    |
-    //          ||+------ 5, r, TWS5:    | - TWI Status
+    //          ||+------ 5, r, TWS5:    | 
     //          |+------- 6, r, TWS6:    |
     //          +-------- 7, r, TWS7:   _|
     // Примечание:
@@ -1010,7 +752,7 @@ void CMCU::USARTInit(){
     // USART Control and Status Register A
     // [ Регистр управления UCSRA ][ATmega16]
     //           00100000 - Initial Value
-    UCSRA = BIN8(00100000); // BIN8() не зависит от уровня оптимизации
+    //UCSRA = BIN8(00100000); // BIN8() не зависит от уровня оптимизации
     //           ||||||||
     //           |||||||+- 0, rw, MPCM: - Multi-processor Communication Mode
     //           ||||||+-- 1, rw, U2X:  - Double the USART Transmission Speed
@@ -1022,17 +764,16 @@ void CMCU::USARTInit(){
     //           +-------- 7, r, RXC:   - USART Receive Complete
     // Примечание:
 
-
-    UCSRB = 0x00; // отключаем, пока настраиваем скорость
+    //UCSRB = 0x00; // отключаем, пока настраиваем скорость
 
     // Определение BAUD см. в файле: "Configuration.h"
-    UBRRL = ( uint8_t ) ( F_CPU / ( 16UL * BAUD ) - 1UL ); // устанавливаем скорость
-    UBRRH = ( uint8_t ) ( ( F_CPU / ( 16UL * BAUD ) - 1UL ) >> 8 );
+    //UBRRL = ( uint8_t ) ( F_CPU / ( 16UL * BAUD ) - 1UL ); // устанавливаем скорость
+    //UBRRH = ( uint8_t ) ( ( F_CPU / ( 16UL * BAUD ) - 1UL ) >> 8 );
 
     // USART Control and Status Register B
     // [ Регистр управления UCSRB ][ATmega16]
     //           00000000 - Initial Value
-    UCSRB = BIN8(10011000); // BIN8() не зависит от уровня оптимизации
+    //UCSRB = BIN8(00000000); // BIN8() не зависит от уровня оптимизации
     //           ||||||||
     //           |||||||+- 0, rw, TXB8:  - Transmit Data Bit 8
     //           ||||||+-- 1, r,  RXB8:  - Receive Data Bit 8
@@ -1044,11 +785,10 @@ void CMCU::USARTInit(){
     //           +-------- 7, rw, RXCIE: - RX Complete Interrupt Enable
     // Примечание:
 
-
     // USART Control and Status Register C
     // [ Регистр управления UCSRC ][ATmega16]
     //           10000110 - Initial Value
-    UCSRC = BIN8(10000110); // BIN8() не зависит от уровня оптимизации
+    //UCSRC = BIN8(10000110); // BIN8() не зависит от уровня оптимизации
     //           ||||||||
     //           |||||||+- 0, rw, UCPOL:    - Clock Polarity
     //           ||||||+-- 1, rw, UCSZ0: -+ - Character Size
@@ -1150,16 +890,16 @@ void CMCU::PortsInit(){
     // Port B Data Direction Register
     // [ Регистр направления порта B ][ATmega16]
     //          00000000 - Initial Value
-    DDRB = BIN8(10110011); // BIN8() не зависит от уровня оптимизации
+    DDRB = BIN8(00000000); // BIN8() не зависит от уровня оптимизации
     //          ||||||||
-    //          |||||||+- 0, rw, DDB0: (XCK/T0)    - CD
-    //          ||||||+-- 1, rw, DDB1: (T1)        - WP
+    //          |||||||+- 0, rw, DDB0: (XCK/T0)    -
+    //          ||||||+-- 1, rw, DDB1: (T1)        -
     //          |||||+--- 2, rw, DDB2: (INT2/AIN0) -
     //          ||||+---- 3, rw, DDB3: (OC0/AIN1)  -
-    //          |||+----- 4, rw, DDB4: (~SS)       - SD_CS
-    //          ||+------ 5, rw, DDB5: (MOSI)      - SD_DI
-    //          |+------- 6, rw, DDB6: (MISO)      - SD_DO
-    //          +-------- 7, rw, DDB7: (SCK)       - SD_CLK
+    //          |||+----- 4, rw, DDB4: (~SS)       -
+    //          ||+------ 5, rw, DDB5: (MOSI)      -
+    //          |+------- 6, rw, DDB6: (MISO)      -
+    //          +-------- 7, rw, DDB7: (SCK)       -
     // Примечание:
 
     // Port C Data Direction Register
@@ -1180,10 +920,10 @@ void CMCU::PortsInit(){
     // Port D Data Direction Register
     // [ Регистр направления порта D ][ATmega16]
     //          00000000 - Initial Value
-    DDRD = BIN8(00000010); // BIN8() не зависит от уровня оптимизации
+    DDRD = BIN8(00000000); // BIN8() не зависит от уровня оптимизации
     //          ||||||||
-    //          |||||||+- 0, rw, DDD0: (RXD)  - RXD
-    //          ||||||+-- 1, rw, DDD1: (TXD)  - TXD
+    //          |||||||+- 0, rw, DDD0: (RXD)  -
+    //          ||||||+-- 1, rw, DDD1: (TXD)  -
     //          |||||+--- 2, rw, DDD2: (INT0) -
     //          ||||+---- 3, rw, DDD3: (INT1) -
     //          |||+----- 4, rw, DDD4: (OC1B) -
@@ -1211,16 +951,16 @@ void CMCU::PortsInit(){
     // Port B Data Register
     // [ Регистр данных порта B ][ATmega16]
     //           00000000 - Initial Value
-    PORTB = BIN8(01000000); // BIN8() не зависит от уровня оптимизации
+    PORTB = BIN8(00000000); // BIN8() не зависит от уровня оптимизации
     //           ||||||||
-    //           |||||||+- 0, rw, PORTB0: (XCK/T0)    - CD
-    //           ||||||+-- 1, rw, PORTB1: (T1)        - WP
+    //           |||||||+- 0, rw, PORTB0: (XCK/T0)    -
+    //           ||||||+-- 1, rw, PORTB1: (T1)        -
     //           |||||+--- 2, rw, PORTB2: (INT2/AIN0) -
     //           ||||+---- 3, rw, PORTB3: (OC0/AIN1)  -
-    //           |||+----- 4, rw, PORTB4: (~SS)       - SD_CS
-    //           ||+------ 5, rw, PORTB5: (MOSI)      - SD_DI
-    //           |+------- 6, rw, PORTB6: (MISO)      - SD_DO
-    //           +-------- 7, rw, PORTB7: (SCK)       - SD_CLK
+    //           |||+----- 4, rw, PORTB4: (~SS)       -
+    //           ||+------ 5, rw, PORTB5: (MOSI)      -
+    //           |+------- 6, rw, PORTB6: (MISO)      -
+    //           +-------- 7, rw, PORTB7: (SCK)       -
     // Примечание:
 
     // Port C Data Register
@@ -1241,10 +981,10 @@ void CMCU::PortsInit(){
     // Port D Data Register
     // [ Регистр данных порта D ][ATmega16]
     //           00000000 - Initial Value
-    PORTD = BIN8(00000001); // BIN8() не зависит от уровня оптимизации
+    PORTD = BIN8(00000000); // BIN8() не зависит от уровня оптимизации
     //           ||||||||
-    //           |||||||+- 0, rw, PORTD0: (RXD)  - RXD
-    //           ||||||+-- 1, rw, PORTD1: (TXD)  - TXD
+    //           |||||||+- 0, rw, PORTD0: (RXD)  -
+    //           ||||||+-- 1, rw, PORTD1: (TXD)  -
     //           |||||+--- 2, rw, PORTD2: (INT0) -
     //           ||||+---- 3, rw, PORTD3: (INT1) -
     //           |||+----- 4, rw, PORTD4: (OC1B) -
@@ -1467,11 +1207,6 @@ void CMCU::OnSPISerialTransferComplete(){
  * USART, Rx Complete
  */
 void CMCU::OnUSARTRxComplete( uint8_t data ){
-
-    if ( !FIFO_IS_FULL( uart_rx_fifo ) ) {
-        
-        FIFO_PUSH( uart_rx_fifo, data );
-    }
 
 }
 
