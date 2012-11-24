@@ -652,7 +652,7 @@ void CMCU::USARTInit(){
     // USART Control and Status Register C
     // [ Регистр управления UCSRC ][ATmega16]
     //           10000110 - Initial Value
-    //UCSRC = BIN8(10100110); // BIN8() не зависит от уровня оптимизации
+    UCSRC = BIN8(10000110); // BIN8() не зависит от уровня оптимизации
     //           ||||||||
     //           |||||||+- 0, rw, UCPOL:    - Clock Polarity
     //           ||||||+-- 1, rw, UCSZ0: -+ - Character Size
