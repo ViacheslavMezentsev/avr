@@ -68,9 +68,6 @@ d.toLocaleDateString() + " " + d.toLocaleTimeString() +
 \r\n\
 /**\r\n\
  * ќбраз дл€ работы с версией программы\r\n\
- *\r\n\
- * ¬нимание. Ётот файл формируетс€ автоматически. Ћюбые внесЄнные\r\n\
- * здесь изменени€ пропадут перед компил€цией.\r\n\
  */\r\n\
 class CVersion {\r\n\
 \r\n\
@@ -82,7 +79,8 @@ public:\r\n\
     inline static uint16_t GetBuild() { return " + Build + "; }\r\n\
 \r\n\
     inline static FCHAR_PTR GetBuildDateString() {\r\n\
-        return SPSTR( \"" + d.toLocaleDateString() + "\" );\r\n\
+        FLASHSTR_DECLARE( char, szBuildDateString, \"" + d.toLocaleDateString() + "\" );\r\n\
+        return szBuildDateString;\r\n\
     }\r\n\
 \r\n\
 };\r\n\

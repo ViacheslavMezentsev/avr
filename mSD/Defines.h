@@ -27,7 +27,7 @@
     #include <avr/pgmspace.h>
     #include <avr/interrupt.h>
     #include <avr/io.h>
-    #include <avr/iom16.h>
+    #include <avr/iom32.h>
 
     // Ќабор шаблонов дл€ "типизации" указателей в AVR GCC
     #ifdef __cplusplus
@@ -79,7 +79,7 @@
     #include <stdlib.h>
     #include <string.h>
 
-    #include <iom16.h>
+    #include <iom32.h>
     #include <ina90.h>
 
     // TODO: ѕодумать об аналогах этих задержек (как в AVR GCC)
@@ -172,9 +172,8 @@
 
 #include "fifo.h"
 
-// Petit FAT File System Module
-#include "diskio.h"
-#include "pff.h"
+#include "ff9a/ff.h"
+#include "ff9a/diskio.h"
 
 #define TOGGLE(x,y) ((x) ^= (1<<(y)))
 #define CHECKBIT(x,y) ((x) & (1<<(y)))
