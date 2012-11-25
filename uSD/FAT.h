@@ -13,13 +13,9 @@
 / * Redistributions of source code must retain the above copyright notice.
 /
 /----------------------------------------------------------------------------*/
+#ifndef _FAT_H_
+#define _FAT_H_
 
-#include "Defines.h"
-//#include "integer.h"
-
-#ifdef __cplusplus
-PR_BEGIN_EXTERN_C
-#endif
 
 /*---------------------------------------------------------------------------/
 / Petit FatFs Configuration Options
@@ -28,8 +24,8 @@ PR_BEGIN_EXTERN_C
 / the configuration options.
 /
 /----------------------------------------------------------------------------*/
-#ifndef _FATFS
-#define _FATFS
+
+#include "Defines.h"
 
 #define	_USE_READ	1	/* pf_read(): 0:Remove ,1:Enable */
 
@@ -74,6 +70,38 @@ PR_BEGIN_EXTERN_C
 #define	CLUST	WORD
 #endif
 
+// Тип, описывающий дату
+// http://elm-chan.org/fsw/ff/en/sfileinfo.html
+typedef struct _SFDATE {
+
+    uint16_t Day:    5; // Day (1..31)
+    uint16_t Month:  4; // Month (1..12)
+    uint16_t Year:   7; // Year origin from 1980 (0..127)
+
+} SFDATE;
+
+typedef union _UFDATE {
+
+    uint16_t Value;
+    SFDATE fdate;
+
+} UFDATE;
+
+// Тип, описывающий время
+typedef struct _SFTIME {
+
+    uint16_t Second:    5; // Second / 2 (0..29)
+    uint16_t Minute:    6; // Minute (0..59)
+    uint16_t Hour:      5; // Hour (0..23)
+
+} SFTIME;
+
+typedef union _UFTIME {
+
+    uint16_t Value;
+    SFTIME ftime;
+
+} UFTIME;
 
 /* File system object structure */
 
@@ -139,14 +167,51 @@ typedef enum {
 /*--------------------------------------------------------------*/
 /* Petit FatFs module application interface                     */
 
-FRESULT pf_mount (FATFS*);						/* Mount/Unmount a logical drive */
-FRESULT pf_open (const char*);					/* Open a file */
-FRESULT pf_read (void*, WORD, WORD*);			/* Read data from the open file */
-FRESULT pf_write (const void*, WORD, WORD*);	/* Write data to the open file */
-FRESULT pf_lseek (DWORD);						/* Move file pointer of the open file */
-FRESULT pf_opendir (DIR*, const char*);			/* Open a directory */
-FRESULT pf_readdir (DIR*, FILINFO*);			/* Read a directory item from the open directory */
+FRESULT pf_mount( FATFS * );						/* Mount/Unmount a logical drive */
+FRESULT pf_open( const char * );					/* Open a file */
+FRESULT pf_read( void *, WORD, WORD * );			/* Read data from the open file */
+FRESULT pf_write( const void *, WORD, WORD * );	/* Write data to the open file */
+FRESULT pf_lseek( DWORD );						/* Move file pointer of the open file */
+FRESULT pf_opendir( DIR *, const char * );			/* Open a directory */
+FRESULT pf_readdir( DIR *, FILINFO * );			/* Read a directory item from the open directory */
 
+/**
+ * Класс CFAT
+ * ~~~~~~~~~~
+ *
+ * Назначение:
+ * Обёртка для работы с драйвером Petit FatFS.
+ *
+ * Автор: Мезенцев Вячеслав
+ *
+ * Почта: mailto:unihomelab@ya.ru
+ *
+ * ВНИМАНИЕ:
+ * Этот файл формируется автоматически в среде EA.
+ * Если Вы что-то изменили здесь, то синхронизируйте изменения в EA.
+ */
+class CFAT {
+
+public:
+
+    static FRESULT Mount( FATFS * FileSystemObject );
+    static FRESULT Open( const char * FileName );
+    static FRESULT Open( FCHAR_PTR FileName );
+    static FRESULT Read( void * Buffer, WORD ByteToRead, WORD * BytesRead );
+    static FRESULT Write( const void * Buffer, WORD ByteToWrite, WORD * BytesWritten );
+    static FRESULT Write( FCHAR_PTR Buffer, WORD ByteToWrite, WORD * BytesWritten );
+    static FRESULT LSeek( DWORD Offset );
+    static FRESULT OpenDir( DIR * DirObject, const char * DirName );
+    static FRESULT OpenDir( DIR * DirObject, FCHAR_PTR DirName );
+    static FRESULT ReadDir( DIR *, FILINFO * FileInfo );
+
+private:
+    inline static FRESULT FollowPath( DIR * DirObject, const char * path );
+    inline static FRESULT FollowPath( DIR * DirObject, FCHAR_PTR path );
+    inline static FRESULT CreateName( DIR * DirObject, const char * * path );
+    inline static FRESULT CreateName( DIR * DirObject, FCHAR_PTR * path );
+
+};
 
 
 /*--------------------------------------------------------------*/
@@ -469,8 +534,4 @@ FRESULT pf_readdir (DIR*, FILINFO*);			/* Read a directory item from the open di
 
 #endif /* _DF1S */
 
-#ifdef __cplusplus
-PR_END_EXTERN_C
-#endif
-
-#endif /* _FATFS */
+#endif // _FAT_H_

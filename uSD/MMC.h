@@ -1,12 +1,5 @@
-/*-----------------------------------------------------------------------
-/  PFF - Low level disk interface modlue include file    (C)ChaN, 2009
-/-----------------------------------------------------------------------*/
-
-#ifndef _DISKIO
-#define _DISKIO
-
-#include "Defines.h"
-
+#ifndef __MMC_H__
+#define __MMC_H__
 
 /* Status of Disk Functions */
 typedef BYTE	DSTATUS;
@@ -21,13 +14,6 @@ typedef enum {
 } DRESULT;
 
 
-///*---------------------------------------*/
-///* Prototypes for disk control functions */
-//
-//DSTATUS disk_initialize (void);
-//DRESULT disk_readp (BYTE*, DWORD, WORD, WORD);
-//DRESULT disk_writep (const BYTE*, DWORD);
-
 #define STA_NOINIT		0x01	/* Drive not initialized */
 #define STA_NODISK		0x02	/* No medium in the drive */
 
@@ -38,4 +24,33 @@ typedef enum {
 #define CT_SDC				(CT_SD1|CT_SD2)	/* SD */
 #define CT_BLOCK			0x08	/* Block addressing */
 
-#endif
+/**
+ * Класс CMMC
+ * ~~~~~~~~~~
+ *
+ * Назначение:
+ * Обёртка ....
+ *
+ * Автор: Мезенцев Вячеслав
+ *
+ * Почта: mailto:unihomelab@ya.ru
+ *
+ * ВНИМАНИЕ:
+ * Этот файл формируется автоматически в среде EA.
+ * Если Вы что-то изменили здесь, то синхронизируйте изменения в EA.
+ */
+
+class CMMC {
+
+public:
+
+    static DSTATUS Initialize();
+    static DRESULT Read( BYTE * buff, DWORD lba, WORD ofs, WORD cnt );
+    static DRESULT Write( const BYTE * buff, DWORD sa );
+    static DRESULT Write( FCHAR_PTR buff, DWORD sa );
+
+private:
+
+};
+
+#endif // __MMC_H__

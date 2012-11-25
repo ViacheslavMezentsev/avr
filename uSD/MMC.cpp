@@ -1,9 +1,11 @@
 //-----------------------------------------------------------------------
-// PFF - Low level disk control module for ATmega32                      
+// PFF - Low level disk control module for ATmega32
 //-----------------------------------------------------------------------
 
-//#include <avr/io.h>
-#include "diskio.h"
+#include "Defines.h"
+#include "Configuration.h"
+#include "MMC.h"
+
 
 // allow write operations
 #define _WRITE_FUNC	1			
@@ -16,21 +18,21 @@
 #define SD_INS  0   // CD
 #define SD_WP   1   // WP
 
-// Definitions for MMC/SDC command 
-#define CMD0	(0x40+0)	// GO_IDLE_STATE 
-#define CMD1	(0x40+1)	// SEND_OP_COND (MMC) 
-#define	ACMD41	(0xC0+41)	// SEND_OP_COND (SDC) 
-#define CMD8	(0x40+8)	// SEND_IF_COND 
-#define CMD16	(0x40+16)	// SET_BLOCKLEN 
-#define CMD17	(0x40+17)	// READ_SINGLE_BLOCK 
-#define CMD24	(0x40+24)	// WRITE_BLOCK 
+// Definitions for MMC/SDC command
+#define CMD0	(0x40+0)	// GO_IDLE_STATE
+#define CMD1	(0x40+1)	// SEND_OP_COND (MMC)
+#define	ACMD41	(0xC0+41)	// SEND_OP_COND (SDC)
+#define CMD8	(0x40+8)	// SEND_IF_COND
+#define CMD16	(0x40+16)	// SET_BLOCKLEN
+#define CMD17	(0x40+17)	// READ_SINGLE_BLOCK
+#define CMD24	(0x40+24)	// WRITE_BLOCK
 #define CMD55	(0x40+55)	// APP_CMD
-#define CMD58	(0x40+58)	// READ_OCR 
+#define CMD58	(0x40+58)	// READ_OCR
 
-// Port Controls (Platform dependent) 
-#define SELECT()	PORTB &= ~_BV( SD_CS )		// MMC CS = L 
-#define	DESELECT()	PORTB |=  _BV( SD_CS )		// MMC CS = H 
-#define	MMC_SEL		!( PORTB & _BV( SD_CS ) )	// MMC CS status (true:selected) 
+// Port Controls (Platform dependent)
+#define SELECT()	PORTB &= ~_BV( SD_CS )		// MMC CS = L
+#define	DESELECT()	PORTB |=  _BV( SD_CS )		// MMC CS = H
+#define	MMC_SEL		!( PORTB & _BV( SD_CS ) )	// MMC CS status (true:selected)
 #define	INIT_SPI()	{ PORTB=_BV(SD_CS)|_BV(SD_DO)|_BV(SD_DI)|_BV(SD_WP)|_BV(SD_INS); DDRB=_BV(SD_CS)|_BV(SD_DI)|_BV(SD_CLK); }	
 
 
@@ -39,10 +41,11 @@
 //-----------------------------------------------------------------------
 static BYTE CardType;
 
+
 //-----------------------------------------------------------------------
 // SPI functions
 //-----------------------------------------------------------------------
-// Send a byte 
+// Send a byte
 void xmit_spi ( BYTE data ) {
 
     BYTE i;
@@ -51,11 +54,11 @@ void xmit_spi ( BYTE data ) {
 
         if ( ( data & 0x80 ) == 0x00 ) PORTB &= ~ _BV( SD_DI );
         else PORTB |= _BV( SD_DI );
-            
-        data = data << 1; 
-        
+
+        data = data << 1;
+
         PORTB |= _BV( SD_CLK );
-        asm( "nop" ); 
+        nop();
         PORTB &= ~_BV( SD_CLK );
 
     }
@@ -73,14 +76,14 @@ BYTE rcv_spi( void ) {
     for ( i = 0; i < 8; i++ ) {
 
         PORTB |= _BV( SD_CLK );
-        
+
         res = res << 1;
-        
+
         if ( ( PINB & _BV( SD_DO ) ) != 0x00 ) res = res | 0x01;
 
         PORTB &= ~ _BV( SD_CLK );
 
-        asm( "nop" );
+        nop();
 
     }
 
@@ -90,7 +93,7 @@ BYTE rcv_spi( void ) {
 
 
 //-----------------------------------------------------------------------
-// Deselect the card and release SPI bus                                 
+// Deselect the card and release SPI bus
 //-----------------------------------------------------------------------
 static void release_spi( void ) {
 
@@ -99,16 +102,16 @@ static void release_spi( void ) {
 
 
 //-----------------------------------------------------------------------
-// Send a command packet to MMC                                          
+// Send a command packet to MMC
 //-----------------------------------------------------------------------
 static BYTE send_cmd (
-	BYTE cmd,		// Command byte 
-	DWORD arg		// Argument 
+	BYTE cmd,		// Command byte
+	DWORD arg		// Argument
     ) {
 
 	BYTE n, res;
 
-	// ACMD<n> is the command sequense of CMD55-CMD<n> 
+	// ACMD<n> is the command sequense of CMD55-CMD<n>
     if ( cmd & 0x80 ) {	
 		
         cmd &= 0x7F;
@@ -117,28 +120,28 @@ static BYTE send_cmd (
 
 	}
 
-	// Select the card 
+	// Select the card
 	DESELECT();
 	rcv_spi();
 	SELECT();
 	rcv_spi();
 
-	// Send a command packet 
-	xmit_spi( cmd );						// Start + Command index 
-	xmit_spi( ( BYTE )( arg >> 24 ) );		// Argument[31..24] 
-	xmit_spi( ( BYTE )( arg >> 16 ) );		// Argument[23..16] 
-	xmit_spi( ( BYTE )( arg >> 8 ) );		// Argument[15..8] 
-	xmit_spi( ( BYTE ) arg );				// Argument[7..0] 
+	// Send a command packet
+	xmit_spi( cmd );						// Start + Command index
+	xmit_spi( ( BYTE )( arg >> 24 ) );		// Argument[31..24]
+	xmit_spi( ( BYTE )( arg >> 16 ) );		// Argument[23..16]
+	xmit_spi( ( BYTE )( arg >> 8 ) );		// Argument[15..8]
+	xmit_spi( ( BYTE ) arg );				// Argument[7..0]
 	
-    n = 0x01;							// Dummy CRC + Stop 
+    n = 0x01;							// Dummy CRC + Stop
 	
-    if ( cmd == CMD0 ) n = 0x95;			// Valid CRC for CMD0(0) 
-	if ( cmd == CMD8 ) n = 0x87;			// Valid CRC for CMD8(0x1AA) 
+    if ( cmd == CMD0 ) n = 0x95;			// Valid CRC for CMD0(0)
+	if ( cmd == CMD8 ) n = 0x87;			// Valid CRC for CMD8(0x1AA)
 	
     xmit_spi(n);
 
-	// Receive a command response 
-	n = 10;								// Wait for a valid response in timeout of 10 attempts 
+	// Receive a command response
+	n = 10;								// Wait for a valid response in timeout of 10 attempts
 
     do {
 		
@@ -146,7 +149,7 @@ static BYTE send_cmd (
 
 	} while ( ( res & 0x80 ) && --n );
 
-	// Return with the response value 
+	// Return with the response value
     return res;			
 
 }
@@ -158,9 +161,9 @@ static BYTE send_cmd (
 //--------------------------------------------------------------------------
 
 //--------------------------------------------------------------------------
-// Initialize Disk Drive                                                 
+// Initialize Disk Drive
 //--------------------------------------------------------------------------
-DSTATUS disk_initialize( void ) {
+DSTATUS CMMC::Initialize() {
 
 	BYTE n, cmd, ty, ocr[4];
 	WORD tmr;
@@ -170,31 +173,31 @@ DSTATUS disk_initialize( void ) {
 	if ( ( PINB & _BV( SD_INS ) ) != 0x00 ) return STA_NOINIT;
 
 #if _WRITE_FUNC
-	// Finalize write process if it is in progress 
-    if ( MMC_SEL ) disk_writep( 0, 0 );
+	// Finalize write process if it is in progress
+    if ( MMC_SEL ) Write( ( const BYTE * ) 0, 0 );
 #endif
 
-	// Dummy clocks 
+	// Dummy clocks
     for ( n = 100; n; n-- ) rcv_spi();	
 
 	ty = 0;
 
-	// Enter Idle state 
+	// Enter Idle state
     if ( send_cmd( CMD0, 0 ) == 1 ) {
 
-		// SDv2 
+		// SDv2
         if ( send_cmd( CMD8, 0x1AA ) == 1 ) {	
 
-			// Get trailing return value of R7 resp 
+			// Get trailing return value of R7 resp
             for ( n = 0; n < 4; n++ ) ocr[n] = rcv_spi();		
 
-			// The card can work at vdd range of 2.7-3.6V 
+			// The card can work at vdd range of 2.7-3.6V
             if ( ocr[2] == 0x01 && ocr[3] == 0xAA ) {		
 
-				// Wait for leaving idle state (ACMD41 with HCS bit) 
+				// Wait for leaving idle state (ACMD41 with HCS bit)
                 for ( tmr = 12000; tmr && send_cmd( ACMD41, 1UL << 30 ); tmr-- ) ;	
 				
-                // Check CCS bit in the OCR 
+                // Check CCS bit in the OCR
                 if ( tmr && send_cmd( CMD58, 0 ) == 0 ) {		
 
 					for ( n = 0; n < 4; n++ ) ocr[n] = rcv_spi();
@@ -206,21 +209,21 @@ DSTATUS disk_initialize( void ) {
 
 			}
 
-		// SDv1 or MMCv3 
+		// SDv1 or MMCv3
         } else {		
 
 			if ( send_cmd( ACMD41, 0 ) <= 1 ) {
 
-				ty = CT_SD1; 
-                cmd = ACMD41;	// SDv1 
+				ty = CT_SD1;
+                cmd = ACMD41;	// SDv1
 
 			} else {
 
-				ty = CT_MMC; 
-                cmd = CMD1;	// MMCv3 
+				ty = CT_MMC;
+                cmd = CMD1;	// MMCv3
 			}
 
-			// Wait for leaving idle state 
+			// Wait for leaving idle state
             for ( tmr = 25000; tmr && send_cmd( cmd, 0 ); tmr-- ) ;	
 
 			// Set R/W block length to 512
@@ -240,16 +243,16 @@ DSTATUS disk_initialize( void ) {
 
 
 //-----------------------------------------------------------------------
-// Read partial sector                                                   
+// Read partial sector
 //-----------------------------------------------------------------------
 
-DRESULT disk_readp (
-	BYTE *buff,		// Pointer to the read buffer (NULL:Read bytes are forwarded to the stream) 
-	DWORD lba,		// Sector number (LBA) 
-	WORD ofs,		// Byte offset to read from (0..511) 
-	WORD cnt		// Number of bytes to read (ofs + cnt mus be <= 512) 
+DRESULT CMMC::Read (
+	BYTE * buff,	// Pointer to the read buffer (NULL:Read bytes are forwarded to the stream)
+	DWORD lba,		// Sector number (LBA)
+	WORD ofs,		// Byte offset to read from (0..511)
+	WORD cnt		// Number of bytes to read (ofs + cnt mus be <= 512)
     ) {
-    
+
     DRESULT res;
 	BYTE rc;
 	WORD bc;
@@ -261,50 +264,50 @@ DRESULT disk_readp (
 
 	res = RES_ERROR;
 
-	// READ_SINGLE_BLOCK 
+	// READ_SINGLE_BLOCK
     if ( send_cmd( CMD17, lba ) == 0 ) {
 
 		bc = 30000;
 
-		// Wait for data packet in timeout of 100ms 
+		// Wait for data packet in timeout of 100ms
         do {							
 
 			rc = rcv_spi();
 
 		} while ( rc == 0xFF && --bc );
 
-		// A data packet arrived 
+		// A data packet arrived
         if ( rc == 0xFE ) {				
 			
             bc = 514 - ofs - cnt;
 
-			// Skip leading bytes 
+			// Skip leading bytes
 			if ( ofs ) {
 
 				do rcv_spi(); while ( --ofs );
 			}
 
-			// Receive a part of the sector 
-			// Store data to the memory 
+			// Receive a part of the sector
+			// Store data to the memory
             if ( buff ) {	
 				do
 					* buff++ = rcv_spi();
 
 				while ( --cnt );
 
-			// Forward data to the outgoing stream (depends on the project) 
+			// Forward data to the outgoing stream (depends on the project)
             } else {	
 
                 do {
 
-                    // (Console output) 
-                    //uart_transmit(rcv_spi());                    
+                    // (Console output)
+                    //uart_transmit(rcv_spi());
 
                 } while ( --cnt );
 
 			}
 
-			// Skip trailing bytes and CRC 
+			// Skip trailing bytes and CRC
 			do rcv_spi(); while (--bc);
 
 			res = RES_OK;
@@ -321,14 +324,13 @@ DRESULT disk_readp (
 
 
 //-----------------------------------------------------------------------
-// Write partial sector                                                  
+// Write partial sector
 //-----------------------------------------------------------------------
 #if _WRITE_FUNC
 
-DRESULT disk_writep (
-	const BYTE *buff,	// Pointer to the bytes to be written (NULL:Initiate/Finalize sector write) 
-	DWORD sa			// Number of bytes to send, Sector number (LBA) or zero 
-    ) {
+// Pointer to the bytes to be written (NULL:Initiate/Finalize sector write)
+// Number of bytes to send, Sector number (LBA) or zero
+DRESULT CMMC::Write( const BYTE * buff,	DWORD sa ) {
 
 	DRESULT res;
 	WORD bc;
@@ -339,16 +341,16 @@ DRESULT disk_writep (
 
 	res = RES_ERROR;
 
-	// Send data bytes 
+	// Send data bytes
     if ( buff ) {		
 
 		bc = ( WORD ) sa;
 		
-        // Send data bytes to the card 
+        // Send data bytes to the card
         while ( bc && wc ) {
 
 			xmit_spi( * buff++ );
-			wc--; 
+			wc--;
             bc--;
 
 		}
@@ -357,34 +359,111 @@ DRESULT disk_writep (
 
 	} else {
 
-		// Initiate sector write process 
+		// Initiate sector write process
         if ( sa ) {	
 
-			// Convert to byte address if needed 
+			// Convert to byte address if needed
             if ( !( CardType & CT_BLOCK ) ) sa *= 512;	
 
-			// WRITE_SINGLE_BLOCK 
+			// WRITE_SINGLE_BLOCK
             if ( send_cmd( CMD24, sa ) == 0) {			
 
-				// Data block header 
+				// Data block header
                 xmit_spi( 0xFF );
                 xmit_spi( 0xFE );		
 				
-                // Set byte counter 
+                // Set byte counter
                 wc = 512;							
 				res = RES_OK;
 
 			}
 
-		// Finalize sector write process 
+		// Finalize sector write process
         } else {	
 
 			bc = wc + 2;
 
-			// Fill left bytes and CRC with zeros 
+			// Fill left bytes and CRC with zeros
             while ( bc-- ) xmit_spi(0);	
 
-			// Receive data resp and wait for end of write process in timeout of 300ms 
+			// Receive data resp and wait for end of write process in timeout of 300ms
+            if ( ( rcv_spi() & 0x1F ) == 0x05 ) {
+
+				// Wait ready
+                for ( bc = 65000; rcv_spi() != 0xFF && bc; bc-- );
+
+				if ( bc ) res = RES_OK;
+
+			}
+
+			release_spi();
+
+		}
+
+	}
+
+	return res;
+
+}
+
+
+DRESULT CMMC::Write( FCHAR_PTR buff, DWORD sa ) {
+
+	DRESULT res;
+	WORD bc;
+	static WORD wc;
+
+	if ( ( PINB & _BV( SD_INS ) ) != 0x00 ) return RES_ERROR;
+	if ( ( PINB & _BV( SD_WP ) ) != 0x00 ) return RES_ERROR;
+
+	res = RES_ERROR;
+
+	// Send data bytes
+    if ( buff != NULL ) {		
+
+		bc = ( WORD ) sa;
+		
+        // Send data bytes to the card
+        while ( bc && wc ) {
+
+			xmit_spi( * buff++ );
+			wc--;
+            bc--;
+
+		}
+
+		res = RES_OK;
+
+	} else {
+
+		// Initiate sector write process
+        if ( sa ) {	
+
+			// Convert to byte address if needed
+            if ( !( CardType & CT_BLOCK ) ) sa *= 512;	
+
+			// WRITE_SINGLE_BLOCK
+            if ( send_cmd( CMD24, sa ) == 0) {			
+
+				// Data block header
+                xmit_spi( 0xFF );
+                xmit_spi( 0xFE );		
+				
+                // Set byte counter
+                wc = 512;							
+				res = RES_OK;
+
+			}
+
+		// Finalize sector write process
+        } else {	
+
+			bc = wc + 2;
+
+			// Fill left bytes and CRC with zeros
+            while ( bc-- ) xmit_spi(0);	
+
+			// Receive data resp and wait for end of write process in timeout of 300ms
             if ( ( rcv_spi() & 0x1F ) == 0x05 ) {
 
 				// Wait ready
