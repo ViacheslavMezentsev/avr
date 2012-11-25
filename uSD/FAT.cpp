@@ -21,9 +21,9 @@
 /----------------------------------------------------------------------------*/
 
 #include "Defines.h"
-
-//#include "pff.h"		/* Petit FatFs configurations and declarations */
-//#include "diskio.h"		/* Declarations of low level disk I/O functions */
+#include "Configuration.h"
+#include "MMC.h"
+#include "FAT.h"
 
 
 /*--------------------------------------------------------------------------
@@ -83,20 +83,20 @@ CLUST get_fat (	/* 1:IO error, Else:Cluster status */
 		bc = (WORD)clst; bc += bc / 2;
 		ofs = bc % 512; bc /= 512;
 		if (ofs != 511) {
-			if (disk_readp(buf, fs->fatbase + bc, ofs, 2)) break;
+            if (CMMC::Read(buf, fs->fatbase + bc, ofs, 2)) break;
 		} else {
-			if (disk_readp(buf, fs->fatbase + bc, 511, 1)) break;
-			if (disk_readp(buf+1, fs->fatbase + bc + 1, 0, 1)) break;
+			if (CMMC::Read(buf, fs->fatbase + bc, 511, 1)) break;
+			if (CMMC::Read(buf+1, fs->fatbase + bc + 1, 0, 1)) break;
 		}
 		wc = LD_WORD(buf);
 		return (clst & 1) ? (wc >> 4) : (wc & 0xFFF);
 
 	case FS_FAT16 :
-		if (disk_readp(buf, fs->fatbase + clst / 256, (WORD)(((WORD)clst % 256) * 2), 2)) break;
+		if (CMMC::Read(buf, fs->fatbase + clst / 256, (WORD)(((WORD)clst % 256) * 2), 2)) break;
 		return LD_WORD(buf);
 #if _FS_FAT32
 	case FS_FAT32 :
-		if (disk_readp(buf, fs->fatbase + clst / 128, (WORD)(((WORD)clst % 128) * 4), 4)) break;
+		if (CMMC::Read(buf, fs->fatbase + clst / 128, (WORD)(((WORD)clst % 128) * 4), 4)) break;
 		return LD_DWORD(buf) & 0x0FFFFFFF;
 #endif
 	}
@@ -223,7 +223,7 @@ FRESULT dir_find (
 
 	dir = FatFs->buf;
 	do {
-		res = disk_readp(dir, dj->sect, (WORD)((dj->index % 16) * 32), 32)	/* Read an entry */
+		res = CMMC::Read(dir, dj->sect, (WORD)((dj->index % 16) * 32), 32)	/* Read an entry */
 			? FR_DISK_ERR : FR_OK;
 		if (res != FR_OK) break;
 		c = dir[DIR_Name];	/* First character */
@@ -255,7 +255,7 @@ FRESULT dir_read (
 	res = FR_NO_FILE;
 	dir = FatFs->buf;
 	while (dj->sect) {
-		res = disk_readp(dir, dj->sect, (WORD)((dj->index % 16) * 32), 32)	/* Read an entry */
+		res = CMMC::Read(dir, dj->sect, (WORD)((dj->index % 16) * 32), 32)	/* Read an entry */
 			? FR_DISK_ERR : FR_OK;
 		if (res != FR_OK) break;
 		c = dir[DIR_Name];
@@ -431,15 +431,15 @@ BYTE check_fs (	/* 0:The FAT boot record, 1:Valid boot record but not an FAT, 2:
 	DWORD sect	/* Sector# (lba) to check if it is an FAT boot record or not */
 )
 {
-	if (disk_readp(buf, sect, 510, 2))		/* Read the boot sector */
+    if (CMMC::Read(buf, sect, 510, 2))		/* Read the boot sector */
 		return 3;
 	if (LD_WORD(buf) != 0xAA55)				/* Check record signature */
 		return 2;
 
-	if (!disk_readp(buf, sect, BS_FilSysType, 2) && LD_WORD(buf) == 0x4146)	/* Check FAT12/16 */
+	if (!CMMC::Read(buf, sect, BS_FilSysType, 2) && LD_WORD(buf) == 0x4146)	/* Check FAT12/16 */
 		return 0;
 #if _FS_FAT32
-	if (!disk_readp(buf, sect, BS_FilSysType32, 2) && LD_WORD(buf) == 0x4146)	/* Check FAT32 */
+	if (!CMMC::Read(buf, sect, BS_FilSysType32, 2) && LD_WORD(buf) == 0x4146)	/* Check FAT32 */
 		return 0;
 #endif
 	return 1;
@@ -472,7 +472,7 @@ FRESULT pf_mount (
     if ( !fs ) return FR_OK;
 
 	/* Check if the drive is ready or not */
-    if ( disk_initialize() & STA_NOINIT ) return FR_NOT_READY;
+    if ( CMMC::Initialize() & STA_NOINIT ) return FR_NOT_READY;
 
 	/* Search FAT partition on the drive */
 	bsect = 0;
@@ -485,7 +485,7 @@ FRESULT pf_mount (
 
 		/* Check a partition listed in top of the partition table */
 		/* 1st partition entry */
-        if ( disk_readp( buf, bsect, MBR_Table, 16 ) ) {	
+        if ( CMMC::Read( buf, bsect, MBR_Table, 16 ) ) {	
 
 			fmt = 3;
 
@@ -512,7 +512,7 @@ FRESULT pf_mount (
     if ( fmt ) return FR_NO_FILESYSTEM;	
 
 	/* Initialize the file system object */
-	if ( disk_readp( buf, bsect, 13, sizeof( buf ) ) ) return FR_DISK_ERR;
+	if ( CMMC::Read( buf, bsect, 13, sizeof( buf ) ) ) return FR_DISK_ERR;
 
 	/* Number of sectors per FAT */
     fsize = LD_WORD( buf + BPB_FATSz16 - 13 );				
@@ -697,7 +697,7 @@ FRESULT pf_read (
 
 		if ( rcnt > btr ) rcnt = btr;
 
-		dr = disk_readp( !buff ? 0 : rbuff, fs->dsect, ( WORD ) ( fs->fptr % 512 ), rcnt );
+		dr = CMMC::Read( !buff ? 0 : rbuff, fs->dsect, ( WORD ) ( fs->fptr % 512 ), rcnt );
 
 		if ( dr ) goto fr_abort;
 
@@ -744,7 +744,7 @@ FRESULT pf_write (
 		return FR_NOT_OPENED;
 
 	if (!btw) {		/* Finalize request */
-		if ((fs->flag & FA__WIP) && disk_writep(0, 0)) goto fw_abort;
+		if ((fs->flag & FA__WIP) && CMMC::Write( ( const BYTE * ) 0, 0 ) ) goto fw_abort;
 		fs->flag &= ~FA__WIP;
 		return FR_OK;
 	} else {		/* Write data request */
@@ -766,16 +766,16 @@ FRESULT pf_write (
 			sect = clust2sect(fs->curr_clust);		/* Get current sector */
 			if (!sect) goto fw_abort;
 			fs->dsect = sect + fs->csect++;
-			if (disk_writep(0, fs->dsect)) goto fw_abort;	/* Initiate a sector write operation */
+			if (CMMC::Write( ( const BYTE * ) 0, fs->dsect)) goto fw_abort;	/* Initiate a sector write operation */
 			fs->flag |= FA__WIP;
 		}
 		wcnt = 512 - ((WORD)fs->fptr % 512);		/* Number of bytes to write to the sector */
 		if (wcnt > btw) wcnt = btw;
-		if (disk_writep(p, wcnt)) goto fw_abort;	/* Send data to the sector */
+		if (CMMC::Write(p, wcnt)) goto fw_abort;	/* Send data to the sector */
 		fs->fptr += wcnt; p += wcnt;				/* Update pointers and counters */
 		btw -= wcnt; *bw += wcnt;
 		if (((WORD)fs->fptr % 512) == 0) {
-			if (disk_writep(0, 0)) goto fw_abort;	/* Finalize the currtent secter write operation */
+			if (CMMC::Write( ( const BYTE * ) 0, 0)) goto fw_abort;	/* Finalize the currtent secter write operation */
 			fs->flag &= ~FA__WIP;
 		}
 	}
@@ -932,6 +932,412 @@ FRESULT pf_readdir (
 
 	return res;
 }
+
+
+/***********************
+*  Р Е А Л И З А Ц И Я
+*  ~~~~~~~~~~~~~~~~~~~
+************************/
+
+FRESULT CFAT::Mount( FATFS * FileSystemObject ) {
+
+    return pf_mount( FileSystemObject );
+
+}
+
+
+FRESULT CFAT::Open( const char * FileName ) {
+
+    return pf_open( FileName );
+
+}
+
+
+FRESULT CFAT::Open( FCHAR_PTR FileName ) {
+
+	FRESULT res;
+	DIR dj;
+	BYTE sp[ 12 ], dir[ 32 ];
+	
+    FATFS * fs = FatFs;
+
+	/* Check file system */
+    if ( !fs ) return FR_NOT_ENABLED;
+
+	fs->flag = 0;
+	fs->buf = dir;
+	dj.fn = sp;
+
+	/* Follow the file path */
+    res = CFAT::FollowPath( & dj, FileName );	
+
+	/* Follow failed */
+    if ( res != FR_OK ) return res;	
+
+	/* It is a directory */
+    if ( !dir[0] || ( dir[ DIR_Attr ] & AM_DIR ) ) return FR_NO_FILE;
+
+	/* File start cluster */
+    fs->org_clust =						
+#if _FS_FAT32
+		( ( DWORD ) LD_WORD( dir + DIR_FstClusHI ) << 16 ) |
+#endif
+		LD_WORD( dir + DIR_FstClusLO );
+
+	/* File size */
+    fs->fsize = LD_DWORD( dir + DIR_FileSize );	
+	
+    /* File pointer */
+    fs->fptr = 0;						
+
+	fs->flag = FA_OPENED;
+
+	return FR_OK;
+
+}
+
+
+FRESULT CFAT::Read( void * Buffer, WORD ByteToRead, WORD * BytesRead ) {
+
+    return pf_read( Buffer, ByteToRead, BytesRead );
+
+}
+
+
+FRESULT CFAT::Write( const void * Buffer, WORD ByteToWrite, WORD * BytesWritten ) {
+
+    return pf_write( Buffer, ByteToWrite, BytesWritten );
+
+}
+
+
+FRESULT CFAT::Write( FCHAR_PTR Buffer, WORD ByteToWrite, WORD * BytesWritten ) {
+
+	WORD wcnt;
+    DWORD sect, remain;   	
+	FCHAR_PTR p = ( FCHAR_PTR ) Buffer;	
+	FATFS * fs = FatFs;
+    CLUST clst;
+
+	* BytesWritten = 0;
+
+	// Check file system
+    if ( !fs ) return FR_NOT_ENABLED;		
+
+	// Check if opened
+    if ( !( fs->flag & FA_OPENED ) ) return FR_NOT_OPENED;
+
+	// Finalize request
+    if ( !ByteToWrite ) {		
+		
+        if ( ( fs->flag & FA__WIP ) && CMMC::Write( ( const BYTE * ) 0, 0 ) ) goto fw_abort;
+		
+        fs->flag &= ~FA__WIP;
+		
+        return FR_OK;
+
+	// Write data request
+    } else {
+
+		// Round down fptr to the sector boundary
+        if ( !( fs->flag & FA__WIP ) ) fs->fptr &= 0xFFFFFE00;
+
+	}
+
+	remain = fs->fsize - fs->fptr;
+
+	// Truncate btw by remaining bytes
+    if ( ByteToWrite > remain ) ByteToWrite = ( WORD ) remain;
+
+	// Repeat until all data transferred
+    while ( ByteToWrite )	{
+
+		// On the sector boundary?
+        if ( ( ( WORD ) fs->fptr % 512 ) == 0 ) {
+
+			// On the cluster boundary?
+            if ( ( fs->fptr / 512 % fs->csize ) == 0 ) {
+
+				// On the top of the file?
+                clst = ( fs->fptr == 0 ) ? fs->org_clust : get_fat( fs->curr_clust );
+
+				if ( clst <= 1 ) goto fw_abort;
+
+				// Update current cluster
+                fs->curr_clust = clst;
+
+				// Reset sector offset in the cluster
+                fs->csect = 0;
+
+			}
+
+			// Get current sector
+            sect = clust2sect( fs->curr_clust );
+
+			if ( !sect ) goto fw_abort;
+
+			fs->dsect = sect + fs->csect++;
+
+			// Initiate a sector write operation
+            if ( CMMC::Write( ( const BYTE * ) 0, fs->dsect ) ) goto fw_abort;	
+
+			fs->flag |= FA__WIP;
+
+		}
+
+		// Number of bytes to write to the sector
+        wcnt = 512 - ( ( WORD ) fs->fptr % 512 );
+
+		if ( wcnt > ByteToWrite) wcnt = ByteToWrite;
+
+		// Send data to the sector
+        if ( CMMC::Write( p, wcnt ) ) goto fw_abort;
+
+		// Update pointers and counters
+        fs->fptr += wcnt; 
+        p += wcnt;
+
+		ByteToWrite -= wcnt; 
+        * BytesWritten += wcnt;
+
+		if ( ( ( WORD ) fs->fptr % 512 ) == 0 ) {
+
+			// Finalize the currtent secter write operation
+            if ( CMMC::Write( ( const BYTE * ) 0, 0 ) ) goto fw_abort;	
+			fs->flag &= ~FA__WIP;
+
+		}
+
+	}
+
+	return FR_OK;
+
+// Обработка ошибок
+fw_abort:
+
+	fs->flag = 0;
+	return FR_DISK_ERR;
+
+}
+
+
+FRESULT CFAT::LSeek( DWORD Offset ) {
+
+    return pf_lseek( Offset );
+
+}
+
+
+FRESULT CFAT::OpenDir( DIR * DirObject, const char * DirName ) {
+
+    return pf_opendir( DirObject, DirName );
+
+}
+
+
+FRESULT CFAT::OpenDir( DIR * DirObject, FCHAR_PTR DirName ) {
+
+	FRESULT res;
+	BYTE sp[12], dir[32];
+	FATFS *fs = FatFs;
+
+
+	if (!fs) {				/* Check file system */
+		res = FR_NOT_ENABLED;
+	} else {
+		fs->buf = dir;
+		DirObject->fn = sp;
+		res = FollowPath(DirObject, DirName);			/* Follow the path to the directory */
+		if (res == FR_OK) {						/* Follow completed */
+			if (dir[0]) {						/* It is not the root dir */
+				if (dir[DIR_Attr] & AM_DIR) {	/* The object is a directory */
+					DirObject->sclust =
+#if _FS_FAT32
+					((DWORD)LD_WORD(dir+DIR_FstClusHI) << 16) |
+#endif
+					LD_WORD(dir+DIR_FstClusLO);
+				} else {						/* The object is not a directory */
+					res = FR_NO_PATH;
+				}
+			}
+			if (res == FR_OK)
+				res = dir_rewind( DirObject );			/* Rewind dir */
+		}
+		if (res == FR_NO_FILE) res = FR_NO_PATH;
+	}
+
+	return res;
+
+}
+
+
+FRESULT CFAT::ReadDir( DIR * DirObject, FILINFO * FileInfo ) {
+
+    return pf_readdir( DirObject, FileInfo );
+
+}
+
+
+FRESULT CFAT::FollowPath( DIR * DirObject, const char * path ) {
+
+    return follow_path( DirObject, path );
+
+}
+
+
+FRESULT CFAT::FollowPath( DIR * DirObject, FCHAR_PTR path ) {
+
+	FRESULT res;
+	BYTE * dir;
+
+	// Skip leading spaces.
+    while ( * path == ' ' ) path++;
+
+	// Strip heading separator.
+    if ( * path == '/' ) path++;
+
+	// Set start directory (always root dir).
+    DirObject->sclust = 0;						
+
+	// Null path means the root directory.
+    if ( ( BYTE ) * path <= ' ' ) {			
+		
+        res = dir_rewind( DirObject );
+		FatFs->buf[0] = 0;
+
+	// Follow path.
+    } else {	
+
+		for (;;) {
+
+			// Get a segment.
+            res = CreateName( DirObject, ( FCHAR_PTR * ) & path );	
+
+			if ( res != FR_OK ) break;
+
+			// Find it
+            res = dir_find( DirObject );				
+
+			// Could not find the object.
+            if ( res != FR_OK ) {
+
+                if ( res == FR_NO_FILE && ! ( * ( DirObject->fn + 11 ) ) ) {
+                 
+                    res = FR_NO_PATH;
+                }
+
+				break;
+
+			}
+
+			// Last segment match. Function completed.
+            if ( * ( DirObject->fn + 11 ) ) break;	
+
+			// There is next segment. Follow the sub directory.
+            dir = FatFs->buf;				
+
+			// Cannot follow because it is a file
+            if ( ! ( dir[ DIR_Attr ] & AM_DIR ) ) { 
+
+				res = FR_NO_PATH; 
+                break;
+
+			}
+
+			DirObject->sclust =
+
+            #if _FS_FAT32
+				( ( DWORD ) LD_WORD( dir + DIR_FstClusHI ) << 16 ) | 
+            #endif
+
+				LD_WORD( dir + DIR_FstClusLO );
+
+		}
+
+	}
+
+	return res;
+
+}
+
+
+FRESULT CFAT::CreateName( DIR * DirObject, const char * * path ) {
+
+    return create_name( DirObject, path );
+
+}
+
+
+/* Pointer to the directory object */
+/* Pointer to pointer to the segment in the path string */
+FRESULT CFAT::CreateName( DIR * DirObject, FCHAR_PTR * path ) {
+	
+    BYTE c, d, ni, si, i, * sfn;
+    //char * _p;
+    //FCHAR_PTR p(_p);
+    FCHAR_PTR2(p);
+
+	// Create file name in directory form
+	sfn = DirObject->fn;
+
+	mem_set( sfn, ' ', 11 );
+
+	si = i = 0; 
+    ni = 8;
+	p = * path;
+
+	for (;;) {
+
+		c = p[ si++ ];
+
+		// Break on end of segment
+        if ( c <= ' ' || c == '/' ) break;
+
+		if ( c == '.' || i >= ni ) {
+
+			if ( ni != 8 || c != '.' ) break;
+			
+            i = 8; 
+            ni = 11;
+
+			continue;
+
+		}
+
+#ifdef _EXCVT
+		// To upper extended char (SBCS)
+        if ( c >= 0x80 ) c = cvt[ c - 0x80 ];
+#endif
+
+		// DBC 1st byte?
+        if ( IsDBCS1(c) && i >= ni - 1 ) {	
+
+			// Get 2nd byte
+            d = p[ si++ ];
+			sfn[ i++ ] = c;
+			sfn[ i++ ] = d;
+
+		// Single byte code
+        } else {
+
+			// toupper
+            if ( IsLower(c) ) c -= 0x20;
+			sfn[i++] = c;
+
+		}
+
+	}
+	
+    // Rerurn pointer to the next segment
+    path[0] = ( FCHAR_PTR ) ( & p + si );
+
+	// Set last segment flag if end of path
+    sfn[11] = ( c <= ' ' ) ? 1 : 0;
+
+	return FR_OK;
+
+}
+
 
 #endif /* _USE_DIR */
 

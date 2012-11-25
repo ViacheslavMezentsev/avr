@@ -9,41 +9,9 @@
 #include "Configuration.h"
 #include "Version.h"
 #include "Console.h"
+#include "FAT.h"
 #include "MCU.h"
 
-
-// Тип, описывающий дату
-// http://elm-chan.org/fsw/ff/en/sfileinfo.html
-typedef struct _SFDATE {
-    
-    uint16_t Day:    5; // Day (1..31)
-    uint16_t Month:  4; // Month (1..12)
-    uint16_t Year:   7; // Year origin from 1980 (0..127)
-    
-} SFDATE;
-
-typedef union _UFDATE {
-    
-    uint16_t Value;
-    SFDATE fdate;    
-    
-} UFDATE;
-
-// Тип, описывающий время
-typedef struct _SFTIME {
-    
-    uint16_t Second:    5; // Second / 2 (0..29)
-    uint16_t Minute:    6; // Minute (0..59)
-    uint16_t Hour:      5; // Hour (0..23)
-    
-} SFTIME;
-
-typedef union _UFTIME {
-    
-    uint16_t Value;
-    SFTIME ftime;    
-    
-} UFTIME;
 
 struct divmod10_t {
 
@@ -53,30 +21,30 @@ struct divmod10_t {
 
 // -=[ Внешние ссылки ]=-
 
+extern FIFO( 16 ) uart_rx_fifo;
+
 
 // -=[ Постоянные во флеш-памяти ]=-
+
+FLASHSTR_DECLARE( char, szCRLF, "\r\n" );
 
 
 // -=[ Переменные в ОЗУ ]=-
 
-// Версия программы
 FRESULT res;
-
-char Version[16];
-char buffer[16];
-
-char read_buf[ 129 ] = {};
-char write_buf[ 128 ] = { 'w', 'r', 'i', 't', 'e', ' ', 'o', 'k', '\r', '\n', 0x00 };
-
-PR_BEGIN_EXTERN_C
-    extern FIFO( 16 ) uart_rx_fifo;
-PR_END_EXTERN_C
-
 UFDATE FDate;
 UFTIME FTime;
 FILINFO fno;
 DIR dir;
 FATFS fs;
+
+// Версия программы
+char Version[16];
+
+char buffer[16];
+
+char read_buf[ 129 ] = {};
+char write_buf[ 128 ] = { 'w', 'r', 'i', 't', 'e', ' ', 'o', 'k', '\r', '\n', '\0' };
 
 
 /***********************
@@ -125,7 +93,7 @@ char * utoa_fast_div( uint32_t value, char * buffer ) {
         divmod10_t res = divmodu10( value );
         * --buffer = res.rem + '0';
         value = res.quot;
-    
+
     } while ( value != 0 );
 
     return buffer;
@@ -141,22 +109,22 @@ FRESULT CMCU::ScanFiles( char * path ) {
     uint8_t len;
 
     // Монтирование FAT32
-    res = pf_mount( & fs );
+    res = CFAT::Mount( & fs );
 
-    res = pf_opendir( & dir, path );
+    res = CFAT::OpenDir( & dir, path );
 
     if ( res == FR_OK ) {
 
         CConsole::WriteString( SPSTR( " Содержимое папки: " ) , CConsole::cp1251 );
         CConsole::WriteString( path, CConsole::cp1251 );
-        CConsole::WriteString( "\r\n" );
+        CConsole::WriteString( szCRLF );
 
         for (;;) {
-                         
-            res = pf_readdir( & dir, & fno );
-                         
+
+            res = CFAT::ReadDir( & dir, & fno );
+
             if ( res != FR_OK || fno.fname[0] == 0 ) break;
-            
+
             // Вывод даты
             FDate.Value = fno.fdate;
 
@@ -174,7 +142,7 @@ FRESULT CMCU::ScanFiles( char * path ) {
             CConsole::PutChar( ( uint8_t ) ( tmp % 10 ) + '0' );
 
             CConsole::PutChar( '.' );
-            
+
             // Месяц
             CConsole::PutChar( FDate.fdate.Month / 10 + '0' );
             CConsole::PutChar( FDate.fdate.Month % 10 + '0' );
@@ -192,7 +160,7 @@ FRESULT CMCU::ScanFiles( char * path ) {
             // Часы
             CConsole::PutChar( FTime.ftime.Hour / 10 + '0' );
             CConsole::PutChar( FTime.ftime.Hour % 10 + '0' );
-            
+
             CConsole::PutChar( ':' );
 
             // Минуты
@@ -209,9 +177,9 @@ FRESULT CMCU::ScanFiles( char * path ) {
 
             // Если объект - папка
             if ( fno.fattrib & AM_DIR ) {
-                                                    
-                CConsole::WriteString( " <DIR> ", CConsole::cp1251 );
-                
+
+                CConsole::WriteString( SPSTR( " <DIR> " ), CConsole::cp1251 );
+
                 len = 12;
 
                 do CConsole::PutChar( ' ' ); while ( len-- );
@@ -221,16 +189,16 @@ FRESULT CMCU::ScanFiles( char * path ) {
 
             // Если объект - файл
             } else {		
-                                                    
-                CConsole::WriteString( "       ", CConsole::cp1251 );
-                
+
+                CConsole::WriteString( SPSTR( "       " ), CConsole::cp1251 );
+
                 len = 11 - strlen( utoa_fast_div( fno.fsize, buffer ) );
 
                 do CConsole::PutChar( ' ' ); while ( len-- );
 
                 // Размер
                 CConsole::WriteString( utoa_fast_div( fno.fsize, buffer ) );
-                
+
                 CConsole::PutChar( ' ' );
 
                 // Имя
@@ -238,12 +206,12 @@ FRESULT CMCU::ScanFiles( char * path ) {
 
             }
 
-            CConsole::WriteString( "\r\n" );
+            CConsole::WriteString( szCRLF );
 
         }
 
         // Отмонтируем FatFs
-        res = pf_mount(0);
+        res = CFAT::Mount( NULL );
 
     }
 
@@ -253,11 +221,30 @@ FRESULT CMCU::ScanFiles( char * path ) {
 
 
 /**
+ * Просмотр папки
+ */
+FRESULT CMCU::ScanFiles( FCHAR_PTR path ) {
+
+    uint8_t i = 0;
+
+    do {
+
+        read_buf[i] = path[i];
+        i++;
+
+    } while ( path[i] != 0 );
+
+    return ScanFiles( read_buf );
+
+}
+
+
+/**
  * Вывод сообщения: OK | FAIL
  */
 void CMCU::ShowStatusMessage( FRESULT Result ) {
 
-    if ( Result == 0x00 ) {
+    if ( Result == FR_OK ) {
 
         CConsole::SetTextAttr( GREEN );
         CConsole::WriteString( SPSTR( "OK\r\n" ) );
@@ -267,7 +254,7 @@ void CMCU::ShowStatusMessage( FRESULT Result ) {
         CConsole::SetTextAttr( LIGHTRED );
         CConsole::WriteString( SPSTR( "FAIL(" ) );
         CConsole::PutChar( Result + '0' );
-        CConsole::WriteString( ")\r\n" );
+        CConsole::WriteString( SPSTR( ")\r\n" ) );
 
     }
 
@@ -281,34 +268,34 @@ void CMCU::ShowStatusMessage( FRESULT Result ) {
  */
 void CMCU::TestDriver() {
 
-    WORD s1;  
-  
+    WORD s1;
+
     // Монтирование FAT32
-    res = pf_mount( & fs );
- 
+    res = CFAT::Mount( & fs );
+
     CConsole::WriteString( SPSTR( "Монтирование FAT32 " ), CConsole::cp1251 );
 
     // Если монтирование было успешным
-    if ( res == 0x00 ) {		
-        
+    if ( res == FR_OK ) {		
+
         ShowStatusMessage( res );
 
         // Открываем файл MainUnit.cpp
-        res = pf_open( "/MainUnit.cpp" );
+        res = CFAT::Open( SPSTR( "/MainUnit.cpp" ) );
 
         CConsole::WriteString( SPSTR( "Открываю MainUnit.cpp " ), CConsole::cp1251 );
 
         ShowStatusMessage( res );
 
         // Устанваливаем указатель на начало файла MainUnit.cpp
-        res = pf_lseek(0);
+        res = CFAT::LSeek(0);
 
         CConsole::WriteString( SPSTR( "Устанавливаем указатель на начало файла MainUnit.cpp " ), CConsole::cp1251 );
 
         ShowStatusMessage( res );
 
         // Читаем первые 128 байт из файла MainUnit.cpp
-        res = pf_read( read_buf, 128, & s1 );	
+        res = CFAT::Read( read_buf, 128, & s1 );	
 
         CConsole::WriteString( SPSTR( "Читаем первые 128 байт из файла MainUnit.cpp " ), CConsole::cp1251 );
 
@@ -319,9 +306,9 @@ void CMCU::TestDriver() {
         // Отображаем содержимое буфера
         CConsole::WriteString( read_buf, CConsole::cp1251 );	
 
-        CConsole::WriteString( "\r\n" );
+        CConsole::WriteString( szCRLF );
 
-        res = pf_open( "/write.txt" );
+        res = CFAT::Open( SPSTR( "/write.txt" ) );
 
         // Открываем файл write.txt
         CConsole::WriteString( SPSTR( "Открываю write.txt " ), CConsole::cp1251 );	
@@ -329,21 +316,21 @@ void CMCU::TestDriver() {
         ShowStatusMessage( res );
 
         // Записываем содержимое буфера в файл write.txt
-        res = pf_write( write_buf, strlen( write_buf ), & s1 );	
+        res = CFAT::Write( write_buf, strlen( write_buf ), & s1 );	
 
         CConsole::WriteString( SPSTR( "Записывам \"write ok\" в файл write.txt " ), CConsole::cp1251 );
 
         ShowStatusMessage( res );
 
         // Финализируем запись в  write.txt
-        res = pf_write( 0, 0, & s1 );
+        res = CFAT::Write( ( const void * ) 0, 0, & s1 );
 
         CConsole::WriteString( SPSTR( "Окончание записи в write.txt " ), CConsole::cp1251 );
 
         ShowStatusMessage( res );
 
         // Устанваливаем указатель на начало файла write.txt
-        res = pf_lseek(0);
+        res = CFAT::LSeek(0);
 
         CConsole::WriteString( SPSTR( "Устанавливаем указатель на начало файла write.txt " ), CConsole::cp1251 );
 
@@ -353,7 +340,7 @@ void CMCU::TestDriver() {
         read_buf[0] = 0;
 
         // Читаем первые 128 байт из файла write.txt
-        res = pf_read( read_buf, 128, & s1 );
+        res = CFAT::Read( read_buf, 128, & s1 );
 
         CConsole::WriteString( SPSTR( "Читаем первые 128 байт из файла write.txt " ), CConsole::cp1251 );
 
@@ -365,14 +352,14 @@ void CMCU::TestDriver() {
         CConsole::WriteString( read_buf );
 
         // Отмонтируем FatFs
-        res = pf_mount(0);
+        res = CFAT::Mount( NULL );
 
         CConsole::WriteString( SPSTR( "Отмонтирование FAT32 " ), CConsole::cp1251 );
 
         ShowStatusMessage( res );
 
     } else {
-        
+
         ShowStatusMessage( res );
     }
 
@@ -393,7 +380,7 @@ void CMCU::CommandShell() {
 
     CConsole::WriteString( SPSTR( "Командная оболочка, версия " ), CConsole::cp1251 );
     CConsole::WriteString( Version );
-    CConsole::WriteString( "\r\n" );
+    CConsole::WriteString( szCRLF );
 
     CConsole::WriteString( SPSTR( "Дата сборки проекта: " ), CConsole::cp1251 );
     CConsole::WriteString( CVersion::GetBuildDateString(), CConsole::cp1251 );
@@ -413,7 +400,7 @@ void CMCU::CommandShell() {
         // Если пустая команда, то переходим на следующую строку
         if ( cmd[0] == 0 ) {
 
-            CConsole::WriteString( "\r\n" );
+            CConsole::WriteString( szCRLF );
 
         // Выводим справку
         } else if ( ( cmd[0] == 'h' ) && ( cmd[1] == 0 ) ) {
@@ -442,14 +429,14 @@ void CMCU::CommandShell() {
         // Тестирование драйвера
         } else if ( ( cmd[0] == 't' ) && ( cmd[1] == 0 ) ) {
 
-            CConsole::WriteString( "\r\n" );
+            CConsole::WriteString( szCRLF );
             TestDriver();
 
         // Промотр папки
         } else if ( ( cmd[0] == 'd' ) && ( cmd[1] == 0 ) ) {
 
-            CConsole::WriteString( "\r\n" );
-            ShowStatusMessage( ScanFiles( "/" ) );            
+            CConsole::WriteString( szCRLF );
+            ShowStatusMessage( ScanFiles( SPSTR( "/" ) ) );
 
         // Выводим сообщение о неподдерживаемой команде
         } else {
@@ -458,7 +445,7 @@ void CMCU::CommandShell() {
             CConsole::WriteString( SPSTR( "\r\nКоманда не поддерживается. Введите " ), CConsole::cp1251 );
 
             CConsole::SetTextAttr( LIGHTRED );
-            CConsole::WriteString( "h" );
+            CConsole::PutChar( 'h' );
 
             CConsole::SetTextAttr( WHITE );
             CConsole::WriteString( SPSTR( " (help) для помощи.\r\n" ), CConsole::cp1251 );
@@ -475,22 +462,24 @@ void CMCU::CommandShell() {
  */
 HRESULT CMCU::MainThreadProcedure(){
 
+    char szDot[] = ".";
+
     // Вычисление строки с версией программы
     strcat( Version, utoa_fast_div( CVersion::GetMajor(), buffer ) );
-    strcat( Version, "." );
+    strcat( Version, szDot );
 
     strcat( Version, utoa_fast_div( CVersion::GetMinor(), buffer ) );
-    strcat( Version, "." );
+    strcat( Version, szDot );
 
     strcat( Version, utoa_fast_div( CVersion::GetRevision(), buffer ) );
-    strcat( Version, "." );
+    strcat( Version, szDot );
 
     strcat( Version, utoa_fast_div( CVersion::GetBuild(), buffer ) );
 
     // Разрешаем прерывания
     __enable_interrupt();
 
-    // Запускаем командрую оболочку
+    // Запускаем командную оболочку
     CommandShell();
 
     // Размонтируем
@@ -555,6 +544,7 @@ void CMCU::ControlRegistersInit(){
     //          00000000 - Initial Value
     temp = BIN8(00000000);
     //          ||||||||
+    //          76543210
     //          |||||||+- 0, rw, ISC00: -+ - Interrupt Sense Control 0 Bit 1 and Bit 0
     //          ||||||+-- 1, rw, ISC01: _|
     //          |||||+--- 2, rw, ISC10: -+ - Interrupt Sense Control 1 Bit 1 and Bit 0
@@ -576,6 +566,7 @@ void CMCU::ControlRegistersInit(){
     //          00000000 - Initial Value
     //GICR = BIN8(00000000);
     //          ||||||||
+    //          76543210
     //          |||||||+- 0, rw, IVCE:  -
     //          ||||||+-- 1, rw, IVSEL: -
     //          |||||+--- 2, r: 0
@@ -592,6 +583,7 @@ void CMCU::ControlRegistersInit(){
     //           00000000 - Initial Value
     //TIMSK = BIN8(00000000); // BIN8() не зависит от уровня оптимизации
     //           ||||||||
+    //           76543210
     //           |||||||+- 0, rw, TOIE0:  - Timer/Counter0 Overflow Interrupt Enable
     //           ||||||+-- 1, rw, OCIE0:  - OCIE0: Timer/Counter0 Output Compare Match Interrupt Enable
     //           |||||+--- 2, rw, TOIE1:  - Timer/Counter1, Overflow Interrupt Enable
@@ -607,6 +599,7 @@ void CMCU::ControlRegistersInit(){
     //          00000000 - Initial Value
     //TIFR = BIN8(00000000); // BIN8() не зависит от уровня оптимизации
     //          ||||||||
+    //          76543210
     //          |||||||+- 0, rw, TOV0:  - Timer/Counter0 Overflow Flag
     //          ||||||+-- 1, rw, OCF0:  - Output Compare Flag 0
     //          |||||+--- 2, rw, TOV1:  - Timer/Counter1, Overflow Flag
@@ -622,6 +615,7 @@ void CMCU::ControlRegistersInit(){
     //           00000000 - Initial Value
     //SFIOR = BIN8(00000000); // BIN8() не зависит от уровня оптимизации
     //           ||||||||
+    //           76543210
     //           |||||||+- 0, rw, PSR321: - Prescaler Reset Timer/Counter3,
     //           |||||||                  - Timer/Counter2, and Timer/Counter1
     //           ||||||+-- 1, rw, PSR0:   - Prescaler Reset Timer/Counter0
@@ -639,6 +633,7 @@ void CMCU::ControlRegistersInit(){
     //            00000000 - Initial Value
     //ADCSRA = BIN8(10001000); // BIN8() не зависит от уровня оптимизации
     //            ||||||||
+    //            76543210
     //            |||||||+- 0, rw, ADPS0: -+ - ADC Prescaler Select Bits
     //            ||||||+-- 1, rw, ADPS1:  |
     //            |||||+--- 2, rw, ADPS2: _|
@@ -662,6 +657,7 @@ void CMCU::ADCInit(){
     //           00000000 - Initial Value
     //ADMUX = BIN8(00000000); // BIN8() не зависит от уровня оптимизации
     //           ||||||||
+    //           76543210
     //           |||||||+- 0, rw, MUX0:  -+ - Analog Channel Selection Bits
     //           ||||||+-- 1, rw, MUX1:   |
     //           |||||+--- 2, rw, MUX2:   |
@@ -678,6 +674,7 @@ void CMCU::ADCInit(){
     //           00000000 - Initial Value
     //DIDR0 = BIN8(00000000); // BIN8() не зависит от уровня оптимизации
     //           ||||||||
+    //           76543210
     //           |||||||+- 0, rw, ADC0D:  -+ - ADC5..0 Digital Input Disable
     //           ||||||+-- 1, rw, ADC1D:   |
     //           |||||+--- 2, rw, ADC2D:   |
@@ -694,6 +691,7 @@ void CMCU::ADCInit(){
     //            00000000 - Initial Value
     //ADCSRB = BIN8(00000000); // BIN8() не зависит от уровня оптимизации
     //            ||||||||
+    //            76543210
     //            |||||||+- 0, rw, ADTS0: -+ - ADC Auto Trigger Source
     //            ||||||+-- 1, rw, ADTS1:  |
     //            |||||+--- 2, rw, ADTS2: _|
@@ -731,6 +729,7 @@ void CMCU::Timer0Init(){
     //           00000000 - Initial Value
     TCCR0 = BIN8(00000011); // BIN8() не зависит от уровня оптимизации
     //           ||||||||
+    //           76543210
     //           |||||||+- 0, rw, CS00:  -+ - Управление тактовым сигналом
     //           ||||||+-- 1, rw, CS01:   |
     //           |||||+--- 2, rw, CS02:  _|
@@ -752,6 +751,7 @@ void CMCU::Timer0Init(){
     //          00000000 - Initial Value
     //ASSR = BIN8(00000000); // BIN8() не зависит от уровня оптимизации
     //          ||||||||
+    //          76543210
     //          |||||||+- 0, r, TCR0UB: - Timer/Counter Control Register0 Update Busy
     //          ||||||+-- 1, r, OCR0UB: - Output Compare Register0 Update Busy
     //          |||||+--- 2, r, TCN0UB: - Timer/Counter0 Update Busy
@@ -789,6 +789,7 @@ void CMCU::Timer1Init(){
     //            00000000 - Initial Value
     TCCR1B = BIN8(00000000); // BIN8() не зависит от уровня оптимизации
     //            ||||||||
+    //            76543210
     //            |||||||+- 0, rw, CS10:  -+
     //            ||||||+-- 1, rw, CS11:   | - Управление тактовым сигналом
     //            |||||+--- 2, rw, CS12:  _|
@@ -820,6 +821,7 @@ void CMCU::Timer1Init(){
     //            00000000 - Initial Value
     TCCR1A = BIN8(00000000); // BIN8() не зависит от уровня оптимизации
     //            ||||||||
+    //            76543210
     //            |||||||+- 0, rw, WGM10:  -+ - Режим работы таймера/счетчика
     //            ||||||+-- 1, rw, WGM11:  _|
     //            |||||+--- 2, rw, COM1C0: -+ - Режим работы канала сравнения C
@@ -832,6 +834,7 @@ void CMCU::Timer1Init(){
 
     TCCR1B = BIN8(00000000); // BIN8() не зависит от уровня оптимизации
     //            ||||||||
+    //            76543210
     //            |||||||+- 0, rw, CS10:  -+
     //            ||||||+-- 1, rw, CS11:   | - Управление тактовым сигналом
     //            |||||+--- 2, rw, CS12:  _|
@@ -856,6 +859,7 @@ void CMCU::Timer2Init(){
     //           00000000 - Initial Value
     TCCR2 = BIN8(00000100); // BIN8() не зависит от уровня оптимизации
     //           ||||||||
+    //           76543210
     //           |||||||+- 0, rw, CS20:  -+ - Clock Select
     //           ||||||+-- 1, rw, CS21:   |
     //           |||||+--- 2, rw, CS22:  _|
@@ -877,6 +881,7 @@ void CMCU::Timer2Init(){
     //          00000000 - Initial Value
     //ASSR = BIN8(00000000); // BIN8() не зависит от уровня оптимизации
     //          ||||||||
+    //          76543210
     //          |||||||+- 0, r, TCR2UB: - Timer/Counter Control Register2 Update Busy
     //          ||||||+-- 1, r, OCR2UB: - Output Compare Register2 Update Busy
     //          |||||+--- 2, r, TCN2UB: - Timer/Counter2 Update Busy
@@ -900,6 +905,7 @@ void CMCU::SPIInit(){
     //          00000000 - Initial Value
     SPCR = BIN8(0000000); // BIN8() не зависит от уровня оптимизации
     //          ||||||||
+    //          76543210
     //          |||||||+- 0, rw, SPR0: -+ - Скорость передачи
     //          ||||||+-- 1, rw, SPR1: _|
     //          |||||+--- 2, rw, CPHA:    - Фаза тактового сигнала
@@ -915,6 +921,7 @@ void CMCU::SPIInit(){
     //          00000000 - Initial Value
     SPSR = BIN8(00000000); // BIN8() не зависит от уровня оптимизации
     //          ||||||||
+    //          76543210
     //          |||||||+- 0, rw, SPI2X:    - Double SPI Speed Bit
     //          ||||||+-- 1, r, 0       -+
     //          |||||+--- 2, r, 0        |
@@ -941,6 +948,7 @@ void CMCU::TWIInit(){
     //          00000000 - Initial Value
     TWCR = BIN8(00000000); // BIN8() не зависит от уровня оптимизации
     //          ||||||||
+    //          76543210
     //          |||||||+- 0, rw, TWIE:  - TWI Interrupt Enable
     //          ||||||+-- 1, r:         - reserved (will always read as zero)
     //          |||||+--- 2, rw, TWEN:  - TWI Enable Bit
@@ -956,6 +964,7 @@ void CMCU::TWIInit(){
     //          11111000 - Initial Value
     TWSR = BIN8(11111000); // BIN8() не зависит от уровня оптимизации
     //          ||||||||
+    //          76543210
     //          |||||||+- 0, rw, TWPS0: -+ - TWI Prescaler Bits
     //          ||||||+-- 1, rw, TWPS1: _|
     //          |||||+--- 2, r:            - reserved (will always read as zero)
@@ -983,6 +992,7 @@ void CMCU::USARTInit(){
     //           00100000 - Initial Value
     UCSRA = BIN8(00100000); // BIN8() не зависит от уровня оптимизации
     //           ||||||||
+    //           76543210
     //           |||||||+- 0, rw, MPCM: - Multi-processor Communication Mode
     //           ||||||+-- 1, rw, U2X:  - Double the USART Transmission Speed
     //           |||||+--- 2, r, PE:    - Parity Error
@@ -1005,6 +1015,7 @@ void CMCU::USARTInit(){
     //           00000000 - Initial Value
     UCSRB = BIN8(10011000); // BIN8() не зависит от уровня оптимизации
     //           ||||||||
+    //           76543210
     //           |||||||+- 0, rw, TXB8:  - Transmit Data Bit 8
     //           ||||||+-- 1, r,  RXB8:  - Receive Data Bit 8
     //           |||||+--- 2, rw, UCSZ2: - Character Size
@@ -1021,6 +1032,7 @@ void CMCU::USARTInit(){
     //           10000110 - Initial Value
     UCSRC = BIN8(10000110); // BIN8() не зависит от уровня оптимизации
     //           ||||||||
+    //           76543210
     //           |||||||+- 0, rw, UCPOL:    - Clock Polarity
     //           ||||||+-- 1, rw, UCSZ0: -+ - Character Size
     //           |||||+--- 2, rw, UCSZ1: _|
@@ -1029,6 +1041,31 @@ void CMCU::USARTInit(){
     //           ||+------ 5, rw, UPM1:  _|
     //           |+------- 6, rw, UMSEL:    - USART Mode Select
     //           +-------- 7, rw: URSEL     - Register Select
+    // Примечание:
+
+    //UCSRC = 0 // ( 1 << UCSZ0 ) | ( 1 << UCSZ1 ) | ( 1 << URSEL )
+
+    //    // Clock Polarity, биты: |-------0|, начальное значение: [0], чтение/запись
+    //    //|  ( 1 << UCPOL )
+
+    //    // Character Size, биты: |-----21-|, начальное значение: [11], чтение/запись
+    //    | ( 1 << UCSZ0 )
+    //    | ( 1 << UCSZ1 )
+
+    //    // Stop Bit Select, биты: |----3---|, начальное значение: [0], чтение/запись
+    //    //| ( 1 << USBS  )
+
+    //    // Parity Mode, биты: |--54----|, начальное значение: [00], чтение/запись
+    //    //| ( 1 << UPM0  )
+    //    //| ( 1 << UPM1  )
+
+    //    // USART Mode Select, биты: |-6------|, начальное значение: [0], чтение/запись
+    //    //| ( 1 << UMSEL )
+
+    //    // Register Select, биты: |7-------|, начальное значение: [0], чтение/запись
+    //    | ( 1 << URSEL )
+
+    //; // UCSRC
     // Примечание:
 
 }
@@ -1084,7 +1121,7 @@ void CMCU::PortsInit(){
 //                                                                                  +----------[17]- VCC
 
 
-    // Table 25. Port Pin Configurations
+    // Table. Port Pin Configurations
     //+-----+------+----------+--------+---------+--------------------------------------------+
     //| DDxn|PORTxn|   PUD    |  I/O   | Pull-up |   Comment                                  |
     //|     |      |(in SFIOR)|        |         |                                            |
@@ -1108,6 +1145,7 @@ void CMCU::PortsInit(){
     //          00000000 - Initial Value
     DDRA = BIN8(00000000); // BIN8() не зависит от уровня оптимизации
     //          ||||||||
+    //          76543210
     //          |||||||+- 0, rw, DDA0: (ADC0) -
     //          ||||||+-- 1, rw, DDA1: (ADC1) -
     //          |||||+--- 2, rw, DDA2: (ADC2) -
@@ -1123,6 +1161,7 @@ void CMCU::PortsInit(){
     //          00000000 - Initial Value
     DDRB = BIN8(10110011); // BIN8() не зависит от уровня оптимизации
     //          ||||||||
+    //          76543210
     //          |||||||+- 0, rw, DDB0: (XCK/T0)    - CD
     //          ||||||+-- 1, rw, DDB1: (T1)        - WP
     //          |||||+--- 2, rw, DDB2: (INT2/AIN0) -
@@ -1138,6 +1177,7 @@ void CMCU::PortsInit(){
     //          00000000 - Initial Value
     DDRC = BIN8(00000000); // BIN8() не зависит от уровня оптимизации
     //          ||||||||
+    //          76543210
     //          |||||||+- 0, rw, DDC0: (SCL)   -
     //          ||||||+-- 1, rw, DDC1: (SDA)   -
     //          |||||+--- 2, rw, DDC2: (TCK)   -
@@ -1153,6 +1193,7 @@ void CMCU::PortsInit(){
     //          00000000 - Initial Value
     DDRD = BIN8(00000010); // BIN8() не зависит от уровня оптимизации
     //          ||||||||
+    //          76543210
     //          |||||||+- 0, rw, DDD0: (RXD)  - RXD
     //          ||||||+-- 1, rw, DDD1: (TXD)  - TXD
     //          |||||+--- 2, rw, DDD2: (INT0) -
@@ -1169,6 +1210,7 @@ void CMCU::PortsInit(){
     //           00000000 - Initial Value
     PORTA = BIN8(00000000); // BIN8() не зависит от уровня оптимизации
     //           ||||||||
+    //           76543210
     //           |||||||+- 0, rw, PORTA0: (ADC0) -
     //           ||||||+-- 1, rw, PORTA1: (ADC1) -
     //           |||||+--- 2, rw, PORTA2: (ADC2) -
@@ -1184,6 +1226,7 @@ void CMCU::PortsInit(){
     //           00000000 - Initial Value
     PORTB = BIN8(01000000); // BIN8() не зависит от уровня оптимизации
     //           ||||||||
+    //           76543210
     //           |||||||+- 0, rw, PORTB0: (XCK/T0)    - CD
     //           ||||||+-- 1, rw, PORTB1: (T1)        - WP
     //           |||||+--- 2, rw, PORTB2: (INT2/AIN0) -
@@ -1199,6 +1242,7 @@ void CMCU::PortsInit(){
     //           00000000 - Initial Value
     PORTC = BIN8(00000000); // BIN8() не зависит от уровня оптимизации
     //           ||||||||
+    //           76543210
     //           |||||||+- 0, rw, PORTC0: (SCL)   -
     //           ||||||+-- 1, rw, PORTC1: (SDA)   -
     //           |||||+--- 2, rw, PORTC2: (TCK)   -
@@ -1214,6 +1258,7 @@ void CMCU::PortsInit(){
     //           00000000 - Initial Value
     PORTD = BIN8(00000001); // BIN8() не зависит от уровня оптимизации
     //           ||||||||
+    //           76543210
     //           |||||||+- 0, rw, PORTD0: (RXD)  - RXD
     //           ||||||+-- 1, rw, PORTD1: (TXD)  - TXD
     //           |||||+--- 2, rw, PORTD2: (INT0) -
@@ -1251,6 +1296,7 @@ void CMCU::InternalWDTInit(){
     //           00000000 - Initial Value
     WDTCR = BIN8(00000000); // BIN8() не зависит от уровня оптимизации
     //           ||||||||
+    //           76543210
     //           |||||||+- 0, rw, WDP0: -+
     //           ||||||+-- 1, rw, WDP1:  |- Коэффициент деления предделителя сторожевого таймера
     //           |||||+--- 2, rw, WDP2: _|
@@ -1293,6 +1339,7 @@ void CMCU::ExternalInterruptsInit(){
     //          ****0000 - Initial Value
     temp = BIN8(00000000);
     //          ||||||||
+    //          76543210
     //          |||||||+- 0, rw, ISC00: -+ - Interrupt Sense Control 0 Bit 1 and Bit 0
     //          ||||||+-- 1, rw, ISC01: _|
     //          |||||+--- 2, rw, ISC10: -+ - Interrupt Sense Control 1 Bit 1 and Bit 0
@@ -1318,6 +1365,7 @@ void CMCU::ExternalInterruptsInit(){
     //          *0****** - Initial Value
     temp = BIN8(00000000);
     //          ||||||||
+    //          76543210
     //          |||||||+- 0, rw, PORF:  -
     //          ||||||+-- 1, rw, EXTRF: -
     //          |||||+--- 2, rw, BORF:  -
@@ -1440,7 +1488,7 @@ void CMCU::OnSPISerialTransferComplete(){
 void CMCU::OnUSARTRxComplete( uint8_t data ){
 
     if ( !FIFO_IS_FULL( uart_rx_fifo ) ) {
-        
+
         FIFO_PUSH( uart_rx_fifo, data );
     }
 

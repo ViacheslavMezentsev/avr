@@ -70,6 +70,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\FAT.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\ISRList.cpp"
 				>
 			</File>
@@ -82,11 +86,7 @@
 				>
 			</File>
 			<File
-				RelativePath=".\mmc.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\pff.cpp"
+				RelativePath=".\MMC.cpp"
 				>
 			</File>
 		</Filter>
@@ -108,7 +108,7 @@
 				>
 			</File>
 			<File
-				RelativePath=".\diskio.h"
+				RelativePath=".\FAT.h"
 				>
 			</File>
 			<File
@@ -128,7 +128,7 @@
 				>
 			</File>
 			<File
-				RelativePath=".\pff.h"
+				RelativePath=".\MMC.h"
 				>
 			</File>
 			<File

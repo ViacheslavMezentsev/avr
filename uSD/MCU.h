@@ -8,19 +8,20 @@
 #if !defined(EA_65BAC4E6_2352_4d1c_A473_BA968DAA6985__INCLUDED_)
 #define EA_65BAC4E6_2352_4d1c_A473_BA968DAA6985__INCLUDED_
 
-#include "windows.h"
+#include "Defines.h"
+#include "FAT.h"
 
 /**
  * Класс CMCU
  * ~~~~~~~~~~
- * 
+ *
  * Назначение:
  * Обёртка для работы с микроконтроллером ATmega16.
- * 
+ *
  * Автор: Мезенцев Вячеслав
- * 
+ *
  * Почта: mailto:unihomelab@ya.ru
- * 
+ *
  * ВНИМАНИЕ:
  * Этот файл формируется автоматически в среде EA.
  * Если Вы что-то изменили здесь, то синхронизируйте изменения в EA.
@@ -55,6 +56,7 @@ public:
 
 private:
     inline static FRESULT ScanFiles( char * path );
+    inline static FRESULT ScanFiles( FCHAR_PTR path );
     inline static void ShowStatusMessage( FRESULT Result );
     inline static void TestDriver();
     inline static void PortsInit();
