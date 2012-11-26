@@ -22,7 +22,7 @@
 #include "Defines.h"
 #include "Configuration.h"
 #include "MCU.h"
-#include "MainUnit.h"
+
 
 // Точка входа в основную программу
 int main() {

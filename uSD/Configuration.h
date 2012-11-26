@@ -1,5 +1,4 @@
-#ifndef _CONFIGURATION_H_
-#define _CONFIGURATION_H_
+#pragma once
 
 #include "Defines.h"
 
@@ -29,6 +28,14 @@
 #define BAUD 19200UL
 //#define BAUD 38400UL
 //#define BAUD 57600UL
+
+// Definitions for MMC/SDC connection
+#define SD_DI   5   // MOSI
+#define SD_DO   6   // MISO
+#define SD_CLK  7   // CLK
+#define SD_CS   4   // SS
+#define SD_INS  0   // CD
+#define SD_WP   1   // WP
 
 
 /**
@@ -76,4 +83,3 @@
 
 //#define Store_Program_Memory_Read
 
-#endif // _CONFIGURATION_H_

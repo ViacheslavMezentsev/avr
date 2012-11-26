@@ -7,55 +7,26 @@
 #include "MMC.h"
 
 
-// allow write operations
-#define _WRITE_FUNC	1			
-
-// Definitions for MMC/SDC connection
-#define SD_DI   5   // MOSI
-#define SD_DO   6   // MISO
-#define SD_CLK  7   // CLK
-#define SD_CS   4   // SS
-#define SD_INS  0   // CD
-#define SD_WP   1   // WP
-
-// Definitions for MMC/SDC command
-#define CMD0	(0x40+0)	// GO_IDLE_STATE
-#define CMD1	(0x40+1)	// SEND_OP_COND (MMC)
-#define	ACMD41	(0xC0+41)	// SEND_OP_COND (SDC)
-#define CMD8	(0x40+8)	// SEND_IF_COND
-#define CMD16	(0x40+16)	// SET_BLOCKLEN
-#define CMD17	(0x40+17)	// READ_SINGLE_BLOCK
-#define CMD24	(0x40+24)	// WRITE_BLOCK
-#define CMD55	(0x40+55)	// APP_CMD
-#define CMD58	(0x40+58)	// READ_OCR
-
-// Port Controls (Platform dependent)
-#define SELECT()	PORTB &= ~_BV( SD_CS )		// MMC CS = L
-#define	DESELECT()	PORTB |=  _BV( SD_CS )		// MMC CS = H
-#define	MMC_SEL		!( PORTB & _BV( SD_CS ) )	// MMC CS status (true:selected)
-#define	INIT_SPI()	{ PORTB=_BV(SD_CS)|_BV(SD_DO)|_BV(SD_DI)|_BV(SD_WP)|_BV(SD_INS); DDRB=_BV(SD_CS)|_BV(SD_DI)|_BV(SD_CLK); }	
-
-
 //-----------------------------------------------------------------------
 //   Module Private Function
 //-----------------------------------------------------------------------
-static BYTE CardType;
+BYTE CMMC::CardType = CMMC::CT_NONE;
 
 
 //-----------------------------------------------------------------------
 // SPI functions
 //-----------------------------------------------------------------------
 // Send a byte
-void xmit_spi ( BYTE data ) {
+void CMMC::SPIWrite( BYTE Data ) {
 
     BYTE i;
 
     for ( i = 0; i < 8; i++ ) {
 
-        if ( ( data & 0x80 ) == 0x00 ) PORTB &= ~ _BV( SD_DI );
+        if ( ( Data & 0x80 ) == 0x00 ) PORTB &= ~ _BV( SD_DI );
         else PORTB |= _BV( SD_DI );
 
-        data = data << 1;
+        Data = Data << 1;
 
         PORTB |= _BV( SD_CLK );
         nop();
@@ -67,7 +38,7 @@ void xmit_spi ( BYTE data ) {
 
 
 // Send 0xFF and receive a byte
-BYTE rcv_spi( void ) {
+BYTE CMMC::SPIRead() {
 
     BYTE i, res = 0;
 
@@ -95,57 +66,56 @@ BYTE rcv_spi( void ) {
 //-----------------------------------------------------------------------
 // Deselect the card and release SPI bus
 //-----------------------------------------------------------------------
-static void release_spi( void ) {
+void CMMC::SPIRelease() {
 
-	rcv_spi();
+	SPIRead();
 }
 
 
 //-----------------------------------------------------------------------
 // Send a command packet to MMC
 //-----------------------------------------------------------------------
-static BYTE send_cmd (
-	BYTE cmd,		// Command byte
-	DWORD arg		// Argument
-    ) {
+// Command byte
+// Argument
+BYTE CMMC::SendCommand( BYTE Command, DWORD Argument ) {
 
 	BYTE n, res;
 
 	// ACMD<n> is the command sequense of CMD55-CMD<n>
-    if ( cmd & 0x80 ) {	
+    if ( Command & 0x80 ) {	
 		
-        cmd &= 0x7F;
-		res = send_cmd( CMD55, 0 );
+        Command &= 0x7F;
+		res = SendCommand( CMD55, 0 );
 		if ( res > 1 ) return res;
 
 	}
 
 	// Select the card
 	DESELECT();
-	rcv_spi();
+	SPIRead();
 	SELECT();
-	rcv_spi();
+	SPIRead();
 
 	// Send a command packet
-	xmit_spi( cmd );						// Start + Command index
-	xmit_spi( ( BYTE )( arg >> 24 ) );		// Argument[31..24]
-	xmit_spi( ( BYTE )( arg >> 16 ) );		// Argument[23..16]
-	xmit_spi( ( BYTE )( arg >> 8 ) );		// Argument[15..8]
-	xmit_spi( ( BYTE ) arg );				// Argument[7..0]
+	SPIWrite( Command );						// Start + Command index
+	SPIWrite( ( BYTE )( Argument >> 24 ) );		// Argument[31..24]
+	SPIWrite( ( BYTE )( Argument >> 16 ) );		// Argument[23..16]
+	SPIWrite( ( BYTE )( Argument >> 8 ) );		// Argument[15..8]
+	SPIWrite( ( BYTE ) Argument );				// Argument[7..0]
 	
     n = 0x01;							// Dummy CRC + Stop
 	
-    if ( cmd == CMD0 ) n = 0x95;			// Valid CRC for CMD0(0)
-	if ( cmd == CMD8 ) n = 0x87;			// Valid CRC for CMD8(0x1AA)
+    if ( Command == CMD0 ) n = 0x95;			// Valid CRC for CMD0(0)
+	if ( Command == CMD8 ) n = 0x87;			// Valid CRC for CMD8(0x1AA)
 	
-    xmit_spi(n);
+    SPIWrite(n);
 
 	// Receive a command response
 	n = 10;								// Wait for a valid response in timeout of 10 attempts
 
     do {
 		
-        res = rcv_spi();
+        res = SPIRead();
 
 	} while ( ( res & 0x80 ) && --n );
 
@@ -178,29 +148,29 @@ DSTATUS CMMC::Initialize() {
 #endif
 
 	// Dummy clocks
-    for ( n = 100; n; n-- ) rcv_spi();	
+    for ( n = 100; n; n-- ) SPIRead();	
 
 	ty = 0;
 
 	// Enter Idle state
-    if ( send_cmd( CMD0, 0 ) == 1 ) {
+    if ( SendCommand( CMD0, 0 ) == 1 ) {
 
 		// SDv2
-        if ( send_cmd( CMD8, 0x1AA ) == 1 ) {	
+        if ( SendCommand( CMD8, 0x1AA ) == 1 ) {	
 
 			// Get trailing return value of R7 resp
-            for ( n = 0; n < 4; n++ ) ocr[n] = rcv_spi();		
+            for ( n = 0; n < 4; n++ ) ocr[n] = SPIRead();		
 
 			// The card can work at vdd range of 2.7-3.6V
             if ( ocr[2] == 0x01 && ocr[3] == 0xAA ) {		
 
 				// Wait for leaving idle state (ACMD41 with HCS bit)
-                for ( tmr = 12000; tmr && send_cmd( ACMD41, 1UL << 30 ); tmr-- ) ;	
+                for ( tmr = 12000; tmr && SendCommand( ACMD41, 1UL << 30 ); tmr-- ) ;	
 				
                 // Check CCS bit in the OCR
-                if ( tmr && send_cmd( CMD58, 0 ) == 0 ) {		
+                if ( tmr && SendCommand( CMD58, 0 ) == 0 ) {		
 
-					for ( n = 0; n < 4; n++ ) ocr[n] = rcv_spi();
+					for ( n = 0; n < 4; n++ ) ocr[n] = SPIRead();
 
 					// SDv2 (HC or SC)
                     ty = ( ocr[0] & 0x40 ) ? CT_SD2 | CT_BLOCK : CT_SD2;	
@@ -212,7 +182,7 @@ DSTATUS CMMC::Initialize() {
 		// SDv1 or MMCv3
         } else {		
 
-			if ( send_cmd( ACMD41, 0 ) <= 1 ) {
+			if ( SendCommand( ACMD41, 0 ) <= 1 ) {
 
 				ty = CT_SD1;
                 cmd = ACMD41;	// SDv1
@@ -224,10 +194,10 @@ DSTATUS CMMC::Initialize() {
 			}
 
 			// Wait for leaving idle state
-            for ( tmr = 25000; tmr && send_cmd( cmd, 0 ); tmr-- ) ;	
+            for ( tmr = 25000; tmr && SendCommand( cmd, 0 ); tmr-- ) ;	
 
 			// Set R/W block length to 512
-            if ( !tmr || send_cmd( CMD16, 512 ) != 0 ) ty = 0;
+            if ( !tmr || SendCommand( CMD16, 512 ) != 0 ) ty = 0;
 
 		}
 
@@ -235,9 +205,9 @@ DSTATUS CMMC::Initialize() {
 
 	CardType = ty;
 
-	release_spi();
+	SPIRelease();
 
-	return ty ? 0 : STA_NOINIT;
+	return ( ty != CT_NONE ) ? 0 : STA_NOINIT;
 
 }
 
@@ -265,14 +235,14 @@ DRESULT CMMC::Read (
 	res = RES_ERROR;
 
 	// READ_SINGLE_BLOCK
-    if ( send_cmd( CMD17, lba ) == 0 ) {
+    if ( SendCommand( CMD17, lba ) == 0 ) {
 
 		bc = 30000;
 
 		// Wait for data packet in timeout of 100ms
         do {							
 
-			rc = rcv_spi();
+			rc = SPIRead();
 
 		} while ( rc == 0xFF && --bc );
 
@@ -284,14 +254,14 @@ DRESULT CMMC::Read (
 			// Skip leading bytes
 			if ( ofs ) {
 
-				do rcv_spi(); while ( --ofs );
+				do SPIRead(); while ( --ofs );
 			}
 
 			// Receive a part of the sector
 			// Store data to the memory
             if ( buff ) {	
 				do
-					* buff++ = rcv_spi();
+					* buff++ = SPIRead();
 
 				while ( --cnt );
 
@@ -301,14 +271,14 @@ DRESULT CMMC::Read (
                 do {
 
                     // (Console output)
-                    //uart_transmit(rcv_spi());
+                    //uart_transmit(SPIRead());
 
                 } while ( --cnt );
 
 			}
 
 			// Skip trailing bytes and CRC
-			do rcv_spi(); while (--bc);
+			do SPIRead(); while (--bc);
 
 			res = RES_OK;
 
@@ -316,7 +286,7 @@ DRESULT CMMC::Read (
 
 	}
 
-	release_spi();
+	SPIRelease();
 
 	return res;
 
@@ -349,7 +319,7 @@ DRESULT CMMC::Write( const BYTE * buff,	DWORD sa ) {
         // Send data bytes to the card
         while ( bc && wc ) {
 
-			xmit_spi( * buff++ );
+			SPIWrite( * buff++ );
 			wc--;
             bc--;
 
@@ -366,11 +336,11 @@ DRESULT CMMC::Write( const BYTE * buff,	DWORD sa ) {
             if ( !( CardType & CT_BLOCK ) ) sa *= 512;	
 
 			// WRITE_SINGLE_BLOCK
-            if ( send_cmd( CMD24, sa ) == 0) {			
+            if ( SendCommand( CMD24, sa ) == 0) {			
 
 				// Data block header
-                xmit_spi( 0xFF );
-                xmit_spi( 0xFE );		
+                SPIWrite( 0xFF );
+                SPIWrite( 0xFE );		
 				
                 // Set byte counter
                 wc = 512;							
@@ -384,19 +354,19 @@ DRESULT CMMC::Write( const BYTE * buff,	DWORD sa ) {
 			bc = wc + 2;
 
 			// Fill left bytes and CRC with zeros
-            while ( bc-- ) xmit_spi(0);	
+            while ( bc-- ) SPIWrite(0);	
 
 			// Receive data resp and wait for end of write process in timeout of 300ms
-            if ( ( rcv_spi() & 0x1F ) == 0x05 ) {
+            if ( ( SPIRead() & 0x1F ) == 0x05 ) {
 
 				// Wait ready
-                for ( bc = 65000; rcv_spi() != 0xFF && bc; bc-- );
+                for ( bc = 65000; SPIRead() != 0xFF && bc; bc-- );
 
 				if ( bc ) res = RES_OK;
 
 			}
 
-			release_spi();
+			SPIRelease();
 
 		}
 
@@ -426,7 +396,7 @@ DRESULT CMMC::Write( FCHAR_PTR buff, DWORD sa ) {
         // Send data bytes to the card
         while ( bc && wc ) {
 
-			xmit_spi( * buff++ );
+			SPIWrite( * buff++ );
 			wc--;
             bc--;
 
@@ -443,11 +413,11 @@ DRESULT CMMC::Write( FCHAR_PTR buff, DWORD sa ) {
             if ( !( CardType & CT_BLOCK ) ) sa *= 512;	
 
 			// WRITE_SINGLE_BLOCK
-            if ( send_cmd( CMD24, sa ) == 0) {			
+            if ( SendCommand( CMD24, sa ) == 0) {			
 
 				// Data block header
-                xmit_spi( 0xFF );
-                xmit_spi( 0xFE );		
+                SPIWrite( 0xFF );
+                SPIWrite( 0xFE );		
 				
                 // Set byte counter
                 wc = 512;							
@@ -461,19 +431,19 @@ DRESULT CMMC::Write( FCHAR_PTR buff, DWORD sa ) {
 			bc = wc + 2;
 
 			// Fill left bytes and CRC with zeros
-            while ( bc-- ) xmit_spi(0);	
+            while ( bc-- ) SPIWrite(0);	
 
 			// Receive data resp and wait for end of write process in timeout of 300ms
-            if ( ( rcv_spi() & 0x1F ) == 0x05 ) {
+            if ( ( SPIRead() & 0x1F ) == 0x05 ) {
 
 				// Wait ready
-                for ( bc = 65000; rcv_spi() != 0xFF && bc; bc-- );
+                for ( bc = 65000; SPIRead() != 0xFF && bc; bc-- );
 
 				if ( bc ) res = RES_OK;
 
 			}
 
-			release_spi();
+			SPIRelease();
 
 		}
 

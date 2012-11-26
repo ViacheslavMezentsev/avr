@@ -1,3 +1,5 @@
+#pragma once
+
 /*---------------------------------------------------------------------------/
 /  Petit FatFs - FAT file system module include file  R0.02    (C)ChaN, 2009
 /----------------------------------------------------------------------------/
@@ -13,9 +15,6 @@
 / * Redistributions of source code must retain the above copyright notice.
 /
 /----------------------------------------------------------------------------*/
-#ifndef _FAT_H_
-#define _FAT_H_
-
 
 /*---------------------------------------------------------------------------/
 / Petit FatFs Configuration Options
@@ -533,5 +532,3 @@ private:
 #define IsDBCS2(c)	0
 
 #endif /* _DF1S */
-
-#endif // _FAT_H_

@@ -1,3 +1,5 @@
+#pragma once
+
 /*
     kbd.h
     Keyboard codes descriptions (defines).

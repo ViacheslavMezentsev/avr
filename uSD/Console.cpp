@@ -44,11 +44,8 @@ FLASHSTR_DECLARE( char, ESC_CURSOR_OFF, "\033[25l" );
 
 // -=[ Переменные в ОЗУ ]=-
 
-//PR_BEGIN_EXTERN_C
-//    FIFO( 16 ) uart_rx_fifo;
-//PR_END_EXTERN_C
-
 FIFO( 16 ) uart_rx_fifo;
+
 
 /***********************
 *  Р Е А Л И З А Ц И Я

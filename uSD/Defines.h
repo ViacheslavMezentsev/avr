@@ -1,8 +1,7 @@
-#ifndef DefinesH
-#define DefinesH
+#pragma once
 
 // Внимание:
-// Для VS2008 нужно сделать явное определение, чтобы работала
+// Для VS20xx нужно сделать явное определение, чтобы работала
 // автоматическая подсветка логики препроцессора в IDE.
 // Это делается в настройках проекта:
 // IntelliSence\Preprocessor Definitions: __GNUC__ или __ICCAVR__
@@ -30,9 +29,8 @@
     #include <avr/iom16.h>
 
     // Набор шаблонов для "типизации" указателей в AVR GCC
-    #ifdef __cplusplus
-        #include "SmartPtr.h"
-    #endif
+    // Предназначен для эмулирования __flash в компиляторах до 4.7
+    #include "SmartPtr.h"
 
     #define nop() asm volatile ("nop")
     #define sleep() asm volatile ("sleep")
@@ -61,7 +59,7 @@
 
     #define FLASHSTR_DECLARE(type,name,init) \
         static PROGMEM type _##name[] = init; \
-        FlashPtr<type> name(_##name);
+        FlashPtr<type> name(_##name)
 
     #define SPSTR(s) (__extension__({ \
         static char __c[] PROGMEM = (s); \
@@ -259,5 +257,3 @@
                       ((n >>  3) & 0x02) | \
                       ((n      ) & 0x01))
 
-
-#endif

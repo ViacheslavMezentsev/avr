@@ -1,5 +1,4 @@
-#ifndef _CONSOLE_H_
-#define _CONSOLE_H_
+#pragma once
 
 /**
  * Класс CConsole
@@ -90,4 +89,3 @@ public:
 
 };
 
-#endif // _CONSOLE_H_

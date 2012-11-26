@@ -120,10 +120,6 @@
 				>
 			</File>
 			<File
-				RelativePath=".\MainUnit.h"
-				>
-			</File>
-			<File
 				RelativePath=".\MCU.h"
 				>
 			</File>
