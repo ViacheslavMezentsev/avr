@@ -111,6 +111,7 @@ FRESULT CMCU::ScanFiles( char * path ) {
     // Монтирование FAT32
     res = CFAT::Mount( & fs );
 
+    // Открываем директорию (папку)
     res = CFAT::OpenDir( & dir, path );
 
     if ( res == FR_OK ) {
@@ -322,7 +323,7 @@ void CMCU::TestDriver() {
 
         ShowStatusMessage( res );
 
-        // Финализируем запись в  write.txt
+        // Финализируем запись в write.txt
         res = CFAT::Write( ( const void * ) 0, 0, & s1 );
 
         CConsole::WriteString( SPSTR( "Окончание записи в write.txt " ), CConsole::cp1251 );
@@ -483,7 +484,7 @@ HRESULT CMCU::MainThreadProcedure(){
     CommandShell();
 
     // Размонтируем
-    pf_mount( NULL );
+    CFAT::Mount( NULL );
 
     // Все проверки прошли успешно, объект в рабочем состоянии
     return NO_ERROR;

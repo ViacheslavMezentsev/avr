@@ -1,5 +1,4 @@
-#ifndef __WINDOWS_H__
-#define __WINDOWS_H__
+#pragma once
 
 /*
  * ShowWindow() Commands
@@ -517,4 +516,3 @@ typedef ULONG HRESULT;
 //
 #define RTC_NOT_RESPOND         1L
 
-#endif
