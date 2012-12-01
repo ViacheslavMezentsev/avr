@@ -25,10 +25,18 @@
 #endif
 
 // Скорость работы внутреннего USART
-//#define BAUD 9600UL
-#define BAUD 19200UL
+#define BAUD 9600UL
+//#define BAUD 19200UL
 //#define BAUD 38400UL
 //#define BAUD 57600UL
+
+// Definitions for MMC/SDC connection
+#define SD_DI   5   // MOSI
+#define SD_DO   6   // MISO
+#define SD_CLK  7   // CLK
+#define SD_CS   4   // SS
+#define SD_INS  0   // CD
+#define SD_WP   1   // WP
 
 
 /**
@@ -54,7 +62,7 @@
 //#define External_Interrupt_Request_1
 //#define External_Interrupt_Request_2
 
-//#define Timer_Counter0_Overflow
+#define Timer_Counter0_Overflow
 //#define Timer_Counter0_Compare_Match
 
 //#define Timer_Counter1_Overflow

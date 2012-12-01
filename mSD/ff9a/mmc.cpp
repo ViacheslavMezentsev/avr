@@ -3,15 +3,27 @@
 /*-----------------------------------------------------------------------*/
 
 #include "Defines.h"
+#include "Configuration.h"
 
 
-/* Port controls  (Platform dependent) */
-#define CS_LOW()	PORTB &= ~( 1 << PB4 )			/* CS=low */
-#define	CS_HIGH()	PORTB |= ( 1 << PB4 )			/* CS=high */
-#define SOCKINS		(!(PINB & 0x01))	/* Card detected.   yes:true, no:false, default:true */
-#define SOCKWP		(PINB & 0x02)		/* Write protected. yes:true, no:false, default:false */
-#define	FCLK_SLOW()	SPCR = 0x52		/* Set slow clock (F_CPU / 64) */
-#define	FCLK_FAST()	SPCR = 0x50		/* Set fast clock (F_CPU / 2) */
+// Port controls (platform dependent)
+// CS = low
+#define CS_LOW()	( PORTB &= ~( 1 << SD_CS ) )
+
+// CS = high
+#define	CS_HIGH()	( PORTB |= ( 1 << SD_CS ) )
+
+// Card detected: yes:true, no:false, default:true
+#define SOCKINS		( !( PINB & ( 1 << SD_INS ) ) )	
+
+// Write protected: yes:true, no:false, default:false
+#define SOCKWP		( PINB & ( SD_WP ) )
+
+// Set slow clock ( F_CPU / 64 )
+#define	FCLK_SLOW()	SPCR = 0x52
+
+// Set fast clock ( F_CPU / 2 )
+#define	FCLK_FAST()	SPCR = 0x50		
 
 
 /*--------------------------------------------------------------------------
@@ -40,14 +52,14 @@
 #define CMD58	(58)		/* READ_OCR */
 
 
-static volatile
-DSTATUS Stat = STA_NOINIT;	/* Disk status */
+// Disk status
+static volatile DSTATUS Stat = STA_NOINIT;
 
-static volatile
-BYTE Timer1, Timer2;	/* 100Hz decrement timer */
+// 100Hz decrement timer
+static volatile BYTE Timer1, Timer2;
 
-static
-BYTE CardType;			/* Card type flags */
+// Card type flags
+static BYTE CardType;
 
 
 /*-----------------------------------------------------------------------*/
@@ -72,25 +84,10 @@ static void power_on() {
 	//	for (Timer1 = 2; Timer1; );	/* Wait for 20ms */
 	//}
     
-    // Port B Data Register
-    // [ Регистр данных порта B ][ATmega32]
-    //           00000000 - Initial Value
-    PORTB = BIN8(01000000); // BIN8() не зависит от уровня оптимизации
-    //           ||||||||
-    //           |||||||+- 0, rw, PORTB0: (XCK/T0)    - CD
-    //           ||||||+-- 1, rw, PORTB1: (T1)        - WP
-    //           |||||+--- 2, rw, PORTB2: (INT2/AIN0) - 
-    //           ||||+---- 3, rw, PORTB3: (OC0/AIN1)  -
-    //           |||+----- 4, rw, PORTB4: (~SS)       - SD_CS
-    //           ||+------ 5, rw, PORTB5: (MOSI)      - SD_DI
-    //           |+------- 6, rw, PORTB6: (MISO)      - SD_DO
-    //           +-------- 7, rw, PORTB7: (SCK)       - SD_CLK
-    // Примечание:
-
     // Port B Data Direction Register
     // [ Регистр направления порта B ][ATmega32]
     //          00000000 - Initial Value
-    DDRB = BIN8(10110011); // BIN8() не зависит от уровня оптимизации
+    DDRB = BIN8(10110000); // BIN8() не зависит от уровня оптимизации
     //          ||||||||
     //          |||||||+- 0, rw, DDB0: (XCK/T0)    - CD
     //          ||||||+-- 1, rw, DDB1: (T1)        - WP
@@ -102,15 +99,76 @@ static void power_on() {
     //          +-------- 7, rw, DDB7: (SCK)       - SD_CLK
     // Примечание:
 
-	SPCR = 0x52;			/* Enable SPI function in mode 0 */
-	SPSR = 0x01;			/* SPI 2x mode */
+
+    // Port B Data Register
+    // [ Регистр данных порта B ][ATmega32]
+    //           00000000 - Initial Value
+    PORTB = BIN8(11110011); // BIN8() не зависит от уровня оптимизации
+    //           ||||||||
+    //           |||||||+- 0, rw, PORTB0: (XCK/T0)    - CD
+    //           ||||||+-- 1, rw, PORTB1: (T1)        - WP
+    //           |||||+--- 2, rw, PORTB2: (INT2/AIN0) - 
+    //           ||||+---- 3, rw, PORTB3: (OC0/AIN1)  -
+    //           |||+----- 4, rw, PORTB4: (~SS)       - SD_CS
+    //           ||+------ 5, rw, PORTB5: (MOSI)      - SD_DI
+    //           |+------- 6, rw, PORTB6: (MISO)      - SD_DO
+    //           +-------- 7, rw, PORTB7: (SCK)       - SD_CLK
+    // Примечание:
+
+
+    // SPI Control Register
+    // [ Регистр управления SPI ][ATmega32]
+    //          00000000 - Initial Value
+    SPCR = BIN8(01010010); // BIN8() не зависит от уровня оптимизации
+    //          ||||||||
+    //          76543210
+    //          |||||||+- 0, rw, SPR0: -+ - Скорость передачи
+    //          ||||||+-- 1, rw, SPR1: _|
+    //          |||||+--- 2, rw, CPHA:    - Фаза тактового сигнала
+    //          ||||+---- 3, rw, CPOL:    - Полярность тактового сигнала
+    //          |||+----- 4, rw, MSTR:    - Выбор режима работы (Master/Slave)
+    //          ||+------ 5, rw, DORD:    - Порядок передачи данных
+    //          |+------- 6, rw, SPE:     - Включение/выключение SPI
+    //          +-------- 7, rw, SPIE:    - Разрешение прерывания от SPI
+    // Примечание: Enable SPI function in mode 0
+
+    // SPI Status Register
+    // [ Регистр статуса SPI ][ATmega32]
+    //          00000000 - Initial Value
+    SPSR = BIN8(00000001); // BIN8() не зависит от уровня оптимизации
+    //          ||||||||	
+    //          76543210
+    //          |||||||+- 0, rw, SPI2X:    - Double SPI Speed Bit
+    //          ||||||+-- 1, r, 0       -+ - зарезервированы
+    //          |||||+--- 2, r, 0        |
+    //          ||||+---- 3, r, 0        | 
+    //          |||+----- 4, r, 0        |
+    //          ||+------ 5, r, 0       _|
+    //          |+------- 6, r, WCOL:      - Write Collision flag
+    //          +-------- 7, r, SPIF:      - SPI Interrupt Flag
+    // Примечание: SPI 2x mode
 
 }
 
+
 static void power_off() {
 
-	/* Disable SPI function */
-    SPCR = 0;				
+    // SPI Control Register
+    // [ Регистр управления SPI ][ATmega32]
+    //          00000000 - Initial Value
+    SPCR = BIN8(00000000); // BIN8() не зависит от уровня оптимизации
+    //          ||||||||
+    //          76543210
+    //          |||||||+- 0, rw, SPR0: -+ - Скорость передачи
+    //          ||||||+-- 1, rw, SPR1: _|
+    //          |||||+--- 2, rw, CPHA:    - Фаза тактового сигнала
+    //          ||||+---- 3, rw, CPOL:    - Полярность тактового сигнала
+    //          |||+----- 4, rw, MSTR:    - Выбор режима работы (Master/Slave)
+    //          ||+------ 5, rw, DORD:    - Порядок передачи данных
+    //          |+------- 6, rw, SPE:     - Включение/выключение SPI
+    //          +-------- 7, rw, SPIE:    - Разрешение прерывания от SPI
+    // Примечание: Disable SPI function			
+
 
     // Port B Data Direction Register
     // [ Регистр направления порта B ][ATmega32]
@@ -161,6 +219,7 @@ static void power_off() {
 static BYTE xchg_spi ( BYTE dat ) {
 
 	SPDR = dat;
+
 	loop_until_bit_is_set( SPSR, SPIF );
 	
     return SPDR;
@@ -387,54 +446,106 @@ BYTE send_cmd (		/* Returns R1 resp (bit7==1:Send failed) */
 /* Initialize Disk Drive                                                 */
 /*-----------------------------------------------------------------------*/
 
-DSTATUS disk_initialize (
-	BYTE drv		/* Physical drive nmuber (0) */
-)
-{
-	BYTE n, cmd, ty, ocr[4];
+// Physical drive nmuber (0)
+DSTATUS disk_initialize( BYTE drv ) {
+	
+    BYTE n, cmd, ty, ocr[4];
 
+	// Supports only single drive
+    if ( drv ) return STA_NOINIT;			
 
-	if (drv) return STA_NOINIT;			/* Supports only single drive */
-	power_off();						/* Turn off the socket power to reset the card */
-	if (Stat & STA_NODISK) return Stat;	/* No card in the socket */
-	power_on();							/* Turn on the socket power */
+	// Turn off the socket power to reset the card
+    power_off();						
+
+	// No card in the socket
+    if ( Stat & STA_NODISK ) return Stat;
+
+	// Turn on the socket power
+    power_on();
+
 	FCLK_SLOW();
-	for (n = 10; n; n--) xchg_spi(0xFF);	/* 80 dummy clocks */
+
+	// 80 dummy clocks
+    for ( n = 10; n; n-- ) xchg_spi( 0xFF );
 
 	ty = 0;
-	if (send_cmd(CMD0, 0) == 1) {			/* Enter Idle state */
-		Timer1 = 100;						/* Initialization timeout of 1000 msec */
-		if (send_cmd(CMD8, 0x1AA) == 1) {	/* SDv2? */
-			for (n = 0; n < 4; n++) ocr[n] = xchg_spi(0xFF);		/* Get trailing return value of R7 resp */
-			if (ocr[2] == 0x01 && ocr[3] == 0xAA) {				/* The card can work at vdd range of 2.7-3.6V */
-				while (Timer1 && send_cmd(ACMD41, 1UL << 30));	/* Wait for leaving idle state (ACMD41 with HCS bit) */
-				if (Timer1 && send_cmd(CMD58, 0) == 0) {		/* Check CCS bit in the OCR */
-					for (n = 0; n < 4; n++) ocr[n] = xchg_spi(0xFF);
-					ty = (ocr[0] & 0x40) ? CT_SD2 | CT_BLOCK : CT_SD2;	/* SDv2 */
+
+	// Enter Idle state
+    if ( send_cmd( CMD0, 0 ) == 1 ) {
+
+		// Initialization timeout of 1000 msec
+        Timer1 = 100;
+
+		// SDv2?
+        if ( send_cmd( CMD8, 0x1AA ) == 1) {	
+
+			// Get trailing return value of R7 resp
+            for ( n = 0; n < 4; n++ ) ocr[n] = xchg_spi( 0xFF );
+
+			// The card can work at vdd range of 2.7-3.6V
+            if ( ocr[2] == 0x01 && ocr[3] == 0xAA ) {
+
+				// Wait for leaving idle state (ACMD41 with HCS bit)
+                while ( Timer1 && send_cmd( ACMD41, 1UL << 30 ) );
+
+				// Check CCS bit in the OCR
+                if ( Timer1 && send_cmd( CMD58, 0 ) == 0 ) {
+
+					for ( n = 0; n < 4; n++ ) ocr[n] = xchg_spi( 0xFF );
+
+					// SDv2
+                    ty = ( ocr[0] & 0x40 ) ? CT_SD2 | CT_BLOCK : CT_SD2;	
+
 				}
+
 			}
-		} else {							/* SDv1 or MMCv3 */
-			if (send_cmd(ACMD41, 0) <= 1) 	{
-				ty = CT_SD1; cmd = ACMD41;	/* SDv1 */
+
+		// SDv1 or MMCv3
+        } else {		
+
+			if ( send_cmd( ACMD41, 0 ) <= 1 ) {
+				
+                // SDv1
+                ty = CT_SD1; 
+                cmd = ACMD41;	
+
 			} else {
-				ty = CT_MMC; cmd = CMD1;	/* MMCv3 */
+
+                // MMCv3
+				ty = CT_MMC; 
+                cmd = CMD1;	
+
 			}
-			while (Timer1 && send_cmd(cmd, 0));			/* Wait for leaving idle state */
-			if (!Timer1 || send_cmd(CMD16, 512) != 0)	/* Set R/W block length to 512 */
-				ty = 0;
+
+			// Wait for leaving idle state
+            while ( Timer1 && send_cmd( cmd, 0 ) );			
+
+			// Set R/W block length to 512
+            if ( !Timer1 || send_cmd( CMD16, 512 ) != 0 ) ty = 0;
+
 		}
+
 	}
+
 	CardType = ty;
+
 	deselect();
 
-	if (ty) {			/* Initialization succeded */
-		Stat &= ~STA_NOINIT;		/* Clear STA_NOINIT */
+	// Initialization succeded
+    if ( ty ) {			
+
+		// Clear STA_NOINIT
+        Stat &= ~STA_NOINIT;		
 		FCLK_FAST();
-	} else {			/* Initialization failed */
+
+	// Initialization failed
+    } else {			
+
 		power_off();
 	}
 
 	return Stat;
+
 }
 
 
@@ -667,27 +778,44 @@ DRESULT disk_ioctl (
 /*-----------------------------------------------------------------------*/
 /* This function must be called in period of 10ms                        */
 
-void disk_timerproc (void)
-{
-	BYTE n, s;
+void disk_timerproc() {
+	
+    BYTE n, s;
 
+    // 100Hz decrement timer
+	n = Timer1;				
 
-	n = Timer1;				/* 100Hz decrement timer */
-	if (n) Timer1 = --n;
+	if ( n ) Timer1 = --n;
+
 	n = Timer2;
-	if (n) Timer2 = --n;
+
+	if ( n ) Timer2 = --n;
 
 	s = Stat;
 
-	if (SOCKWP)				/* Write protected */
+	// Write protected
+    if ( SOCKWP ) {
+
 		s |= STA_PROTECT;
-	else					/* Write enabled */
+
+    // Write enabled
+    } else {
+
 		s &= ~STA_PROTECT;
+    }
 
-	if (SOCKINS)			/* Card inserted */
-		s &= ~STA_NODISK;
-	else					/* Socket empty */
-		s |= (STA_NODISK | STA_NOINIT);
+	// Card inserted
+    if ( SOCKINS ) {			
 
-	Stat = s;				/* Update MMC status */
+        s &= ~STA_NODISK;
+    
+    // Socket empty
+    } else {
+	
+        s |= ( STA_NODISK | STA_NOINIT );
+    }
+
+	// Update MMC status
+    Stat = s;				
+
 }

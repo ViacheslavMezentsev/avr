@@ -20,23 +20,24 @@ struct divmod10_t {
 
 // -=[ Внешние ссылки ]=-
 
+extern FIFO( 16 ) uart_rx_fifo;
+extern void disk_timerproc();
+
 
 // -=[ Постоянные во флеш-памяти ]=-
 
 
 // -=[ Переменные в ОЗУ ]=-
 
+UINT ByteRead = 0;
+uint16_t Counter10ms = 0;
+
 char Version[16];
 char buffer[16];
 
-static FRESULT f_err_code; //FRESULT для функций модуля
-static FATFS FATFS_Obj; //структура - логический раздел
-FIL fil_obj; //структура файла, с которым работаем
-UINT ByteRead = 0;
-
-PR_BEGIN_EXTERN_C
-    extern FIFO( 16 ) uart_rx_fifo;
-PR_END_EXTERN_C
+static FRESULT f_err_code; // FRESULT для функций модуля
+static FATFS FATFS_Obj; // структура - логический раздел
+FIL fil_obj; // структура файла, с которым работаем
 
 
 /***********************
@@ -128,17 +129,38 @@ void CMCU::ShowStatusMessage( FRESULT Result ) {
 
 
 /**
- * Тест драйвера Petit FAT File System
+ * Тест драйвера FAT File System
  */
 void CMCU::TestDriver() {
 
-    // Инициализируем карточку
-    BYTE status = disk_initialize(0); 
-
     CConsole::WriteString( SPSTR( "Инициализируем карточку " ), CConsole::cp1251 );
+
+    BYTE status = disk_initialize(0); 
 
     ShowStatusMessage( ( FRESULT ) status );
 
+    CConsole::WriteString( SPSTR( "Монтируем логический раздел " ), CConsole::cp1251 );
+
+    // Возвратит FR_OK = 0 в случае успеха
+    f_err_code = f_mount( 0, & FATFS_Obj );
+
+    ShowStatusMessage( ( FRESULT ) f_err_code );
+
+    // Если монтирование было успешным
+    if ( f_err_code == FR_OK ) {
+
+        CConsole::WriteString( SPSTR( "Открываю MainUnit.cpp " ), CConsole::cp1251 ); 
+
+        f_err_code = f_open( & fil_obj, "MainUnit.cpp", FA_READ );
+
+        ShowStatusMessage( ( FRESULT ) f_err_code );
+
+        f_close( & fil_obj ); // закрываем файл
+
+    }
+
+    f_mount( 0, NULL );
+ 
 }
 
 
@@ -275,7 +297,7 @@ void CMCU::Initialization() {
     PortsInit();
 
     // Настройка таймера/счётчика 0 [ATmega32]
-    //Timer0Init();
+    Timer0Init();
 
     // Настройка таймера/счётчика 1 [ATmega32]
     //Timer1Init();
@@ -287,7 +309,7 @@ void CMCU::Initialization() {
     USARTInit();
 
     // Настройка последовательного интерфейса SPI [ATmega32]
-    //SPIInit();
+    SPIInit();
 
     // Настройка работы с внешними прерываниями [ATmega32]
     //ExternalInterruptsInit();
@@ -308,6 +330,7 @@ void CMCU::ControlRegistersInit() {
     //           00000000 - Initial Value
     MCUCR = BIN8(00000000);
     //           ||||||||
+    //           76543210
     //           |||||||+- 0, rw, IVCE:   - Interrupt Vector Change Enable
     //           ||||||+-- 1, rw, IVSEL:  - Interrupt Vector Select
     //           |||||+--- 2, rw, SM2: -+ - Interrupt 1 Sense Control
@@ -321,8 +344,9 @@ void CMCU::ControlRegistersInit() {
     // Timer/Counter Interrupt Mask Register
     // [ Регистр маски прерываний от таймеров/счётчиков ][ATmega32]
     //           00000000 - Initial Value
-    TIMSK = BIN8(00000000); // BIN8() не зависит от уровня оптимизации
-    //           ||||||||		
+    TIMSK = BIN8(00000001); // BIN8() не зависит от уровня оптимизации
+    //           ||||||||	
+    //           76543210
     //           |||||||+- 0, rw, TOIE0:  - Timer/Counter0 Overflow Interrupt Enable
     //           ||||||+-- 1, rw, OCIE0:  - OCIE0: Timer/Counter0 Output Compare Match Interrupt Enable
     //           |||||+--- 2, rw, TOIE1:  - Timer/Counter1, Overflow Interrupt Enable
@@ -337,7 +361,8 @@ void CMCU::ControlRegistersInit() {
     // [ Регистр флагов прерываний таймеров/счётчиков ]
     //          00000000 - Initial Value
     //TIFR = BIN8(00000000); // BIN8() не зависит от уровня оптимизации
-    //          ||||||||		
+    //          ||||||||
+    //          76543210
     //          |||||||+- 0, rw, TOV0:  - Timer/Counter0 Overflow Flag
     //          ||||||+-- 1, rw, OCF0:  - Output Compare Flag 0
     //          |||||+--- 2, rw, TOV1:  - Timer/Counter1, Overflow Flag
@@ -352,7 +377,8 @@ void CMCU::ControlRegistersInit() {
     // [ Регистр специальных функций ввода/вывода ]
     //           00000000 - Initial Value
     //SFIOR = BIN8(00000000); // BIN8() не зависит от уровня оптимизации
-    //           ||||||||		
+    //           ||||||||	
+    //           76543210
     //           |||||||+- 0, rw, PSR321: - Prescaler Reset Timer/Counter3,
     //           |||||||                  - Timer/Counter2, and Timer/Counter1
     //           ||||||+-- 1, rw, PSR0:   - Prescaler Reset Timer/Counter0
@@ -368,7 +394,8 @@ void CMCU::ControlRegistersInit() {
     // [ Регистр управления и состояния A ]
     //            00000000 - Initial Value
     //ADCSRA = BIN8(00000000); // BIN8() не зависит от уровня оптимизации
-    //            ||||||||		
+    //            ||||||||	
+    //            76543210
     //            |||||||+- 0, rw, ADPS0: -+ - ADC Prescaler Select Bits
     //            ||||||+-- 1, rw, ADPS1:  |
     //            |||||+--- 2, rw, ADPS2: _|
@@ -387,27 +414,28 @@ void CMCU::ControlRegistersInit() {
  */
 void CMCU::Timer0Init() {
 
-    // [ATmega32] Table 56. Clock Select Bit Description
+    // [ATmega32] Table. Clock Select Bit Description
     // +----+----+----+-----------------------------------------------------------------+
     // |CSn2|CSn1|CSn0| Description                                                     ¦
     // +----+----+----+-----------------------------------------------------------------+
     // | 0  | 0  | 0  | No clock source. (Таймер/счетчик остановлен)                    |
     // | 0  | 0  | 1  | clkT0S/(No prescaling)                                          |
     // | 0  | 1  | 0  | clkT0S/8    (From prescaler)                                    |
-    // | 0  | 1  | 1  | clkT0S/32   (From prescaler)                                    |
-    // | 1  | 0  | 0  | clkT0S/64   (From prescaler)                                    |
-    // | 1  | 0  | 1  | clkT0S/128  (From prescaler)                                    |
-    // | 1  | 1  | 0  | clkT0S/256  (From prescaler)                                    |
-    // | 1  | 1  | 1  | clkT0S/1024 (From prescaler)                                    |
+    // | 0  | 1  | 1  | clkT0S/64   (From prescaler)                                    |
+    // | 1  | 0  | 0  | clkT0S/256  (From prescaler)                                    |
+    // | 1  | 0  | 1  | clkT0S/1024 (From prescaler)                                    |
+    // | 1  | 1  | 0  | External clock source on T0 pin. Clock on falling edge.         |
+    // | 1  | 1  | 1  | External clock source on T0 pin. Clock on rising edge.          |
     // +----+----+----+-----------------------------------------------------------------+
 
     // Timer/Counter 0 Control Register
     // [ Регистр управления Таймером/Счётчиком 0 ]
     //           00000000 - Initial Value
-    //TCCR0 = BIN8(00000000); // BIN8() не зависит от уровня оптимизации
-    //           ||||||||		
-    //           |||||||+- 0, rw, CS00:  -+
-    //           ||||||+-- 1, rw, CS01:   | - Управление тактовым сигналом
+    TCCR0 = BIN8(00000011); // BIN8() не зависит от уровня оптимизации
+    //           ||||||||	
+    //           76543210
+    //           |||||||+- 0, rw, CS00:  -+ - Управление тактовым сигналом
+    //           ||||||+-- 1, rw, CS01:   | 
     //           |||||+--- 2, rw, CS02:  _|
     //           ||||+---- 3, rw, WGM01: -+ - Waveform Generation Mode
     //           |||+----- 4, rw, COM00: -+ - Compare Match Output Mode
@@ -417,16 +445,17 @@ void CMCU::Timer0Init() {
     // Примечание:
 
     // Устанавливаем значения для счётного регистра
-    //TCNT0 = 0xFF - F_CPU / 1024000UL;
+    TCNT0 = 0xFF - F_CPU / 64000UL;
 
     // Timer/Counter0 Output Compare Register
-    //OCR0 = 0x00;
+    OCR0 = 0x00;
 
     // Timer/Counter0 Asynchronous Status Register
     // [ Регистр ... ][ATmega32]
     //          00000000 - Initial Value
-    //ASSR = BIN8(00000000); // BIN8() не зависит от уровня оптимизации
+    ASSR = BIN8(00000000); // BIN8() не зависит от уровня оптимизации
     //          ||||||||		
+    //          76543210
     //          |||||||+- 0, r, TCR0UB: - Timer/Counter Control Register0 Update Busy
     //          ||||||+-- 1, r, OCR0UB: - Output Compare Register0 Update Busy
     //          |||||+--- 2, r, TCN0UB: - Timer/Counter0 Update Busy
@@ -463,7 +492,8 @@ void CMCU::Timer1Init() {
     // [ Регистр управления B Таймером/Счётчиком 1 ][ATmega32]
     //            00000000 - Initial Value
     //TCCR1B = BIN8(00000000); // BIN8() не зависит от уровня оптимизации
-    //            ||||||||		
+    //            ||||||||	
+    //            76543210
     //            |||||||+- 0, rw, CS10:  -+
     //            ||||||+-- 1, rw, CS11:   | - Управление тактовым сигналом
     //            |||||+--- 2, rw, CS12:  _|
@@ -495,6 +525,7 @@ void CMCU::Timer1Init() {
     //            00000000 - Initial Value
     //TCCR1A = BIN8(00000000); // BIN8() не зависит от уровня оптимизации
     //            ||||||||		
+    //            76543210
     //            |||||||+- 0, rw, WGM10:  -+ - Режим работы таймера/счетчика
     //            ||||||+-- 1, rw, WGM11:  _|
     //            |||||+--- 2, rw, COM1C0: -+ - Режим работы канала сравнения C
@@ -507,6 +538,7 @@ void CMCU::Timer1Init() {
 
     //TCCR1B = BIN8(00000000); // BIN8() не зависит от уровня оптимизации
     //            ||||||||		
+    //            76543210
     //            |||||||+- 0, rw, CS10:  -+
     //            ||||||+-- 1, rw, CS11:   | - Управление тактовым сигналом
     //            |||||+--- 2, rw, CS12:  _|
@@ -529,8 +561,9 @@ void CMCU::SPIInit() {
     // SPI Control Register
     // [ Регистр управления SPI ][ATmega32]
     //          00000000 - Initial Value
-    //SPCR = BIN8(00000000); // BIN8() не зависит от уровня оптимизации
-    //          ||||||||		
+    SPCR = BIN8(01000000); // BIN8() не зависит от уровня оптимизации
+    //          ||||||||
+    //          76543210
     //          |||||||+- 0, rw, SPR0: -+ - Скорость передачи
     //          ||||||+-- 1, rw, SPR1: _|
     //          |||||+--- 2, rw, CPHA:    - Фаза тактового сигнала
@@ -544,8 +577,9 @@ void CMCU::SPIInit() {
     // SPI Status Register
     // [ Регистр статуса SPI ][ATmega32]
     //          00000000 - Initial Value
-    //SPSR = BIN8(00000000); // BIN8() не зависит от уровня оптимизации
-    //          ||||||||		
+    SPSR = BIN8(00000000); // BIN8() не зависит от уровня оптимизации
+    //          ||||||||	
+    //          76543210
     //          |||||||+- 0, rw, SPI2X:    - Double SPI Speed Bit
     //          ||||||+-- 1, r, 0       -+
     //          |||||+--- 2, r, 0        |
@@ -572,6 +606,7 @@ void CMCU::TWIInit() {
     //          00000000 - Initial Value
     //TWCR = BIN8(00000000); // BIN8() не зависит от уровня оптимизации
     //          ||||||||		
+    //          76543210
     //          |||||||+- 0, rw, TWIE:  - TWI Interrupt Enable
     //          ||||||+-- 1, r:         - reserved (will always read as zero)
     //          |||||+--- 2, rw, TWEN:  - TWI Enable Bit
@@ -586,7 +621,8 @@ void CMCU::TWIInit() {
     // [ TWI статус регистр ][ATmega32]
     //          11111000 - Initial Value
     //TWSR = BIN8(11111000); // BIN8() не зависит от уровня оптимизации
-    //          ||||||||		
+    //          ||||||||	
+    //          76543210
     //          |||||||+- 0, rw, TWPS0: -+ - TWI Prescaler Bits
     //          ||||||+-- 1, rw, TWPS1: _|
     //          |||||+--- 2, r:            - reserved (will always read as zero)
@@ -613,7 +649,8 @@ void CMCU::USARTInit() {
     // [ Регистр управления USART0A ]
     //           00100000 - Initial Value
     UCSRA = BIN8(00100000); // BIN8() не зависит от уровня оптимизации
-    //           ||||||||		
+    //           ||||||||	
+    //           76543210
     //           |||||||+- 0, rw, MPCM: - Multi-processor Communication Mode
     //           ||||||+-- 1, rw, U2X:  - Double the USART Transmission Speed
     //           |||||+--- 2, r, PE:    - Parity Error
@@ -633,7 +670,8 @@ void CMCU::USARTInit() {
     // USART Control and Status Register B
     //           00000000 - Initial Value
     UCSRB = BIN8(10011000); // BIN8() не зависит от уровня оптимизации
-    //           ||||||||		
+    //           ||||||||	
+    //           76543210
     //           |||||||+- 0, rw, TXB8:  - Transmit Data Bit 8
     //           ||||||+-- 1, r,  RXB8:  - Receive Data Bit 8
     //           |||||+--- 2, rw, UCSZ2: - Character Size
@@ -647,7 +685,8 @@ void CMCU::USARTInit() {
     // USART Control and Status Register C
     //           10000110 - Initial Value
     UCSRC = BIN8(10000110); // BIN8() не зависит от уровня оптимизации
-    //           ||||||||		
+    //           ||||||||	
+    //           76543210
     //           |||||||+- 0, rw, UCPOL:    - Clock Polarity
     //           ||||||+-- 1, rw, UCSZ0: -+ - Character Size
     //           |||||+--- 2, rw, UCSZ1: _|
@@ -735,6 +774,7 @@ void CMCU::PortsInit() {
     //          00000000 - Initial Value
     DDRA = BIN8(00000000); // BIN8() не зависит от уровня оптимизации
     //          ||||||||
+    //          76543210
     //          |||||||+- 0, rw, DDA0: (ADC0) - 
     //          ||||||+-- 1, rw, DDA1: (ADC1) - 
     //          |||||+--- 2, rw, DDA2: (ADC2) - 
@@ -748,8 +788,9 @@ void CMCU::PortsInit() {
     // Port B Data Direction Register
     // [ Регистр направления порта B ][ATmega32]
     //          00000000 - Initial Value
-    DDRB = BIN8(10110011); // BIN8() не зависит от уровня оптимизации
+    DDRB = BIN8(10110000); // BIN8() не зависит от уровня оптимизации
     //          ||||||||
+    //          76543210
     //          |||||||+- 0, rw, DDB0: (XCK/T0)    - CD
     //          ||||||+-- 1, rw, DDB1: (T1)        - WP
     //          |||||+--- 2, rw, DDB2: (INT2/AIN0) - 
@@ -765,6 +806,7 @@ void CMCU::PortsInit() {
     //          00000000 - Initial Value
     DDRC = BIN8(00000000); // BIN8() не зависит от уровня оптимизации
     //          ||||||||
+    //          76543210
     //          |||||||+- 0, rw, DDC0: (SCL)   - 
     //          ||||||+-- 1, rw, DDC1: (SDA)   - 
     //          |||||+--- 2, rw, DDC2: (TCK)   - 
@@ -780,6 +822,7 @@ void CMCU::PortsInit() {
     //          00000000 - Initial Value
     DDRD = BIN8(00000010); // BIN8() не зависит от уровня оптимизации
     //          ||||||||
+    //          76543210
     //          |||||||+- 0, rw, DDD0: (RXD)  - RXD
     //          ||||||+-- 1, rw, DDD1: (TXD)  - TXD
     //          |||||+--- 2, rw, DDD2: (INT0) -
@@ -796,6 +839,7 @@ void CMCU::PortsInit() {
     //           00000000 - Initial Value
     PORTA = BIN8(00000000); // BIN8() не зависит от уровня оптимизации
     //           ||||||||
+    //           76543210
     //           |||||||+- 0, rw, PORTA0: (ADC0) -
     //           ||||||+-- 1, rw, PORTA1: (ADC1) -
     //           |||||+--- 2, rw, PORTA2: (ADC2) -
@@ -809,8 +853,9 @@ void CMCU::PortsInit() {
     // Port B Data Register
     // [ Регистр данных порта B ][ATmega32]
     //           00000000 - Initial Value
-    PORTB = BIN8(01000000); // BIN8() не зависит от уровня оптимизации
+    PORTB = BIN8(11110011); // BIN8() не зависит от уровня оптимизации
     //           ||||||||
+    //           76543210
     //           |||||||+- 0, rw, PORTB0: (XCK/T0)    - CD
     //           ||||||+-- 1, rw, PORTB1: (T1)        - WP
     //           |||||+--- 2, rw, PORTB2: (INT2/AIN0) - 
@@ -826,6 +871,7 @@ void CMCU::PortsInit() {
     //           00000000 - Initial Value
     PORTC = BIN8(00000000); // BIN8() не зависит от уровня оптимизации
     //           ||||||||
+    //           76543210
     //           |||||||+- 0, rw, PORTC0: (SCL)   - 
     //           ||||||+-- 1, rw, PORTC1: (SDA)   - 
     //           |||||+--- 2, rw, PORTC2: (TCK)   - 
@@ -841,6 +887,7 @@ void CMCU::PortsInit() {
     //           00000000 - Initial Value
     PORTD = BIN8(00000001); // BIN8() не зависит от уровня оптимизации
     //           ||||||||
+    //           76543210
     //           |||||||+- 0, rw, PORTD0: (RXD)  - RXD
     //           ||||||+-- 1, rw, PORTD1: (TXD)  - TXD
     //           |||||+--- 2, rw, PORTD2: (INT0) -
@@ -878,6 +925,7 @@ void CMCU::InternalWDTInit() {
     //           00000000 - Initial Value
     //WDTCR = BIN8(00000000); // BIN8() не зависит от уровня оптимизации
     //           ||||||||
+    //           76543210
     //           |||||||+- 0, rw, WDP0: -+
     //           ||||||+-- 1, rw, WDP1:  |- Коэффициент деления предделителя сторожевого таймера
     //           |||||+--- 2, rw, WDP2: _|
@@ -920,6 +968,7 @@ void CMCU::ExternalInterruptsInit() {
     //          ****0000 - Initial Value
     temp = BIN8(00000000);
     //          ||||||||
+    //          76543210
     //          |||||||+- 0, rw, ISC00: -+ - Interrupt Sense Control 0 Bit 1 and Bit 0
     //          ||||||+-- 1, rw, ISC01: _|
     //          |||||+--- 2, rw, ISC10: -+ - Interrupt Sense Control 1 Bit 1 and Bit 0
@@ -945,6 +994,7 @@ void CMCU::ExternalInterruptsInit() {
     //          *0****** - Initial Value
     temp = BIN8(00000000);
     //          ||||||||
+    //          76543210
     //          |||||||+- 0, rw, PORF:  -
     //          ||||||+-- 1, rw, EXTRF: -
     //          |||||+--- 2, rw, BORF:  -
@@ -966,6 +1016,7 @@ void CMCU::ExternalInterruptsInit() {
     //          00000000 - Initial Value
     //GICR = BIN8(00000000);
     //          ||||||||
+    //          76543210
     //          |||||||+- 0, rw, IVCE:  - 
     //          ||||||+-- 1, rw, IVSEL: - 
     //          |||||+--- 2, r: 0
@@ -1065,6 +1116,19 @@ void CMCU::OnTimerCounter0CompareMatch() {
  * Timer/Counter0 Overflow
  */
 void CMCU::OnTimerCounter0Overflow() {
+
+    // Восстанавливаем счётчик
+    TCNT0 = 0xFF - F_CPU / 64000UL;
+
+    Counter10ms++;
+
+    if ( Counter10ms == 10 ) {
+
+        disk_timerproc();
+
+        Counter10ms = 0;
+
+    }
 
 }
 
