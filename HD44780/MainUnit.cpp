@@ -21,6 +21,7 @@
 
 #include "Defines.h"
 #include "Configuration.h"
+#include "LCD.h"
 #include "MCU.h"
 
 
@@ -29,6 +30,9 @@ int main() {
 
     // Инициализация микроконтроллера
     CMCU::Initialization();
+
+    // Выполняем инициализацию драйвера ЖКИ индикатора
+    CLCD::Initialization( CLCD::LCD_DRIVER_HD44780 );
 
     // Запуск основного потока
     HRESULT hResult = CMCU::MainThreadProcedure();
