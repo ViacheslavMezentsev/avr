@@ -1,9 +1,9 @@
 ========================================================================
 
-        Проект: ATmega16 + Petit FAT File System Module
-        Контроллер: ATmega16 @ 16 МГц
+        Проект: Шаблон для ATmega16
+        Контроллер: ATmega16
 
-        Хранилище проекта: https://mysvn.ru/avr/examples/uSD/
+        Хранилище проекта: https://mysvn.ru/avr/templates/ATmega16/
 
         Автор: Мезенцев В. Н.
         Почта: mailto:unihomelab@ya.ru
@@ -64,9 +64,9 @@
 13. Visual Basic 6 - простая среда разработки для Windows.
 
 14. Virtual Serial Ports Driver XP 4.0 - Утилита позволяет эмулировать
-	последовательный порт RS232, соединенный виртуальным нуль-модемным
-	кабелем.
-	
+    последовательный порт RS232, соединенный виртуальным нуль-модемным
+    кабелем.
+
 ------------------------------------------------------------------------------
 
 Команды для сборки проекта (для VS2008):
@@ -92,7 +92,7 @@ build: "C:\Program Files\Atmel\Atmel Studio 6.0\extensions\Atmel\AVRGCC\3.3.2.31
 clean: "C:\Program Files\Atmel\Atmel Studio 6.0\extensions\Atmel\AVRGCC\3.3.2.31\AVRToolchain\bin\make.exe" clean
 build all: "C:\Program Files\Atmel\Atmel Studio 6.0\extensions\Atmel\AVRGCC\3.3.2.31\AVRToolchain\bin\make.exe" build all
 
-Директивы препроцессора: 
+Директивы препроцессора:
 Debug: __GNUC__;__AVR_ATmega16__;__DEBUG__
 Release: __GNUC__;__AVR_ATmega16__
 
