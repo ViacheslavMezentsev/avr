@@ -8,6 +8,7 @@
 #include "Defines.h"
 #include "Configuration.h"
 #include "Version.h"
+#include "LCD.h"
 #include "MCU.h"
 
 
@@ -15,6 +16,20 @@
 
 
 // -=[ Постоянные во флеш-памяти ]=-
+
+// Описание заставки
+FLASHSTR_DECLARE( char, frmSplashString,
+"                 Pinboard II Демо\n"
+#ifdef __GNUC__
+"                 Автор: уни [GCC]" );
+#elif defined __ICCAVR__
+"                 Автор: уни [IAR]" );
+#endif
+
+// Статическая информация на экране
+FLASHSTR_DECLARE( char, frmString,
+"Температура:    \n"
+"Напряжение:     " );
 
 
 // -=[ Переменные в ОЗУ ]=-
@@ -31,6 +46,25 @@
  * Главный (основной) поток программы
  */
 HRESULT CMCU::MainThreadProcedure(){
+
+    // Вывод заставки
+	CLCD::WriteString( frmSplashString, 0, 0 );
+	
+    // Анимация заставки
+	uint8_t cnt = 16;
+	
+	do {
+	
+	    CLCD::ShiftLeft();
+	    _delay_ms( 250 );
+	
+	} while ( cnt-- );
+	
+	_delay_ms( 2000 );
+
+    CLCD::Clear();
+    CLCD::Home();
+    CLCD::WriteString( frmString, 0 ,0 );
 
     // Разрешаем прерывания
     __enable_interrupt();
@@ -52,7 +86,7 @@ HRESULT CMCU::MainThreadProcedure(){
 void CMCU::Initialization(){
 
     // Схема соединений (разводка выводов) [ATmega16]
-    //PortsInit();
+    PortsInit();
 
     // Настройка АЦП [ATmega16]
     //ADCInit();
@@ -70,7 +104,7 @@ void CMCU::Initialization(){
     //InternalWDTInit();
 
     // Настройка внутреннего USART [ATmega16]
-    //USARTInit();
+    USARTInit();
 
     // Настройка последовательного интерфейса TWI [ATmega16]
     //TWIInit();
@@ -82,7 +116,7 @@ void CMCU::Initialization(){
     //ExternalInterruptsInit();
 
     // Настройка управляющих регистров контроллера [ATmega16]
-    //ControlRegistersInit();
+    ControlRegistersInit();
 
 }
 
@@ -149,6 +183,7 @@ void CMCU::ControlRegistersInit(){
     //           +-------- 7, rw, OCIE2:  - Timer/Counter2 Output Compare Match Interrupt Enable
     // Примечание:
 
+
     // Timer/Counter Interrupt Flag Register
     // [ Регистр флагов прерываний таймеров/счётчиков ][ATmega16]
     //          00000000 - Initial Value
@@ -164,6 +199,7 @@ void CMCU::ControlRegistersInit(){
     //          |+------- 6, rw, TOV2:  - Timer/Counter2 Overflow Flag
     //          +-------- 7, rw, OCF2:  - Output Compare Flag 2
     // Примечание:
+
 
     // Special Function IO Register
     // [ Регистр специальных функций ввода/вывода ][ATmega16]
@@ -198,6 +234,7 @@ void CMCU::ControlRegistersInit(){
     //            |+------- 6, rw, ADSC:     - ADC Start Conversion
     //            +-------- 7, rw, ADEN:     - ADC Enable
     // Примечание:
+
 
 }
 
@@ -684,54 +721,6 @@ void CMCU::PortsInit(){
     //          +-------- 7, rw, DDA7: (ADC7) -
     // Примечание:
 
-    // Port B Data Direction Register
-    // [ Регистр направления порта B ][ATmega16]
-    //          00000000 - Initial Value
-    DDRB = BIN8(00000000); // BIN8() не зависит от уровня оптимизации
-    //          ||||||||
-    //          76543210
-    //          |||||||+- 0, rw, DDB0: (XCK/T0)    -
-    //          ||||||+-- 1, rw, DDB1: (T1)        -
-    //          |||||+--- 2, rw, DDB2: (INT2/AIN0) -
-    //          ||||+---- 3, rw, DDB3: (OC0/AIN1)  -
-    //          |||+----- 4, rw, DDB4: (~SS)       -
-    //          ||+------ 5, rw, DDB5: (MOSI)      -
-    //          |+------- 6, rw, DDB6: (MISO)      -
-    //          +-------- 7, rw, DDB7: (SCK)       -
-    // Примечание:
-
-    // Port C Data Direction Register
-    // [ Регистр направления порта C ][ATmega16]
-    //          00000000 - Initial Value
-    DDRC = BIN8(00000000); // BIN8() не зависит от уровня оптимизации
-    //          ||||||||
-    //          76543210
-    //          |||||||+- 0, rw, DDC0: (SCL)   -
-    //          ||||||+-- 1, rw, DDC1: (SDA)   -
-    //          |||||+--- 2, rw, DDC2: (TCK)   -
-    //          ||||+---- 3, rw, DDC3: (TMS)   -
-    //          |||+----- 4, rw, DDC4: (TDO)   -
-    //          ||+------ 5, rw, DDC5: (TDI)   -
-    //          |+------- 6, rw, DDC6: (TOSC1) -
-    //          +-------- 7, rw, DDC7: (TOSC2) -
-    // Примечание:
-
-    // Port D Data Direction Register
-    // [ Регистр направления порта D ][ATmega16]
-    //          00000000 - Initial Value
-    DDRD = BIN8(00000000); // BIN8() не зависит от уровня оптимизации
-    //          ||||||||
-    //          76543210
-    //          |||||||+- 0, rw, DDD0: (RXD)  -
-    //          ||||||+-- 1, rw, DDD1: (TXD)  -
-    //          |||||+--- 2, rw, DDD2: (INT0) -
-    //          ||||+---- 3, rw, DDD3: (INT1) -
-    //          |||+----- 4, rw, DDD4: (OC1B) -
-    //          ||+------ 5, rw, DDD5: (OC1A) -
-    //          |+------- 6, rw, DDD6: (ICP1) -
-    //          +-------- 7, rw, DDD7: (OC2)  -
-    // Примечание:
-
 
     // Port A Data Register
     // [ Регистр данных порта A ][ATmega16]
@@ -749,21 +738,57 @@ void CMCU::PortsInit(){
     //           +-------- 7, rw, PORTA7: (ADC7) -
     // Примечание:
 
+
+    // Port B Data Direction Register
+    // [ Регистр направления порта B ][ATmega16]
+    //          00000000 - Initial Value
+    DDRB = BIN8(00000000); // BIN8() не зависит от уровня оптимизации
+    //          ||||||||
+    //          76543210
+    //          |||||||+- 0, rw, DDB0: (XCK/T0)    - LCD E
+    //          ||||||+-- 1, rw, DDB1: (T1)        - LCD RW
+    //          |||||+--- 2, rw, DDB2: (INT2/AIN0) - 
+    //          ||||+---- 3, rw, DDB3: (OC0/AIN1)  - 
+    //          |||+----- 4, rw, DDB4: (~SS)       - LCD_D4
+    //          ||+------ 5, rw, DDB5: (MOSI)      - LCD_D5
+    //          |+------- 6, rw, DDB6: (MISO)      - LCD_D6
+    //          +-------- 7, rw, DDB7: (SCK)       - LCD_D7
+    // Примечание:
+
+
     // Port B Data Register
     // [ Регистр данных порта B ][ATmega16]
     //           00000000 - Initial Value
     PORTB = BIN8(00000000); // BIN8() не зависит от уровня оптимизации
     //           ||||||||
     //           76543210
-    //           |||||||+- 0, rw, PORTB0: (XCK/T0)    -
-    //           ||||||+-- 1, rw, PORTB1: (T1)        -
+    //           |||||||+- 0, rw, PORTB0: (XCK/T0)    - LCD E
+    //           ||||||+-- 1, rw, PORTB1: (T1)        - LCD RW
     //           |||||+--- 2, rw, PORTB2: (INT2/AIN0) -
     //           ||||+---- 3, rw, PORTB3: (OC0/AIN1)  -
-    //           |||+----- 4, rw, PORTB4: (~SS)       -
-    //           ||+------ 5, rw, PORTB5: (MOSI)      -
-    //           |+------- 6, rw, PORTB6: (MISO)      -
-    //           +-------- 7, rw, PORTB7: (SCK)       -
+    //           |||+----- 4, rw, PORTB4: (~SS)       - LCD_D4
+    //           ||+------ 5, rw, PORTB5: (MOSI)      - LCD_D5
+    //           |+------- 6, rw, PORTB6: (MISO)      - LCD_D6
+    //           +-------- 7, rw, PORTB7: (SCK)       - LCD_D7
     // Примечание:
+
+
+    // Port C Data Direction Register
+    // [ Регистр направления порта C ][ATmega16]
+    //          00000000 - Initial Value
+    DDRC = BIN8(00000000); // BIN8() не зависит от уровня оптимизации
+    //          ||||||||
+    //          76543210
+    //          |||||||+- 0, rw, DDC0: (SCL)   -
+    //          ||||||+-- 1, rw, DDC1: (SDA)   -
+    //          |||||+--- 2, rw, DDC2: (TCK)   -
+    //          ||||+---- 3, rw, DDC3: (TMS)   -
+    //          |||+----- 4, rw, DDC4: (TDO)   -
+    //          ||+------ 5, rw, DDC5: (TDI)   -
+    //          |+------- 6, rw, DDC6: (TOSC1) -
+    //          +-------- 7, rw, DDC7: (TOSC2) -
+    // Примечание:
+
 
     // Port C Data Register
     // [ Регистр данных порта C ][ATmega16]
@@ -781,14 +806,32 @@ void CMCU::PortsInit(){
     //           +-------- 7, rw, PORTC7: (TOSC2) -
     // Примечание:
 
+
+    // Port D Data Direction Register
+    // [ Регистр направления порта D ][ATmega16]
+    //          00000000 - Initial Value
+    DDRD = BIN8(00000000); // BIN8() не зависит от уровня оптимизации
+    //          ||||||||
+    //          76543210
+    //          |||||||+- 0, rw, DDD0: (RXD)  - RXD
+    //          ||||||+-- 1, rw, DDD1: (TXD)  - TXD
+    //          |||||+--- 2, rw, DDD2: (INT0) -
+    //          ||||+---- 3, rw, DDD3: (INT1) -
+    //          |||+----- 4, rw, DDD4: (OC1B) -
+    //          ||+------ 5, rw, DDD5: (OC1A) -
+    //          |+------- 6, rw, DDD6: (ICP1) -
+    //          +-------- 7, rw, DDD7: (OC2)  -
+    // Примечание:
+
+
     // Port D Data Register
     // [ Регистр данных порта D ][ATmega16]
     //           00000000 - Initial Value
     PORTD = BIN8(00000000); // BIN8() не зависит от уровня оптимизации
     //           ||||||||
     //           76543210
-    //           |||||||+- 0, rw, PORTD0: (RXD)  -
-    //           ||||||+-- 1, rw, PORTD1: (TXD)  -
+    //           |||||||+- 0, rw, PORTD0: (RXD)  - RXD
+    //           ||||||+-- 1, rw, PORTD1: (TXD)  - TXD
     //           |||||+--- 2, rw, PORTD2: (INT0) -
     //           ||||+---- 3, rw, PORTD3: (INT1) -
     //           |||+----- 4, rw, PORTD4: (OC1B) -
@@ -796,6 +839,7 @@ void CMCU::PortsInit(){
     //           |+------- 6, rw, PORTD6: (ICP1) -
     //           +-------- 7, rw, PORTD7: (OC2)  -
     // Примечание:
+
 
 }
 
