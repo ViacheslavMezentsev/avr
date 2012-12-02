@@ -89,10 +89,10 @@ void CMCU::Initialization(){
     PortsInit();
 
     // Настройка АЦП [ATmega16]
-    //ADCInit();
+    ADCInit();
 
     // Настройка таймера/счётчика 0 [ATmega16]
-    //Timer0Init();
+    Timer0Init();
 
     // Настройка таймера/счётчика 1 [ATmega16]
     //Timer1Init();
