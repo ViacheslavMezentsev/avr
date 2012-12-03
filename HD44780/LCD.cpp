@@ -192,6 +192,7 @@ CLCD::EnLCDDriverType CLCD::Driver = LCD_DRIVER_NONE;
 *  ~~~~~~~~~~~~~~~~~~~ 
 ************************/
 
+
 /**
  * Настройка LCD дисплея
  */
@@ -258,6 +259,7 @@ void CLCD::WriteLine(uint8_t Line, char * pString){
 
 }
 
+
 /**
  * Строб записи по линии E
  */
@@ -277,6 +279,7 @@ void CLCD::WriteStrobe(uint16_t usec){
     while( usec-- ) _delay_us(1);
 
 }
+
 
 /**
  * Запись младшего полубайта данных
@@ -356,6 +359,7 @@ void CLCD::PutChar(uint8_t Data){
 
 }
 
+
 /**
  * Вывод символа из ОЗУ
  */
@@ -368,6 +372,7 @@ void CLCD::PutChar(uint8_t Data, uint8_t Row, uint8_t Col){
 
 }
 
+
 /**
  * Сдвиг влево
  */
@@ -377,6 +382,7 @@ void CLCD::ShiftLeft(){
 
 }
 
+
 /**
  * Сдвиг вправо
  */
@@ -385,6 +391,10 @@ void CLCD::ShiftRight(){
     Scroll( SCROLL_RIGHT );
 }
 
+
+/**
+ * 
+ */
 void CLCD::Scroll(uint8_t Direction){
 
     // Заглушка, если драйвер не выбран
@@ -416,6 +426,7 @@ void CLCD::Scroll(uint8_t Direction){
 void CLCD::Init_User(){
 
 }
+
 
 /**
  * Настройка HD44780 драйвера LCD дисплея
@@ -473,22 +484,23 @@ void CLCD::Init_HD44780(){
     Home(); // -> 0x02
     
     // set data address to 0
-    Goto( 0, 0 );
+    //Goto( 0, 0 );
 
     // Загружаем восемь пользовательских символов
     // Первый параметр: идентификатор массива
     // Второй параметр: номер элемента в массиве
     // Третий параметр: в какой пользовательский символ записываем данные
-    LoadCustomChar( LcdCustomChar, LCDCHAR_PROGRESS05, 0 );
-    LoadCustomChar( LcdCustomChar, LCDCHAR_PROGRESS15, 1 );
-    LoadCustomChar( LcdCustomChar, LCDCHAR_PROGRESS25, 2 );
-    LoadCustomChar( LcdCustomChar, LCDCHAR_PROGRESS35, 3 );
-    LoadCustomChar( LcdCustomChar, LCDCHAR_PROGRESS45, 4 );
-    LoadCustomChar( LcdCustomChar, LCDCHAR_PROGRESS55, 5 );
-    LoadCustomChar( LcdCustomChar, LCDCHAR_REWINDARROW, 6 );
-    LoadCustomChar( LcdCustomChar, LCDCHAR_STOPBLOCK, 7 );
+    //LoadCustomChar( LcdCustomChar, LCDCHAR_PROGRESS05, 0 );
+    //LoadCustomChar( LcdCustomChar, LCDCHAR_PROGRESS15, 1 );
+    //LoadCustomChar( LcdCustomChar, LCDCHAR_PROGRESS25, 2 );
+    //LoadCustomChar( LcdCustomChar, LCDCHAR_PROGRESS35, 3 );
+    //LoadCustomChar( LcdCustomChar, LCDCHAR_PROGRESS45, 4 );
+    //LoadCustomChar( LcdCustomChar, LCDCHAR_PROGRESS55, 5 );
+    //LoadCustomChar( LcdCustomChar, LCDCHAR_REWINDARROW, 6 );
+    //LoadCustomChar( LcdCustomChar, LCDCHAR_STOPBLOCK, 7 );
 
 }
+
 
 /**
  * Установить количество столбцов
@@ -642,7 +654,7 @@ void CLCD::WriteData(EnLCDDataType Type, uint8_t Data){
 /**
  * Считываем счётчик адреса
  */
-uint8_t CLCD::ReadAddress(void){
+uint8_t CLCD::ReadAddress(){
          
     // Ожидаем, пока дисплей занят обработкой предыдущей команды
     while ( IsBusy() );
@@ -681,7 +693,7 @@ uint8_t CLCD::ReadAddress(void){
 /**
  * read the control byte from the display controller
  */
-uint8_t CLCD::ReadData(void){
+uint8_t CLCD::ReadData(){
          
     // Ожидаем, пока дисплей занят обработкой предыдущей команды
     while ( IsBusy() );
@@ -813,6 +825,7 @@ void CLCD::ShowCursor( bool Blinking ) {
     WriteData( TYPE_COMMAND, Value );
 
 }
+
 
 /**
  * Показать курсор по координатам
@@ -1075,6 +1088,7 @@ void CLCD::WriteString( const char * pString ){
     while ( * pString != 0 ) PutChar( ( uint8_t ) * ( pString++ ) );
 
 }
+
 
 /**
  * Вывести данные из ОЗУ на индикатор

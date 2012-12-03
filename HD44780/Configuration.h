@@ -14,7 +14,7 @@
 
 #elif defined( __ICCAVR__ )
 
-    #define F_CPU 16000000UL
+    #define F_CPU 4000000UL
 
 #endif
 
@@ -34,9 +34,9 @@
 // Конфигурация LCD дисплея
 
 // Число видимых строк
-#define LCD_LINES   2   
+#define LCD_LINES   2
 // Длина строки (в символах)
-#define LCD_LINE_LENGTH 16  
+#define LCD_LINE_LENGTH 16
 
 // Адреса строк в DDRAM
 #define LCD_LINE0_DDRAMADDR 0x00
@@ -51,13 +51,13 @@
 #define LCD_DDR_NAME_En     SET_DDR_NAME( B )   // -> DDRB
 #define LCD_PORT_NAME_En    SET_PORT_NAME( B )  // -> PORTB
 #define LCD_PIN_NAME_En     SET_PIN_NAME( B )   // -> PINB
-#define LCD_PIN_En          SET_PORT_PIN_NUMBER( B, 0 ) // -> PB0
+#define LCD_PIN_En          SET_PORT_PIN_NUMBER( B, 2 ) // -> PB2
 
 // Линия: Data/Instruction Select
-#define LCD_DDR_NAME_RS     SET_DDR_NAME( C )   // -> DDRC
-#define LCD_PORT_NAME_RS    SET_PORT_NAME( C )  // -> PORTC
-#define LCD_PIN_NAME_RS     SET_PIN_NAME( C )   // -> PINC
-#define LCD_PIN_RS          SET_PORT_PIN_NUMBER( C, 6 ) // -> PC6
+#define LCD_DDR_NAME_RS     SET_DDR_NAME( B )   // -> DDRB
+#define LCD_PORT_NAME_RS    SET_PORT_NAME( B )  // -> PORTB
+#define LCD_PIN_NAME_RS     SET_PIN_NAME( B )   // -> PINB
+#define LCD_PIN_RS          SET_PORT_PIN_NUMBER( B, 0 ) // -> PB0
 
 // Линия: Read/Write Select
 //#define LCD_RW_UNUSED

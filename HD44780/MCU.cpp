@@ -12,6 +12,13 @@
 #include "MCU.h"
 
 
+struct divmod10_t {
+
+    uint32_t quot;
+    uint8_t rem;
+};
+
+
 // -=[ Внешние ссылки ]=-
 
 
@@ -19,20 +26,25 @@
 
 // Описание заставки
 FLASHSTR_DECLARE( char, frmSplashString,
-"                 Pinboard II Демо\n"
 #ifdef __GNUC__
-"                 Автор: уни [GCC]" );
+"                 HD44780 Demo GCC\n"
 #elif defined __ICCAVR__
-"                 Автор: уни [IAR]" );
+"                 HD44780 Demo IAR\n"
 #endif
+"                 Author: uni     " );
 
 // Статическая информация на экране
 FLASHSTR_DECLARE( char, frmString,
-"Температура:    \n"
-"Напряжение:     " );
+"Ver:            \n"
+"                " );
 
 
 // -=[ Переменные в ОЗУ ]=-
+
+// Версия программы
+char Version[ 16 ];
+
+char buffer[ 16 ];
 
 
 
@@ -42,10 +54,72 @@ FLASHSTR_DECLARE( char, frmString,
 ************************/
 
 
+divmod10_t divmodu10( uint32_t n ) {
+
+    divmod10_t res;
+
+    // умножаем на 0.8
+    res.quot = n >> 1;
+    res.quot += res.quot >> 1;
+    res.quot += res.quot >> 4;
+    res.quot += res.quot >> 8;
+    res.quot += res.quot >> 16;
+    uint32_t qq = res.quot;
+
+    // делим на 8
+    res.quot >>= 3;
+
+    // вычисляем остаток
+    res.rem = uint8_t( n - ( ( res.quot << 1 ) + ( qq & ~7ul ) ) );
+
+    // корректируем остаток и частное
+    if ( res.rem > 9 ) {
+
+        res.rem -= 10;
+        res.quot++;
+    }
+
+    return res;
+
+}
+
+
+char * utoa_fast_div( uint32_t value, char * buffer ) {
+
+    buffer += 11;
+    * --buffer = 0;
+
+    do {
+
+        divmod10_t res = divmodu10( value );
+        * --buffer = res.rem + '0';
+        value = res.quot;
+
+    } while ( value != 0 );
+
+    return buffer;
+
+}
+
+
 /**
  * Главный (основной) поток программы
  */
 HRESULT CMCU::MainThreadProcedure(){
+
+    char szDot[] = ".";
+
+    // Вычисление строки с версией программы
+    strcat( Version, utoa_fast_div( CVersion::GetMajor(), buffer ) );
+    strcat( Version, szDot );
+
+    strcat( Version, utoa_fast_div( CVersion::GetMinor(), buffer ) );
+    strcat( Version, szDot );
+
+    strcat( Version, utoa_fast_div( CVersion::GetRevision(), buffer ) );
+    strcat( Version, szDot );
+
+    strcat( Version, utoa_fast_div( CVersion::GetBuild(), buffer ) );
 
     // Вывод заставки
 	CLCD::WriteString( frmSplashString, 0, 0 );
@@ -60,11 +134,14 @@ HRESULT CMCU::MainThreadProcedure(){
 	
 	} while ( cnt-- );
 	
-	_delay_ms( 2000 );
+	_delay_ms( 3000UL );
 
     CLCD::Clear();
     CLCD::Home();
-    CLCD::WriteString( frmString, 0 ,0 );
+    CLCD::WriteString( frmString, 0, 0 );
+
+    // Вывод версии
+    CLCD::WriteString( Version, 0, 5 );
 
     // Разрешаем прерывания
     __enable_interrupt();
@@ -742,13 +819,13 @@ void CMCU::PortsInit(){
     // Port B Data Direction Register
     // [ Регистр направления порта B ][ATmega16]
     //          00000000 - Initial Value
-    DDRB = BIN8(00000000); // BIN8() не зависит от уровня оптимизации
+    DDRB = BIN8(11110111); // BIN8() не зависит от уровня оптимизации
     //          ||||||||
     //          76543210
-    //          |||||||+- 0, rw, DDB0: (XCK/T0)    - LCD E
+    //          |||||||+- 0, rw, DDB0: (XCK/T0)    - LCD RS
     //          ||||||+-- 1, rw, DDB1: (T1)        - LCD RW
-    //          |||||+--- 2, rw, DDB2: (INT2/AIN0) - 
-    //          ||||+---- 3, rw, DDB3: (OC0/AIN1)  - 
+    //          |||||+--- 2, rw, DDB2: (INT2/AIN0) - LCD E
+    //          ||||+---- 3, rw, DDB3: (OC0/AIN1)  -
     //          |||+----- 4, rw, DDB4: (~SS)       - LCD_D4
     //          ||+------ 5, rw, DDB5: (MOSI)      - LCD_D5
     //          |+------- 6, rw, DDB6: (MISO)      - LCD_D6
@@ -762,9 +839,9 @@ void CMCU::PortsInit(){
     PORTB = BIN8(00000000); // BIN8() не зависит от уровня оптимизации
     //           ||||||||
     //           76543210
-    //           |||||||+- 0, rw, PORTB0: (XCK/T0)    - LCD E
+    //           |||||||+- 0, rw, PORTB0: (XCK/T0)    - LCD RS
     //           ||||||+-- 1, rw, PORTB1: (T1)        - LCD RW
-    //           |||||+--- 2, rw, PORTB2: (INT2/AIN0) -
+    //           |||||+--- 2, rw, PORTB2: (INT2/AIN0) - LCD E
     //           ||||+---- 3, rw, PORTB3: (OC0/AIN1)  -
     //           |||+----- 4, rw, PORTB4: (~SS)       - LCD_D4
     //           ||+------ 5, rw, PORTB5: (MOSI)      - LCD_D5
