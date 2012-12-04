@@ -172,7 +172,7 @@
 
 // Описание типов, аналогичных в Windows
 #include "windows.h"
-
+#include "Properties.h"
 #include "fifo.h"
 
 #define TOGGLE(x,y) ((x) ^= (1<<(y)))
