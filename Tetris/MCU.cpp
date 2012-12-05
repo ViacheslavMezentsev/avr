@@ -24,6 +24,7 @@ struct divmod10_t {
     
 extern FIFO( 16 ) uart_rx_fifo;
 extern CGame Game;
+extern CKeys GameKeys;
 
 
 // -=[ Постоянные во флеш-памяти ]=-
@@ -153,7 +154,10 @@ void CMCU::CommandShell() {
         } else if ( ( cmd[0] == 't' ) && ( cmd[1] == 0 ) ) {
 
             Game.Initialization();
-            Game.DrawGlass( 10, 4, 20, 10, GREEN );
+
+            Game.DrawFunctionKeys( GameKeys );
+
+            Game.DrawFrame( 13, 2, 52, 20, WHITE, LIGHTGRAY );
             
             // Запуск игры.
             Game.Run();
