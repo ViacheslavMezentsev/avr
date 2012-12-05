@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="windows-1251"?>
 <VisualStudioProject
 	ProjectType="Visual C++"
-	Version="9.00"
+	Version="9,00"
 	Name="Tetris"
 	ProjectGUID="{65F874ED-F2EE-4D44-88E7-1CF601D199BD}"
 	RootNamespace="Tetris"
@@ -109,6 +109,10 @@
 			</File>
 			<File
 				RelativePath=".\fifo.h"
+				>
+			</File>
+			<File
+				RelativePath=".\Figures.h"
 				>
 			</File>
 			<File

@@ -1,6 +1,26 @@
 #pragma once
 
 
+enum EnFigureType {
+
+    ftI = 0,
+    ftJ, 
+    ftL, 
+    ftO, 
+    ftS, 
+    ftT, 
+    ftZ
+};
+
+
+enum EnGameState {
+    
+    gsStopped = 0,
+    gsRunning
+
+};
+
+
 class CKeys {
    
 public:	
@@ -26,16 +46,21 @@ class CGame {
 
 private:
     uint8_t F_Level;
+    EnGameState F_State;
 
     uint8_t getLevel() { return F_Level; }
     void setLevel( uint8_t Level ) { F_Level = Level; }
-    
+
+    EnGameState getState() { return F_State; }
+    void setState( EnGameState State ) { F_State = State; }
+
 public:	    
 
     // Начало свойств
     properties_start( CGame );
     
         property( CGame, uint8_t, getLevel, setLevel ) Level;
+        property( CGame, EnGameState, getState, setState ) State;
     
     // Конец свойств
     properties_end();
@@ -46,7 +71,10 @@ public:
     CGame();
 
 	void Initialization();    
+    void DrawTitle();
     void DrawFrame( uint8_t x, uint8_t y, uint8_t width, uint8_t height, 
+        uint8_t color, uint8_t bgcolor = BLACK );
+    void DrawGlass( uint8_t x, uint8_t y, uint8_t width, uint8_t height, 
         uint8_t color, uint8_t bgcolor = BLACK );
     void DrawFigure();  
     void DrawFunctionKeys( CKeys & Keys );
