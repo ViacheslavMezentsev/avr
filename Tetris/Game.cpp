@@ -19,12 +19,20 @@ extern char * utoa_fast_div( uint32_t value, char * buffer );
 
 uint8_t oldx, oldy;
 uint8_t x, y;
+
+EnFigureColor FigureColor;
 EnFigureType FigureType;
 
 CKeys GameKeys;
+
 CFigureI FigureI;
 CFigureJ FigureJ;
 CFigureL FigureL;
+CFigureO FigureO;
+CFigureS FigureS;
+CFigureT FigureT;
+CFigureZ FigureZ;
+
 CGame Game;
 
 char Block[ 32 ];
@@ -62,6 +70,7 @@ void CGame::Initialization() {
     x = 20; y = 6;
     oldx = x; oldy = y;
 
+    FigureColor = fcMAGENTA;
     FigureType = ftJ;
 
     // Очистка экрана
@@ -212,7 +221,6 @@ void CGame::DrawFigure(){
     // Сохраняем текущие координаты.
     oldx = x; oldy = y;
 
-    CConsole::SetTextColor( BLUE );
     CConsole::SetTextBackground( BLACK );
 
     // Удаляем старое изображение.
@@ -228,16 +236,37 @@ void CGame::DrawFigure(){
     } // for
 
     y++;
-    if ( y > 19 ) y = 6;
 
-    // Рисуем новое.
+    if ( y > 19 ) { 
+       
+        y = 6;
+
+        FigureType = ( EnFigureType ) ( ( uint8_t ) FigureType + 1 );
+        FigureType = ( EnFigureType ) ( ( uint8_t ) FigureType % 7 );
+
+        FigureColor = ( EnFigureColor ) ( ( uint8_t ) FigureColor + 1 );
+        FigureColor = ( EnFigureColor ) ( ( uint8_t ) FigureColor % 9 );
+
+    }
+
+    CConsole::SetTextColor( FigureColor );
+
+    // Рисуем новое изображение.
     switch ( FigureType ) {
 
         case ftI: { CopyFigureToRAM( Block, FigureI[0] ); break; }
     
         case ftJ: { CopyFigureToRAM( Block, FigureJ[0] ); break; }
 
+        case ftL: { CopyFigureToRAM( Block, FigureL[0] ); break; }
 
+        case ftO: { CopyFigureToRAM( Block, FigureO[0] ); break; }
+
+        case ftS: { CopyFigureToRAM( Block, FigureS[0] ); break; }
+
+        case ftT: { CopyFigureToRAM( Block, FigureT[0] ); break; }
+
+        case ftZ: { CopyFigureToRAM( Block, FigureZ[0] ); break; }
 
         default:;
 

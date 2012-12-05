@@ -1,18 +1,6 @@
 #pragma once
 
 
-enum EnFigureType {
-
-    ftI = 0,
-    ftJ, 
-    ftL, 
-    ftO, 
-    ftS, 
-    ftT, 
-    ftZ
-};
-
-
 enum EnGameState {
     
     gsStopped = 0,
@@ -70,7 +58,7 @@ public:
     // Конструктор
     CGame();
 
-	void Initialization();    
+    void Initialization();    
     void DrawTitle();
     void DrawFrame( uint8_t x, uint8_t y, uint8_t width, uint8_t height, 
         uint8_t color, uint8_t bgcolor = BLACK );
