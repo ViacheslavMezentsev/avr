@@ -155,9 +155,13 @@ void CMCU::CommandShell() {
 
             Game.Initialization();
 
+            Game.DrawTitle();
+
             Game.DrawFunctionKeys( GameKeys );
 
             Game.DrawFrame( 13, 2, 52, 20, WHITE, LIGHTGRAY );
+
+            Game.DrawGlass( 14, 3, 25, 19, WHITE, LIGHTGRAY );
             
             // Запуск игры.
             Game.Run();
@@ -1146,18 +1150,18 @@ void CMCU::OnTimerCounter0Overflow(){
 
         CSystemTime::SetTime( CSystemTime::GetTime() + 1 );
 
-        Counter1s = 0;
+        // Отображаем фигуру в зависимости от уровня игры.
+        switch ( Game.Level ) {
 
-    }
+            case 0: {
 
-    // Отображаем фигуру в зависимости от уровня игры.
-    switch ( Game.Level ) {
+                Game.DrawFigure();
+                break;
+            }
 
-        case 0: {
-
-            Game.DrawFigure();
-            break;
         }
+
+        Counter1s = 0;
 
     }
     
