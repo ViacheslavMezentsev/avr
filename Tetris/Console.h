@@ -27,6 +27,14 @@
 #define ACS_LRCORNER	(0xD9)	/* lower right corner */
 #define ACS_HLINE		(0xC4)	/* horizontal line */
 #define ACS_VLINE		(0xB3)	/* vertical line */
+
+#define ACS_DBL_ULCORNER	(0xC9)	/* upper left corner */
+#define ACS_DBL_LLCORNER	(0xC8)	/* lower left corner */
+#define ACS_DBL_URCORNER	(0xBB)	/* upper right corner */
+#define ACS_DBL_LRCORNER	(0xBC)	/* lower right corner */
+#define ACS_DBL_HLINE		(0xCD)	/* horizontal line */
+#define ACS_DBL_VLINE		(0xBA)	/* vertical line */
+
 #define ACS_LTEE	(acs_map['t'])	/* tee pointing right */
 #define ACS_RTEE	(acs_map['u'])	/* tee pointing left */
 #define ACS_BTEE	(acs_map['v'])	/* tee pointing up */
@@ -77,8 +85,8 @@ public:
     static uint8_t GetChar();
     static void PutChar( uint8_t ch, EnCodePage CodePage = cp866 );
     static char * ReadString( char * s );
-    static void WriteString( FCHAR_PTR s, EnCodePage CodePage = cp866 );
-    static void WriteString( const char * s, EnCodePage CodePage = cp866 );
+    static void WriteString( FCHAR_PTR Value, EnCodePage CodePage = cp866, uint8_t Length = 0 );
+    static void WriteString( const char * Value, EnCodePage CodePage = cp866, uint8_t Length = 0 );
     static void ClearScreen();
     static void ClearEndOfLine();
     static void CursorOn();

@@ -381,11 +381,11 @@
         </option>
         <option>
           <name>IExtraOptions</name>
-          <state></state>
+          <state>--string_literals_in_flash</state>
         </option>
         <option>
           <name>IExtraOptionsCheck</name>
-          <state>0</state>
+          <state>1</state>
         </option>
         <option>
           <name>CCMultibyteSupport</name>
@@ -2005,10 +2005,10 @@
     </settings>
   </configuration>
   <file>
-    <name>$PROJ_DIR$\..\conio.cpp</name>
+    <name>$PROJ_DIR$\..\Console.cpp</name>
   </file>
   <file>
-    <name>$PROJ_DIR$\..\hw_atmega.cpp</name>
+    <name>$PROJ_DIR$\..\Game.cpp</name>
   </file>
   <file>
     <name>$PROJ_DIR$\..\ISRList.cpp</name>
@@ -2021,9 +2021,6 @@
   </file>
   <file>
     <name>$PROJ_DIR$\..\SystemTime.cpp</name>
-  </file>
-  <file>
-    <name>$PROJ_DIR$\..\ui.cpp</name>
   </file>
 </project>
 

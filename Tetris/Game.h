@@ -1,10 +1,25 @@
 #pragma once
 
-// Свойства в С++, Автор: Денис Майдыковский
-// http://www.rsdn.ru/article/vcpp/props.xml
 
-// Свойства в C++, Alno’s blog: C++, Java и Rails
-// http://blog.alno.name/ru/2008/05/cpp-properties
+class CKeys {
+   
+public:	
+
+    inline FCHAR_PTR operator []( uint8_t Key ) {
+        
+        switch ( Key ) {
+
+            case 0: return SPSTR( "Помощь" );
+            case 2: return SPSTR( "Новая игра" );
+            case 9: return SPSTR( "Выход" );
+            
+            default: return 0;
+
+        }        
+
+    }
+
+};
 
 
 class CGame {
@@ -31,9 +46,12 @@ public:
     CGame();
 
 	void Initialization();    
-    void DrawGlass( uint8_t x, uint8_t y, uint8_t width, uint8_t height, 
+    void DrawFrame( uint8_t x, uint8_t y, uint8_t width, uint8_t height, 
         uint8_t color, uint8_t bgcolor = BLACK );
     void DrawFigure();  
+    void DrawFunctionKeys( CKeys & Keys );
     void Run();
 
 };
+
+

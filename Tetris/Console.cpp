@@ -153,16 +153,32 @@ char * CConsole::ReadString( char * s ) {
 }
 
 
-void CConsole::WriteString( FCHAR_PTR s, EnCodePage CodePage ) {
+void CConsole::WriteString( FCHAR_PTR s, EnCodePage CodePage, uint8_t Length ) {
 
-    while ( * s != 0 ) PutChar( ( uint8_t ) * ( s++ ), CodePage );
+    uint8_t index = 0;
+
+    while ( ( s[ index ] != 0 ) | ( index == ( Length - 1 ) ) ) {
+
+        PutChar( ( uint8_t ) s[ index ], CodePage );
+
+        index++;
+
+    }
 
 }
 
 
-void CConsole::WriteString( const char * s, EnCodePage CodePage ) {
+void CConsole::WriteString( const char * s, EnCodePage CodePage, uint8_t Length ) {
 
-    while ( * s != 0 ) PutChar( * s++, CodePage );
+    uint8_t index = 0;
+
+    while ( ( s[ index ] != 0 ) | ( index == ( Length - 1 ) ) ) {
+
+        PutChar( ( uint8_t ) s[ index ], CodePage );
+
+        index++;
+
+    }
 
 }
 
