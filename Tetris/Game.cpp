@@ -24,6 +24,7 @@ EnFigureType FigureType;
 CKeys GameKeys;
 CFigureI FigureI;
 CFigureJ FigureJ;
+CFigureL FigureL;
 CGame Game;
 
 char Block[ 32 ];
