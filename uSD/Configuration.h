@@ -24,10 +24,10 @@
 #endif
 
 // Скорость работы внутреннего USART
-#define BAUD 9600UL
+//#define BAUD 9600UL
 //#define BAUD 19200UL
 //#define BAUD 38400UL
-//#define BAUD 57600UL
+#define BAUD 57600UL
 
 // Definitions for MMC/SDC connection
 #define SD_DI   5   // MOSI

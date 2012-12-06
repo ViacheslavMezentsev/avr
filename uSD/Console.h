@@ -1,4 +1,5 @@
-#pragma once
+#ifndef _CONSOLE_H_
+#define _CONSOLE_H_
 
 /**
  *  ласс CConsole
@@ -26,6 +27,14 @@
 #define ACS_LRCORNER	(0xD9)	/* lower right corner */
 #define ACS_HLINE		(0xC4)	/* horizontal line */
 #define ACS_VLINE		(0xB3)	/* vertical line */
+
+#define ACS_DBL_ULCORNER	(0xC9)	/* upper left corner */
+#define ACS_DBL_LLCORNER	(0xC8)	/* lower left corner */
+#define ACS_DBL_URCORNER	(0xBB)	/* upper right corner */
+#define ACS_DBL_LRCORNER	(0xBC)	/* lower right corner */
+#define ACS_DBL_HLINE		(0xCD)	/* horizontal line */
+#define ACS_DBL_VLINE		(0xBA)	/* vertical line */
+
 #define ACS_LTEE	(acs_map['t'])	/* tee pointing right */
 #define ACS_RTEE	(acs_map['u'])	/* tee pointing left */
 #define ACS_BTEE	(acs_map['v'])	/* tee pointing up */
@@ -47,25 +56,80 @@
 #define ACS_LANTERN	(acs_map['i'])	/* lantern symbol */
 #define ACS_BLOCK	(acs_map['0'])	/* solid square block */
 
+
+enum EnMoveDirection {
+
+    // Cursor Up: Moves the cursor up by the specified number of lines without
+    // changing columns. If the cursor is already on the top line, ANSI.SYS
+    // ignores this sequence.
+    mdUp = 0,
+
+    // Cursor Down: Moves the cursor down by the specified number of lines
+    // without changing columns. If the cursor is already on the bottom line,
+    // ANSI.SYS ignores this sequence.
+    mdDown,
+
+    // Cursor Forward: Moves the cursor forward by the specified number of
+    // columns without changing lines. If the cursor is already in the
+    // rightmost column, ANSI.SYS ignores this sequence.
+    mdForward,
+
+    // Cursor Backward: Moves the cursor back by the specified number of
+    // columns without changing lines. If the cursor is already in the leftmost
+    // column, ANSI.SYS ignores this sequence.
+    mdBackward
+
+};
+
+
+// Text attributes
+enum EnAttributes {
+
+    atOff               = 0,    // Reset all attributes
+    atIntensityBold     = 1,
+    atIntensityFaint    = 2,    // (not widely supported)
+    atItalicOn          = 3,    // (not widely supported)
+    atUnderlineSingle   = 4,    // (not widely supported)
+    atBlinkSlow         = 5,
+    atBlinkRapid        = 6,
+    atImageNegative     = 7,
+    atConceal           = 8,    // (not widely supported)
+
+    atUnderlineDouble   = 21,   //
+    atIntensityNormal   = 22,   // not bold and not faint
+    atUnderlineNone     = 24,   //
+    atBlinkOff          = 25,   //
+    atImagePositive     = 27,   //
+    atReveal            = 28    // conceal off
+
+};
+
+
 //  ÷вета
+enum EnColor {
+
 /* dark colors */
-#define BLACK           0          
-#define RED             1 
-#define GREEN           2
-#define BROWN           3
-#define BLUE            4
-#define MAGENTA         5
-#define CYAN            6
-#define LIGHTGRAY       7
+    clBlack = 0,
+    clRed, 
+    clGreen, 
+    clYellow, 
+    clBlue, 
+    clMagenta, 
+    clCyan,
+    clWhite,
+
 /* light colors */
-#define DARKGRAY        8       
-#define LIGHTRED        9
-#define LIGHTGREEN      10
-#define YELLOW          11
-#define LIGHTBLUE       12
-#define LIGHTMAGENTA    13
-#define LIGHTCYAN       14
-#define WHITE           15
+    clDarkGray,
+    clLightRed,
+    clLightGreen,
+    clLightYellow,
+    clLightBlue,
+    clLightMagenta,
+    clLightCyan,
+    clLightGray
+
+};
+
 
 class CConsole {
 
@@ -76,16 +140,20 @@ public:
     static uint8_t GetChar();
     static void PutChar( uint8_t ch, EnCodePage CodePage = cp866 );
     static char * ReadString( char * s );
-    static void WriteString( FCHAR_PTR s, EnCodePage CodePage = cp866 );
-    static void WriteString( const char * s, EnCodePage CodePage = cp866 );
+    static void WriteString( FCHAR_PTR Value, EnCodePage CodePage = cp866, uint8_t Length = 0 );
+    static void WriteString( const char * Value, EnCodePage CodePage = cp866, uint8_t Length = 0 );
     static void ClearScreen();
     static void ClearEndOfLine();
     static void CursorOn();
     static void CursorOff();
-    static void SetTextColor( uint8_t color );
-    static void SetTextBackground( uint8_t color );
-    static void SetTextAttr( uint8_t attr );
-    static void GotoXY( uint8_t x, uint8_t y );
+    static void SaveCursor();
+    static void RestoreCursor();
+    static void SetForegroundColor( EnColor Color );
+    static void SetBackgroundColor( EnColor Color );
+    static void SetTextAttributes( EnAttributes Attributes );
+    static void MoveTo( uint8_t Left, uint8_t Top );
+    static void Move( EnMoveDirection Direction, uint8_t Delta );
 
 };
 
+#endif // _CONSOLE_H_
