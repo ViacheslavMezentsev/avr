@@ -123,7 +123,7 @@ void CMCU::CommandShell() {
 
         // Выводим приглашение
         CConsole::SetTextAttributes( atOff );
-        CConsole::SetForegroundColor( clGreen );
+        CConsole::SetForegroundColor( clLightGreen );
         CConsole::WriteString( SPSTR( "[ATmega16]$ " ) );
 
         // Считываем ввод пользователя
