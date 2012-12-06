@@ -10,6 +10,7 @@
 #include "Version.h"
 #include "Console.h"
 #include "FAT.h"
+#include "FileManager.h"
 #include "MCU.h"
 
 
@@ -37,6 +38,8 @@ UFTIME FTime;
 FILINFO fno;
 DIR dir;
 FATFS fs;
+
+CKeys Keys;
 
 // Версия программы
 char Version[16];
@@ -247,19 +250,20 @@ void CMCU::ShowStatusMessage( FRESULT Result ) {
 
     if ( Result == FR_OK ) {
 
-        CConsole::SetTextAttr( GREEN );
+        CConsole::SetForegroundColor( clLightGreen );
         CConsole::WriteString( SPSTR( "OK\r\n" ) );
 
     } else {
 
-        CConsole::SetTextAttr( LIGHTRED );
+        CConsole::SetForegroundColor( clLightRed );
+
         CConsole::WriteString( SPSTR( "FAIL(" ) );
         CConsole::PutChar( Result + '0' );
         CConsole::WriteString( SPSTR( ")\r\n" ) );
 
     }
 
-    CConsole::SetTextAttr( WHITE );
+    CConsole::SetForegroundColor( clWhite );
 
 }
 
@@ -374,10 +378,12 @@ void CMCU::CommandShell() {
 
     char * cmd;
 
-    CConsole::SetTextAttr( LIGHTGRAY );
+    CConsole::SetTextAttributes( atOff );
+    CConsole::SetBackgroundColor( clBlack );
+    CConsole::SetForegroundColor( clLightGray );
     CConsole::ClearScreen();
 
-    CConsole::GotoXY( 1, 25 );
+    CConsole::MoveTo( 1, 25 );
 
     CConsole::WriteString( SPSTR( "Командная оболочка, версия " ), CConsole::cp1251 );
     CConsole::WriteString( Version );
@@ -391,11 +397,14 @@ void CMCU::CommandShell() {
     while ( true ) {
 
         // Выводим приглашение
-        CConsole::SetTextAttr( GREEN );
+        CConsole::SetTextAttributes( atOff );
+        CConsole::CursorOn();
+        CConsole::SetForegroundColor( clLightGreen );
         CConsole::WriteString( SPSTR( "[ATmega16]$ " ) );
 
         // Считываем ввод пользователя
-        CConsole::SetTextAttr( LIGHTGRAY );
+        CConsole::SetForegroundColor( clLightGray );
+
         cmd = CConsole::ReadString( buffer );
 
         // Если пустая команда, то переходим на следующую строку
@@ -406,26 +415,33 @@ void CMCU::CommandShell() {
         // Выводим справку
         } else if ( ( cmd[0] == 'h' ) && ( cmd[1] == 0 ) ) {
 
-            CConsole::SetTextAttr( WHITE );
+            CConsole::SetForegroundColor( clWhite );
             CConsole::WriteString( SPSTR( "\r\nДоступные команды:\r\n" ), CConsole::cp1251 );
 
-            CConsole::SetTextAttr( LIGHTRED );
+            CConsole::SetForegroundColor( clLightRed );
             CConsole::PutChar( 'h' );
 
-            CConsole::SetTextAttr( WHITE );
+            CConsole::SetForegroundColor( clWhite );
             CConsole::WriteString( SPSTR( " - (help) вывод подсказки.\r\n" ), CConsole::cp1251 );
 
-            CConsole::SetTextAttr( LIGHTRED );
+            CConsole::SetForegroundColor( clLightRed );
             CConsole::PutChar( 't' );
 
-            CConsole::SetTextAttr( WHITE );
+            CConsole::SetForegroundColor( clWhite );
             CConsole::WriteString( SPSTR( " - (test) тест драйвера Petit FAT File System.\r\n" ), CConsole::cp1251 );
 
-            CConsole::SetTextAttr( LIGHTRED );
+            CConsole::SetForegroundColor( clLightRed );
             CConsole::PutChar( 'd' );
 
-            CConsole::SetTextAttr( WHITE );
+            CConsole::SetForegroundColor( clWhite );
             CConsole::WriteString( SPSTR( " - (dir) просмотр папки.\r\n" ), CConsole::cp1251 );
+
+            CConsole::SetForegroundColor( clLightRed );
+            CConsole::PutChar( 'f' );
+
+            CConsole::SetForegroundColor( clWhite );
+            CConsole::WriteString( SPSTR( " - (file manager) вызов файлового менеджера.\r\n" ), CConsole::cp1251 );
+
 
         // Тестирование драйвера
         } else if ( ( cmd[0] == 't' ) && ( cmd[1] == 0 ) ) {
@@ -433,22 +449,44 @@ void CMCU::CommandShell() {
             CConsole::WriteString( szCRLF );
             TestDriver();
 
+
         // Промотр папки
         } else if ( ( cmd[0] == 'd' ) && ( cmd[1] == 0 ) ) {
 
             CConsole::WriteString( szCRLF );
             ShowStatusMessage( ScanFiles( SPSTR( "/" ) ) );
 
+
+        // Запуск файлового менеджера
+        } else if ( ( cmd[0] == 'f' ) && ( cmd[1] == 0 ) ) {
+
+            CFileManager::Initialization();
+
+            CFileManager::DrawMainMenu();
+            CFileManager::DrawLeftPanel();
+            CFileManager::DrawRightPanel();            
+            CFileManager::DrawFunctionKeys( Keys );
+
+            CFileManager::Run();
+
+            CConsole::SetTextAttributes( atOff );
+            CConsole::SetBackgroundColor( clBlack );
+            CConsole::SetForegroundColor( clLightGray );
+            CConsole::ClearScreen();
+
+            CConsole::MoveTo( 1, 25 );
+
+
         // Выводим сообщение о неподдерживаемой команде
         } else {
 
-            CConsole::SetTextAttr( WHITE );
+            CConsole::SetForegroundColor( clWhite );
             CConsole::WriteString( SPSTR( "\r\nКоманда не поддерживается. Введите " ), CConsole::cp1251 );
 
-            CConsole::SetTextAttr( LIGHTRED );
+            CConsole::SetForegroundColor( clLightRed );
             CConsole::PutChar( 'h' );
 
-            CConsole::SetTextAttr( WHITE );
+            CConsole::SetForegroundColor( clWhite );
             CConsole::WriteString( SPSTR( " (help) для помощи.\r\n" ), CConsole::cp1251 );
 
         }

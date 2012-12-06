@@ -22,6 +22,7 @@ struct divmod10_t {
 
 // -=[ Внешние ссылки ]=-
     
+extern SYSTEMTIME Time;
 extern FIFO( 16 ) uart_rx_fifo;
 extern CGame Game;
 extern CKeys GameKeys;
@@ -123,6 +124,7 @@ void CMCU::CommandShell() {
 
         // Выводим приглашение
         CConsole::SetTextAttributes( atOff );
+        CConsole::CursorOn();
         CConsole::SetForegroundColor( clLightGreen );
         CConsole::WriteString( SPSTR( "[ATmega16]$ " ) );
 
@@ -1161,16 +1163,37 @@ void CMCU::OnTimerCounter0Overflow(){
 
         CSystemTime::SetTime( CSystemTime::GetTime() + 1 );
 
-        // Отображаем фигуру в зависимости от уровня игры.
-        switch ( Game.Level ) {
+        if ( Game.State == gsRunning ) {
+        
+            // Отображаем время в заголовке
+            CSystemTime::GetTimeAsSystemTime( & Time );
 
-            case 0: {
+            CConsole::MoveTo( 73, 1 );
+            CConsole::SetTextAttributes( atOff );
+            CConsole::SetForegroundColor( clBlack );
+            CConsole::SetBackgroundColor( clWhite );
 
-                Game.DrawFigure();
-                break;
+            CConsole::PutChar( Time.wHour / 10 + '0' );
+            CConsole::PutChar( Time.wHour % 10 + '0' );
+            CConsole::PutChar( ':' );
+            CConsole::PutChar( Time.wMinute / 10 + '0' );
+            CConsole::PutChar( Time.wMinute % 10 + '0' );
+            CConsole::PutChar( ':' );
+            CConsole::PutChar( Time.wSecond / 10 + '0' );
+            CConsole::PutChar( Time.wSecond % 10 + '0' );
+
+            // Отображаем фигуру в зависимости от уровня игры.
+            switch ( Game.Level ) {
+
+                case 0: {
+
+                    Game.DrawFigure();
+                    break;
+                }
+
             }
 
-        }
+        } // if
 
         Counter1s = 0;
 

@@ -85,15 +85,22 @@ enum EnMoveDirection {
 // Text attributes
 enum EnAttributes {
 
-    atOff = 0,          // Reset all attributes
-    atBright = 1,
-    atDim = 2,
-    // - ?
-    atUnderscore = 4,
-    atBlinkOn = 5,
-    // - ?
-    atReverse = 7,
-    atHidden = 8
+    atOff               = 0,    // Reset all attributes
+    atIntensityBold     = 1,
+    atIntensityFaint    = 2,    // (not widely supported)
+    atItalicOn          = 3,    // (not widely supported)
+    atUnderlineSingle   = 4,    // (not widely supported)
+    atBlinkSlow         = 5,
+    atBlinkRapid        = 6,
+    atImageNegative     = 7,
+    atConceal           = 8,    // (not widely supported)
+
+    atUnderlineDouble   = 21,   //
+    atIntensityNormal   = 22,   // not bold and not faint
+    atUnderlineNone     = 24,   //
+    atBlinkOff          = 25,   //
+    atImagePositive     = 27,   //
+    atReveal            = 28    // conceal off
 
 };
 

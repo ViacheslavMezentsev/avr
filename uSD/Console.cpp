@@ -36,10 +36,6 @@
 #endif
 
 FLASHSTR_DECLARE( char, ESC, "\033[" );
-FLASHSTR_DECLARE( char, ESC_CLEAR_SCREEN, "\033[2J" );
-FLASHSTR_DECLARE( char, ESC_CLEAR_END_OF_LINE, "\033[K" );
-FLASHSTR_DECLARE( char, ESC_CURSOR_ON, "\033[25h" );
-FLASHSTR_DECLARE( char, ESC_CURSOR_OFF, "\033[25l" );
 
 
 // -=[ Переменные в ОЗУ ]=-
@@ -153,96 +149,169 @@ char * CConsole::ReadString( char * s ) {
 }
 
 
-void CConsole::WriteString( FCHAR_PTR s, EnCodePage CodePage ) {
+void CConsole::WriteString( FCHAR_PTR s, EnCodePage CodePage, uint8_t Length ) {
 
-    while ( * s != 0 ) PutChar( ( uint8_t ) * ( s++ ), CodePage );
+    uint8_t index = 0;
+
+    while ( ( s[ index ] != 0 ) | ( index == ( Length - 1 ) ) ) {
+
+        PutChar( ( uint8_t ) s[ index ], CodePage );
+
+        index++;
+
+    }
 
 }
 
 
-void CConsole::WriteString( const char * s, EnCodePage CodePage ) {
+void CConsole::WriteString( const char * s, EnCodePage CodePage, uint8_t Length ) {
 
-    while ( * s != 0 ) PutChar( * s++, CodePage );
+    uint8_t index = 0;
+
+    while ( ( s[ index ] != 0 ) | ( index == ( Length - 1 ) ) ) {
+
+        PutChar( ( uint8_t ) s[ index ], CodePage );
+
+        index++;
+
+    }
 
 }
 
 
 void CConsole::ClearScreen() {
 
-    WriteString( ESC_CLEAR_SCREEN );
+    WriteString( SPSTR( "\033[2J" ) );
 
 }
 
 
 void CConsole::ClearEndOfLine() {
 
-    WriteString( ESC_CLEAR_END_OF_LINE );
+    WriteString( SPSTR( "\033[K" ) );
 
 }
 
 
 void CConsole::CursorOn() {
 
-    WriteString( ESC_CURSOR_ON );
+    WriteString( SPSTR( "\033[?25h" ) );
 
 }
 
 
 void CConsole::CursorOff() {
 
-    WriteString( ESC_CURSOR_OFF );
+    WriteString( SPSTR( "\033[?25l" ) );
 
 }
 
 
-void CConsole::SetTextColor( uint8_t color ) {
+void CConsole::SaveCursor() {
 
-    WriteString( ESC );
-    ( color & 0x8 ) ? PutChar( '1' ) : PutChar( '2' );
-    PutChar( 'm' );
+    WriteString( SPSTR( "\033[s" ) );
+
+}
+
+
+void CConsole::RestoreCursor() {
+
+    WriteString( SPSTR( "\033[u" ) );
+
+}
+
+
+void CConsole::SetForegroundColor( EnColor Color ) {
+
+    if ( Color & 0x8 ) {
+        
+        WriteString( ESC );
+        PutChar( '1' );
+        PutChar( 'm' );
+
+    } else {
+
+        WriteString( ESC );
+        PutChar( '2' );
+        PutChar( 'm' );
+    }
 
     WriteString( ESC );
     PutChar( '3' );
-    PutChar( ( ( color & 0x7 ) % 10 ) + '0' );
+    PutChar( ( Color & 0x07 ) + '0' );
     PutChar( 'm' );
 
 }
 
 
-void CConsole::SetTextBackground( uint8_t color ) {
+void CConsole::SetBackgroundColor( EnColor Color ) {
 
-    WriteString( ESC );
-    ( color & 0x8 ) ? PutChar( '5' ) : PutChar( '6' );
-    PutChar( 'm' );
+    if ( Color & 0x8 ) {
+        
+        WriteString( ESC );
+        PutChar( '5' );
+        PutChar( 'm' );
+
+    } else {
+
+        WriteString( ESC );
+        PutChar( '6' );
+        PutChar( 'm' );
+    }
 
     WriteString( ESC );
     PutChar( '4' );
-    PutChar( ( color & 0x7 ) + '0' );
+    PutChar( ( Color & 0x07 ) + '0' );
     PutChar( 'm' );
 
 }
 
 
-void CConsole::SetTextAttr( uint8_t attr ) {
+void CConsole::SetTextAttributes( EnAttributes Attributes ) {
 
-    SetTextColor( attr & 0xF );
-    SetTextBackground( attr >> 4 );
+    WriteString( ESC );
+    PutChar( ( Attributes & 0x0F ) + '0' );
+    PutChar( 'm' );
 
 }
 
 
-void CConsole::GotoXY( uint8_t x, uint8_t y ) {
+void CConsole::MoveTo( uint8_t Left, uint8_t Top ) {
 
-    if ( x == 0 || y == 0 ) return;
+    if ( Left == 0 || Top == 0 ) return;
 
-    if ( x > MAX_X || y > MAX_Y ) return;
+    if ( Left > MAX_X || Top > MAX_Y ) return;
 
     WriteString( ESC );
-    PutChar( ( y / 10 ) + '0' );
-    PutChar( ( y % 10 ) + '0' );
+    PutChar( ( Top / 10 ) + '0' );
+    PutChar( ( Top % 10 ) + '0' );
     PutChar( ';' );
-    PutChar( ( x / 10 ) + '0' );
-    PutChar( ( x % 10 ) + '0' );
+    PutChar( ( Left / 10 ) + '0' );
+    PutChar( ( Left % 10 ) + '0' );
     PutChar( 'f' );
+
+}
+
+
+void CConsole::Move( EnMoveDirection Direction, uint8_t Delta ) {
+
+    WriteString( ESC );
+
+    PutChar( ( Delta / 10 ) + '0' );
+    PutChar( ( Delta % 10 ) + '0' );
+
+    switch ( Direction ) {
+
+        case mdUp: { PutChar( 'A' ); break; }
+
+        case mdDown: { PutChar( 'B' ); break; }
+
+        case mdForward: { PutChar( 'C' ); break; }
+
+        case mdBackward: { PutChar( 'D' ); break; }
+
+        default: PutChar( 'C' );
+
+    }
 
 }

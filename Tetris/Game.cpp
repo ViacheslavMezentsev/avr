@@ -79,13 +79,13 @@ void CGame::Initialization() {
     // Очищаем память стакана.
     for ( uint16_t i = 0; i < ( GLASS_WIDTH / 2 ) * GLASS_HEIGHT; i++ ) Glass[i] = 0;
     
-    // Очистка экрана.
-    CConsole::SetTextAttributes( atOff );
-    CConsole::SetBackgroundColor( clBlue );
-    CConsole::ClearScreen();
-
     // Прячем курсор.
     CConsole::CursorOff();
+
+    // Очистка экрана.
+    CConsole::SetTextAttributes( atOff );    
+    CConsole::SetBackgroundColor( clBlue );
+    CConsole::ClearScreen();
 
 }
 
@@ -355,8 +355,6 @@ void CGame::DrawFigure(){
         } // for
     
     } // for
-
-    CConsole::CursorOff();
 
 }
 
