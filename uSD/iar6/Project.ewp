@@ -2011,6 +2011,9 @@
     <name>$PROJ_DIR$\..\FAT.cpp</name>
   </file>
   <file>
+    <name>$PROJ_DIR$\..\FileManager.cpp</name>
+  </file>
+  <file>
     <name>$PROJ_DIR$\..\ISRList.cpp</name>
   </file>
   <file>
