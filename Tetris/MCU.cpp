@@ -106,7 +106,7 @@ void CMCU::CommandShell() {
     CConsole::SetTextAttr( LIGHTGRAY );
     CConsole::ClearScreen();
 
-    CConsole::GotoXY( 1, 25 );
+    CConsole::MoveTo( 1, 25 );
 
     CConsole::WriteString( SPSTR( "Командная оболочка, версия " ), CConsole::cp1251 );
     CConsole::WriteString( Version );
@@ -161,7 +161,7 @@ void CMCU::CommandShell() {
 
             Game.DrawFrame( 13, 2, 52, 20, WHITE, LIGHTGRAY );
 
-            Game.DrawGlass( 14, 3, 25, 19, WHITE, LIGHTGRAY );
+            Game.DrawGlass( GLASS_OFFSET_LEFT, GLASS_OFFSET_TOP, GLASS_WIDTH, GLASS_HEIGHT, WHITE, LIGHTGRAY );
             
             // Запуск игры.
             Game.Run();

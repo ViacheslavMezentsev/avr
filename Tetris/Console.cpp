@@ -247,18 +247,18 @@ void CConsole::SetTextAttr( uint8_t attr ) {
 }
 
 
-void CConsole::GotoXY( uint8_t x, uint8_t y ) {
+void CConsole::MoveTo( uint8_t Left, uint8_t Top ) {
 
-    if ( x == 0 || y == 0 ) return;
+    if ( Left == 0 || Top == 0 ) return;
 
-    if ( x > MAX_X || y > MAX_Y ) return;
+    if ( Left > MAX_X || Top > MAX_Y ) return;
 
     WriteString( ESC );
-    PutChar( ( y / 10 ) + '0' );
-    PutChar( ( y % 10 ) + '0' );
+    PutChar( ( Top / 10 ) + '0' );
+    PutChar( ( Top % 10 ) + '0' );
     PutChar( ';' );
-    PutChar( ( x / 10 ) + '0' );
-    PutChar( ( x % 10 ) + '0' );
+    PutChar( ( Left / 10 ) + '0' );
+    PutChar( ( Left % 10 ) + '0' );
     PutChar( 'f' );
 
 }
