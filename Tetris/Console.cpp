@@ -211,29 +211,29 @@ void CConsole::CursorOff() {
 }
 
 
-void CConsole::SetTextColor( uint8_t color ) {
+void CConsole::SetTextColor( EnColor Color ) {
 
     WriteString( ESC );
-    ( color & 0x8 ) ? PutChar( '1' ) : PutChar( '2' );
+    ( Color & 0x8 ) ? PutChar( '1' ) : PutChar( '2' );
     PutChar( 'm' );
 
     WriteString( ESC );
     PutChar( '3' );
-    PutChar( ( ( color & 0x7 ) % 10 ) + '0' );
+    PutChar( ( ( Color & 0x7 ) % 10 ) + '0' );
     PutChar( 'm' );
 
 }
 
 
-void CConsole::SetTextBackground( uint8_t color ) {
+void CConsole::SetTextBackground( EnColor Color ) {
 
     WriteString( ESC );
-    ( color & 0x8 ) ? PutChar( '5' ) : PutChar( '6' );
+    ( Color & 0x8 ) ? PutChar( '5' ) : PutChar( '6' );
     PutChar( 'm' );
 
     WriteString( ESC );
     PutChar( '4' );
-    PutChar( ( color & 0x7 ) + '0' );
+    PutChar( ( Color & 0x7 ) + '0' );
     PutChar( 'm' );
 
 }
@@ -241,8 +241,8 @@ void CConsole::SetTextBackground( uint8_t color ) {
 
 void CConsole::SetTextAttr( uint8_t attr ) {
 
-    SetTextColor( attr & 0xF );
-    SetTextBackground( attr >> 4 );
+    SetTextColor( ( EnColor ) ( attr & 0xF ) );
+    SetTextBackground( ( EnColor ) ( attr >> 4 ) );
 
 }
 

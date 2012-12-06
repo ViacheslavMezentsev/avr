@@ -61,9 +61,9 @@ public:
     void Initialization();    
     void DrawTitle();
     void DrawFrame( uint8_t Left, uint8_t Top, uint8_t Width, uint8_t Height, 
-        uint8_t Color, uint8_t bgColor = BLACK );
+        EnColor Color, EnColor bgColor = clBlack );
     void DrawGlass( uint8_t Left, uint8_t Top, uint8_t Width, uint8_t Height, 
-        uint8_t Color, uint8_t bgColor = BLACK );
+        EnColor Color, EnColor bgColor = clBlack );
     void DrawFigure();  
     void DrawFunctionKeys( CKeys & Keys );
     void Run();

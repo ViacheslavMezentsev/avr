@@ -103,7 +103,7 @@ void CMCU::CommandShell() {
 
     char * cmd;
 
-    CConsole::SetTextAttr( LIGHTGRAY );
+    CConsole::SetTextAttr( clLightGray );
     CConsole::ClearScreen();
 
     CConsole::MoveTo( 1, 25 );
@@ -120,11 +120,11 @@ void CMCU::CommandShell() {
     while ( true ) {
 
         // Выводим приглашение
-        CConsole::SetTextAttr( GREEN );
+        CConsole::SetTextAttr( clGreen );
         CConsole::WriteString( SPSTR( "[ATmega16]$ " ) );
 
         // Считываем ввод пользователя
-        CConsole::SetTextAttr( LIGHTGRAY );
+        CConsole::SetTextAttr( clLightGray );
         cmd = CConsole::ReadString( buffer );
 
         // Если пустая команда, то переходим на следующую строку
@@ -135,19 +135,19 @@ void CMCU::CommandShell() {
         // Выводим справку
         } else if ( ( cmd[0] == 'h' ) && ( cmd[1] == 0 ) ) {
 
-            CConsole::SetTextAttr( WHITE );
+            CConsole::SetTextAttr( clWhite );
             CConsole::WriteString( SPSTR( "\r\nДоступные команды:\r\n" ), CConsole::cp1251 );
 
-            CConsole::SetTextAttr( LIGHTRED );
+            CConsole::SetTextAttr( clLightRed );
             CConsole::PutChar( 'h' );
 
-            CConsole::SetTextAttr( WHITE );
+            CConsole::SetTextAttr( clWhite );
             CConsole::WriteString( SPSTR( " - (help) вывод подсказки.\r\n" ), CConsole::cp1251 );
 
-            CConsole::SetTextAttr( LIGHTRED );
+            CConsole::SetTextAttr( clLightRed );
             CConsole::PutChar( 't' );
 
-            CConsole::SetTextAttr( WHITE );
+            CConsole::SetTextAttr( clWhite );
             CConsole::WriteString( SPSTR( " - (tetris) запуск игры Тетрис.\r\n" ), CConsole::cp1251 );
 
         // Тестирование драйвера
@@ -159,9 +159,9 @@ void CMCU::CommandShell() {
 
             Game.DrawFunctionKeys( GameKeys );
 
-            Game.DrawFrame( 13, 2, 52, 20, WHITE, LIGHTGRAY );
+            Game.DrawFrame( 13, 2, 52, 20, clWhite, clLightGray );
 
-            Game.DrawGlass( GLASS_OFFSET_LEFT, GLASS_OFFSET_TOP, GLASS_WIDTH, GLASS_HEIGHT, WHITE, LIGHTGRAY );
+            Game.DrawGlass( GLASS_OFFSET_LEFT, GLASS_OFFSET_TOP, GLASS_WIDTH, GLASS_HEIGHT, clWhite, clLightGray );
             
             // Запуск игры.
             Game.Run();
@@ -170,13 +170,13 @@ void CMCU::CommandShell() {
         // Выводим сообщение о неподдерживаемой команде
         } else {
 
-            CConsole::SetTextAttr( WHITE );
+            CConsole::SetTextAttr( clWhite );
             CConsole::WriteString( SPSTR( "\r\nКоманда не поддерживается. Введите " ), CConsole::cp1251 );
 
-            CConsole::SetTextAttr( LIGHTRED );
+            CConsole::SetTextAttr( clLightRed );
             CConsole::PutChar( 'h' );
 
-            CConsole::SetTextAttr( WHITE );
+            CConsole::SetTextAttr( clWhite );
             CConsole::WriteString( SPSTR( " (help) для помощи.\r\n" ), CConsole::cp1251 );
 
         }

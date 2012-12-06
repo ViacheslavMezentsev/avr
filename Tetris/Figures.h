@@ -1,20 +1,6 @@
 #pragma once
 
 
-enum EnFigureColor {
-
-    fcRED = 0,
-    fcGREEN, 
-    fcBROWN, 
-    fcBLUE, 
-    fcMAGENTA, 
-    fcCYAN, 
-    fcLIGHTGRAY,
-    fcYELLOW,
-    fcWHITE
-};
-
-
 enum EnFigureType {
 
     ftI = 0,
@@ -24,6 +10,7 @@ enum EnFigureType {
     ftS, 
     ftT, 
     ftZ
+
 };
 
 

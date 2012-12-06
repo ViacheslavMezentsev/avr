@@ -57,24 +57,29 @@
 #define ACS_BLOCK	(acs_map['0'])	/* solid square block */
 
 //  Цвета
+enum EnColor {
+
 /* dark colors */
-#define BLACK           0          
-#define RED             1 
-#define GREEN           2
-#define BROWN           3
-#define BLUE            4
-#define MAGENTA         5
-#define CYAN            6
-#define LIGHTGRAY       7
+    clBlack = 0,
+    clRed, 
+    clGreen, 
+    clBrown, 
+    clBlue, 
+    clMagenta, 
+    clCyan,
+    clLightGray,
 /* light colors */
-#define DARKGRAY        8       
-#define LIGHTRED        9
-#define LIGHTGREEN      10
-#define YELLOW          11
-#define LIGHTBLUE       12
-#define LIGHTMAGENTA    13
-#define LIGHTCYAN       14
-#define WHITE           15
+    clDarkGray,
+    clLightRed,
+    clLightGreen,
+    clYellow,
+    clLightBlue,
+    clLightMagenta,
+    clLightCyan,
+    clWhite
+
+};
+
 
 class CConsole {
 
@@ -91,8 +96,8 @@ public:
     static void ClearEndOfLine();
     static void CursorOn();
     static void CursorOff();
-    static void SetTextColor( uint8_t color );
-    static void SetTextBackground( uint8_t color );
+    static void SetTextColor( EnColor Color );
+    static void SetTextBackground( EnColor Color );
     static void SetTextAttr( uint8_t attr );
     static void MoveTo( uint8_t Left, uint8_t Top );
 

@@ -20,7 +20,7 @@ extern char * utoa_fast_div( uint32_t value, char * buffer );
 uint8_t oldx, oldy;
 uint8_t x, y;
 
-EnFigureColor FigureColor;
+EnColor FigureColor;
 EnFigureType FigureType;
 
 CKeys GameKeys;
@@ -71,7 +71,7 @@ void CGame::Initialization() {
     x = 20; y = 6;
     oldx = x; oldy = y;
 
-    FigureColor = fcMAGENTA;
+    FigureColor = clMagenta;
     FigureType = ftJ;
 
     // Очищаем память стакана.
@@ -93,11 +93,11 @@ void CGame::Initialization() {
  */
 void CGame::DrawTitle() {
 
-        CConsole::SetTextBackground( BLUE );
+        CConsole::SetTextBackground( clBlue );
         CConsole::ClearScreen();
 
-        CConsole::SetTextColor( BLACK );
-        CConsole::SetTextBackground( LIGHTGRAY );
+        CConsole::SetTextColor( clBlack );
+        CConsole::SetTextBackground( clLightGray );
         CConsole::WriteString( SPSTR( "Pinboard II, Тетрис, ATmega16 @ 16 МГц, версия сборки: " ), CConsole::cp1251 );
         CConsole::WriteString( Version );
 
@@ -116,7 +116,7 @@ void CGame::DrawTitle() {
  * Отрисовка окна с рамкой
  */
 void CGame::DrawFrame( uint8_t Left, uint8_t Top, uint8_t Width, uint8_t Height, 
-        uint8_t Color, uint8_t bgColor ) {
+        EnColor Color, EnColor bgColor ) {
 
     CConsole::SetTextColor( Color );
     CConsole::SetTextBackground( bgColor );
@@ -129,7 +129,7 @@ void CGame::DrawFrame( uint8_t Left, uint8_t Top, uint8_t Width, uint8_t Height,
     
     // Элемент заголовка для закрытия окна при помощи мыши.
     CConsole::PutChar( '[' );
-    CConsole::SetTextColor( GREEN );
+    CConsole::SetTextColor( clGreen );
     CConsole::PutChar( 0xFE );
     CConsole::SetTextColor( Color );
     CConsole::PutChar( ']' );
@@ -172,7 +172,7 @@ void CGame::DrawFrame( uint8_t Left, uint8_t Top, uint8_t Width, uint8_t Height,
  * Отрисовка стакана
  */
 void CGame::DrawGlass( uint8_t Left, uint8_t Top, uint8_t Width, uint8_t Height, 
-        uint8_t Color, uint8_t bgColor ) {
+        EnColor Color, EnColor bgColor ) {
 
     CConsole::SetTextColor( Color );
     CConsole::SetTextBackground( bgColor );
@@ -190,7 +190,7 @@ void CGame::DrawGlass( uint8_t Left, uint8_t Top, uint8_t Width, uint8_t Height,
         CConsole::MoveTo( Left, Top + i + 1 );
         CConsole::PutChar( ACS_VLINE );
 
-        CConsole::SetTextBackground( BLACK );
+        CConsole::SetTextBackground( clBlack );
         CConsole::PutChar( ' ' );
 
         for ( uint8_t j = 0; j < Width; j++ ) CConsole::PutChar( ' ' );
@@ -227,7 +227,7 @@ void CGame::DrawFigure(){
     // Сохраняем текущие координаты.
     oldx = x; oldy = y;
 
-    CConsole::SetTextBackground( BLACK );
+    CConsole::SetTextBackground( clBlack );
 
     // Удаляем старое изображение.
     for ( uint8_t i = 0; i < 4; i++ ) {
@@ -236,9 +236,20 @@ void CGame::DrawFigure(){
 
             CConsole::MoveTo( x + j, y + i );
 
-            offset = ( y - GLASS_OFFSET_TOP ) * GLASS_WIDTH / 2 + ( x - GLASS_OFFSET_LEFT ) / 2;
+            offset = ( y + i - GLASS_OFFSET_TOP ) * ( GLASS_WIDTH / 2 ) + ( x + j - GLASS_OFFSET_LEFT ) / 2;
 
-            ( x - GLASS_OFFSET_LEFT ) % 2 ? CConsole::PutChar( Glass[ offset ] & 0x0F ) : CConsole::PutChar( Glass[ offset ] >> 4 );
+            // Если нечётное, то берём младшую тетраду.
+            if ( ( x + j - GLASS_OFFSET_LEFT ) % 2 ) {
+                
+                CConsole::SetTextColor( ( EnColor ) ( Glass[ offset ] & 0x0F ) );
+
+            // Если чётное, то берём старшую тетраду.
+            } else { 
+                
+                CConsole::SetTextColor( ( EnColor ) ( Glass[ offset ] >> 4 ) );
+            }
+
+            CConsole::PutChar( 0xDB );
 
         } // for
     
@@ -253,8 +264,8 @@ void CGame::DrawFigure(){
         FigureType = ( EnFigureType ) ( ( uint8_t ) FigureType + 1 );
         FigureType = ( EnFigureType ) ( ( uint8_t ) FigureType % 7 );
 
-        FigureColor = ( EnFigureColor ) ( ( uint8_t ) FigureColor + 1 );
-        FigureColor = ( EnFigureColor ) ( ( uint8_t ) FigureColor % 9 );
+        FigureColor = ( EnColor ) ( ( uint8_t ) FigureColor + 1 );
+        FigureColor = ( EnColor ) ( ( uint8_t ) FigureColor % 9 );
 
     }
 
@@ -296,7 +307,7 @@ void CGame::DrawFigure(){
     
     } // for
 
-    CConsole::SetTextColor( BLACK );
+    CConsole::SetTextColor( clBlack );
 
 }
 
@@ -315,8 +326,8 @@ void CGame::DrawFunctionKeys( CKeys & Keys ) {
 
         if ( Keys[i] != 0 ) {
             
-            CConsole::SetTextColor( RED );
-            CConsole::SetTextBackground( LIGHTGRAY );
+            CConsole::SetTextColor( clRed );
+            CConsole::SetTextBackground( clLightGray );
             
             // Разделитель
             CConsole::PutChar( ' ' );
@@ -326,7 +337,7 @@ void CGame::DrawFunctionKeys( CKeys & Keys ) {
             // Разделитель
             CConsole::PutChar( ' ' );
 
-            CConsole::SetTextColor( BLACK );
+            CConsole::SetTextColor( clBlack );
             CConsole::WriteString( Keys[i], CConsole::cp1251 );
 
         }
@@ -356,7 +367,7 @@ void CGame::Run() {
 
     F_State = gsStopped;
 
-    CConsole::SetTextAttr( LIGHTGRAY );
+    CConsole::SetTextAttr( clLightGray );
     CConsole::ClearScreen();
 
     CConsole::MoveTo( 1, 25 );
