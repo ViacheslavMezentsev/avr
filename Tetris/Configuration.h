@@ -31,10 +31,10 @@
 #define BAUD 57600UL
 //#define BAUD 115200UL
 
-#define GLASS_OFFSET_LEFT   14 
-#define GLASS_OFFSET_TOP    3
-#define GLASS_WIDTH     26
-#define GLASS_HEIGHT    19
+#define GLASS_OFFSET_LEFT   15 
+#define GLASS_OFFSET_TOP    4
+#define GLASS_WIDTH     24
+#define GLASS_HEIGHT    17
 
 
 /**

@@ -103,7 +103,9 @@ void CMCU::CommandShell() {
 
     char * cmd;
 
-    CConsole::SetTextAttr( clLightGray );
+    CConsole::SetTextAttributes( atOff );
+    CConsole::SetBackgroundColor( clBlack );
+    CConsole::SetForegroundColor( clLightGray );
     CConsole::ClearScreen();
 
     CConsole::MoveTo( 1, 25 );
@@ -117,15 +119,17 @@ void CMCU::CommandShell() {
 
     CConsole::WriteString( SPSTR( "\r\nАвтор: Мезенцев Вячеслав (unihomelab@ya.ru)\r\n\r\n" ), CConsole::cp1251 );
 
-    while ( true ) {
+    while ( true ) {        
 
         // Выводим приглашение
-        CConsole::SetTextAttr( clGreen );
+        CConsole::SetTextAttributes( atOff );
+        CConsole::SetForegroundColor( clGreen );
         CConsole::WriteString( SPSTR( "[ATmega16]$ " ) );
 
         // Считываем ввод пользователя
-        CConsole::SetTextAttr( clLightGray );
-        cmd = CConsole::ReadString( buffer );
+        CConsole::SetForegroundColor( clLightGray );
+
+        cmd = CConsole::ReadString( buffer );        
 
         // Если пустая команда, то переходим на следующую строку
         if ( cmd[0] == 0 ) {
@@ -135,48 +139,55 @@ void CMCU::CommandShell() {
         // Выводим справку
         } else if ( ( cmd[0] == 'h' ) && ( cmd[1] == 0 ) ) {
 
-            CConsole::SetTextAttr( clWhite );
+            CConsole::SetForegroundColor( clWhite );
             CConsole::WriteString( SPSTR( "\r\nДоступные команды:\r\n" ), CConsole::cp1251 );
 
-            CConsole::SetTextAttr( clLightRed );
+            CConsole::SetForegroundColor( clLightRed );
             CConsole::PutChar( 'h' );
 
-            CConsole::SetTextAttr( clWhite );
+            CConsole::SetForegroundColor( clWhite );
             CConsole::WriteString( SPSTR( " - (help) вывод подсказки.\r\n" ), CConsole::cp1251 );
 
-            CConsole::SetTextAttr( clLightRed );
+            CConsole::SetForegroundColor( clLightRed );
             CConsole::PutChar( 't' );
 
-            CConsole::SetTextAttr( clWhite );
+            CConsole::SetForegroundColor( clWhite );
             CConsole::WriteString( SPSTR( " - (tetris) запуск игры Тетрис.\r\n" ), CConsole::cp1251 );
 
         // Тестирование драйвера
         } else if ( ( cmd[0] == 't' ) && ( cmd[1] == 0 ) ) {
-
+         
             Game.Initialization();
 
             Game.DrawTitle();
 
             Game.DrawFunctionKeys( GameKeys );
 
-            Game.DrawFrame( 13, 2, 52, 20, clWhite, clLightGray );
+            Game.DrawFrame( 13, 2, 52, 20, clLightGray, clWhite );
 
-            Game.DrawGlass( GLASS_OFFSET_LEFT, GLASS_OFFSET_TOP, GLASS_WIDTH, GLASS_HEIGHT, clWhite, clLightGray );
+            Game.DrawGlass( GLASS_OFFSET_LEFT - 1, GLASS_OFFSET_TOP - 1, 
+                GLASS_WIDTH + 2, GLASS_HEIGHT + 2, clLightGray, clWhite );
             
             // Запуск игры.
             Game.Run();
 
+            CConsole::SetTextAttributes( atOff );
+            CConsole::SetBackgroundColor( clBlack );
+            CConsole::SetForegroundColor( clLightGray );
+            CConsole::ClearScreen();
+
+            CConsole::MoveTo( 1, 25 );
 
         // Выводим сообщение о неподдерживаемой команде
         } else {
 
-            CConsole::SetTextAttr( clWhite );
+            CConsole::SetForegroundColor( clWhite );
             CConsole::WriteString( SPSTR( "\r\nКоманда не поддерживается. Введите " ), CConsole::cp1251 );
 
-            CConsole::SetTextAttr( clLightRed );
+            CConsole::SetForegroundColor( clLightRed );
             CConsole::PutChar( 'h' );
 
-            CConsole::SetTextAttr( clWhite );
+            CConsole::SetForegroundColor( clWhite );
             CConsole::WriteString( SPSTR( " (help) для помощи.\r\n" ), CConsole::cp1251 );
 
         }

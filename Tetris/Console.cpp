@@ -36,10 +36,6 @@
 #endif
 
 FLASHSTR_DECLARE( char, ESC, "\033[" );
-FLASHSTR_DECLARE( char, ESC_CLEAR_SCREEN, "\033[2J" );
-FLASHSTR_DECLARE( char, ESC_CLEAR_END_OF_LINE, "\033[K" );
-FLASHSTR_DECLARE( char, ESC_CURSOR_ON, "\033[25h" );
-FLASHSTR_DECLARE( char, ESC_CURSOR_OFF, "\033[25l" );
 
 
 // -=[ Переменные в ОЗУ ]=-
@@ -185,64 +181,97 @@ void CConsole::WriteString( const char * s, EnCodePage CodePage, uint8_t Length 
 
 void CConsole::ClearScreen() {
 
-    WriteString( ESC_CLEAR_SCREEN );
+    WriteString( SPSTR( "\033[2J" ) );
 
 }
 
 
 void CConsole::ClearEndOfLine() {
 
-    WriteString( ESC_CLEAR_END_OF_LINE );
+    WriteString( SPSTR( "\033[K" ) );
 
 }
 
 
 void CConsole::CursorOn() {
 
-    WriteString( ESC_CURSOR_ON );
+    WriteString( SPSTR( "\033[25h" ) );
 
 }
 
 
 void CConsole::CursorOff() {
 
-    WriteString( ESC_CURSOR_OFF );
+    WriteString( SPSTR( "\033[25l" ) );
 
 }
 
 
-void CConsole::SetTextColor( EnColor Color ) {
+void CConsole::SaveCursor() {
 
-    WriteString( ESC );
-    ( Color & 0x8 ) ? PutChar( '1' ) : PutChar( '2' );
-    PutChar( 'm' );
+    WriteString( SPSTR( "\033[s" ) );
+
+}
+
+
+void CConsole::RestoreCursor() {
+
+    WriteString( SPSTR( "\033[u" ) );
+
+}
+
+
+void CConsole::SetForegroundColor( EnColor Color ) {
+
+    if ( Color & 0x8 ) {
+        
+        WriteString( ESC );
+        PutChar( '1' );
+        PutChar( 'm' );
+
+    } else {
+
+        WriteString( ESC );
+        PutChar( '2' );
+        PutChar( 'm' );
+    }
 
     WriteString( ESC );
     PutChar( '3' );
-    PutChar( ( ( Color & 0x7 ) % 10 ) + '0' );
+    PutChar( ( Color & 0x07 ) + '0' );
     PutChar( 'm' );
 
 }
 
 
-void CConsole::SetTextBackground( EnColor Color ) {
+void CConsole::SetBackgroundColor( EnColor Color ) {
 
-    WriteString( ESC );
-    ( Color & 0x8 ) ? PutChar( '5' ) : PutChar( '6' );
-    PutChar( 'm' );
+    if ( Color & 0x8 ) {
+        
+        WriteString( ESC );
+        PutChar( '5' );
+        PutChar( 'm' );
+
+    } else {
+
+        WriteString( ESC );
+        PutChar( '6' );
+        PutChar( 'm' );
+    }
 
     WriteString( ESC );
     PutChar( '4' );
-    PutChar( ( Color & 0x7 ) + '0' );
+    PutChar( ( Color & 0x07 ) + '0' );
     PutChar( 'm' );
 
 }
 
 
-void CConsole::SetTextAttr( uint8_t attr ) {
+void CConsole::SetTextAttributes( EnAttributes Attributes ) {
 
-    SetTextColor( ( EnColor ) ( attr & 0xF ) );
-    SetTextBackground( ( EnColor ) ( attr >> 4 ) );
+    WriteString( ESC );
+    PutChar( ( Attributes & 0x0F ) + '0' );
+    PutChar( 'm' );
 
 }
 
