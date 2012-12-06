@@ -56,15 +56,44 @@
 #define ACS_LANTERN	(acs_map['i'])	/* lantern symbol */
 #define ACS_BLOCK	(acs_map['0'])	/* solid square block */
 
+
+enum EnMoveDirection {
+
+    // Cursor Up: Moves the cursor up by the specified number of lines without
+    // changing columns. If the cursor is already on the top line, ANSI.SYS
+    // ignores this sequence.
+    mdUp = 0,
+
+    // Cursor Down: Moves the cursor down by the specified number of lines
+    // without changing columns. If the cursor is already on the bottom line,
+    // ANSI.SYS ignores this sequence.
+    mdDown,
+
+    // Cursor Forward: Moves the cursor forward by the specified number of
+    // columns without changing lines. If the cursor is already in the
+    // rightmost column, ANSI.SYS ignores this sequence.
+    mdForward,
+
+    // Cursor Backward: Moves the cursor back by the specified number of
+    // columns without changing lines. If the cursor is already in the leftmost
+    // column, ANSI.SYS ignores this sequence.
+    mdBackward
+
+};
+
+
 // Text attributes
 enum EnAttributes {
-    
-    atOff = 0,          // All attributes off
-    atBoldOn = 1,
+
+    atOff = 0,          // Reset all attributes
+    atBright = 1,
+    atDim = 2,
+    // - ?
     atUnderscore = 4,
     atBlinkOn = 5,
-    atReverseVideoOn = 7,
-    atConcealedOn = 8
+    // - ?
+    atReverse = 7,
+    atHidden = 8
 
 };
 
@@ -116,6 +145,7 @@ public:
     static void SetBackgroundColor( EnColor Color );
     static void SetTextAttributes( EnAttributes Attributes );
     static void MoveTo( uint8_t Left, uint8_t Top );
+    static void Move( EnMoveDirection Direction, uint8_t Delta );
 
 };
 
