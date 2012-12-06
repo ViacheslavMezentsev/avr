@@ -39,7 +39,6 @@ FILINFO fno;
 DIR dir;
 FATFS fs;
 
-CKeys Keys;
 
 // Версия программы
 char Version[16];
@@ -461,12 +460,6 @@ void CMCU::CommandShell() {
         } else if ( ( cmd[0] == 'f' ) && ( cmd[1] == 0 ) ) {
 
             CFileManager::Initialization();
-
-            CFileManager::DrawMainMenu();
-            CFileManager::DrawLeftPanel();
-            CFileManager::DrawRightPanel();            
-            CFileManager::DrawFunctionKeys( Keys );
-
             CFileManager::Run();
 
             CConsole::SetTextAttributes( atOff );
