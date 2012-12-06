@@ -94,7 +94,7 @@ public:
     static void SetTextColor( uint8_t color );
     static void SetTextBackground( uint8_t color );
     static void SetTextAttr( uint8_t attr );
-    static void GotoXY( uint8_t x, uint8_t y );
+    static void MoveTo( uint8_t Left, uint8_t Top );
 
 };
 

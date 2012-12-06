@@ -60,10 +60,10 @@ public:
 
     void Initialization();    
     void DrawTitle();
-    void DrawFrame( uint8_t x, uint8_t y, uint8_t width, uint8_t height, 
-        uint8_t color, uint8_t bgcolor = BLACK );
-    void DrawGlass( uint8_t x, uint8_t y, uint8_t width, uint8_t height, 
-        uint8_t color, uint8_t bgcolor = BLACK );
+    void DrawFrame( uint8_t Left, uint8_t Top, uint8_t Width, uint8_t Height, 
+        uint8_t Color, uint8_t bgColor = BLACK );
+    void DrawGlass( uint8_t Left, uint8_t Top, uint8_t Width, uint8_t Height, 
+        uint8_t Color, uint8_t bgColor = BLACK );
     void DrawFigure();  
     void DrawFunctionKeys( CKeys & Keys );
     void Run();

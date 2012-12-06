@@ -36,6 +36,7 @@ CFigureZ FigureZ;
 CGame Game;
 
 char Block[ 32 ];
+char Glass[ GLASS_WIDTH / 2 * GLASS_HEIGHT ];
 
 
 /***********************
@@ -73,10 +74,15 @@ void CGame::Initialization() {
     FigureColor = fcMAGENTA;
     FigureType = ftJ;
 
-    // Очистка экрана
+    // Очищаем память стакана.
+    for ( uint8_t i = 0; i < GLASS_WIDTH / 2 * GLASS_HEIGHT; i++ ) Glass[i] = 0;
+
+    Glass[ ( 4 * GLASS_WIDTH / 2 ) + 3 ] = 0x12;
+    
+    // Очистка экрана.
     CConsole::ClearScreen();
 
-    // Прячем курсор
+    // Прячем курсор.
     CConsole::CursorOff();
 
 }
@@ -109,13 +115,13 @@ void CGame::DrawTitle() {
 /**
  * Отрисовка окна с рамкой
  */
-void CGame::DrawFrame( uint8_t x, uint8_t y, uint8_t width, uint8_t height, 
-    uint8_t color, uint8_t bgcolor ) {
+void CGame::DrawFrame( uint8_t Left, uint8_t Top, uint8_t Width, uint8_t Height, 
+        uint8_t Color, uint8_t bgColor ) {
 
-    CConsole::SetTextColor( color );
-    CConsole::SetTextBackground( bgcolor );
+    CConsole::SetTextColor( Color );
+    CConsole::SetTextBackground( bgColor );
 
-    CConsole::GotoXY( x, y );
+    CConsole::MoveTo( Left, Top );
 
     CConsole::PutChar( ACS_DBL_ULCORNER );
 
@@ -125,39 +131,37 @@ void CGame::DrawFrame( uint8_t x, uint8_t y, uint8_t width, uint8_t height,
     CConsole::PutChar( '[' );
     CConsole::SetTextColor( GREEN );
     CConsole::PutChar( 0xFE );
-    CConsole::SetTextColor( color );
+    CConsole::SetTextColor( Color );
     CConsole::PutChar( ']' );
 
-    for ( uint8_t i = 0; i < width / 2 - 6; i++ ) CConsole::PutChar( ACS_DBL_HLINE );
+    for ( uint8_t i = 0; i < Width / 2 - 6; i++ ) CConsole::PutChar( ACS_DBL_HLINE );
 
     CConsole::WriteString( SPSTR( " Тетрис " ), CConsole::cp1251 );
 
-    for ( uint8_t i = 0; i < width / 2 - 4; i++ ) CConsole::PutChar( ACS_DBL_HLINE );
+    for ( uint8_t i = 0; i < Width / 2 - 4; i++ ) CConsole::PutChar( ACS_DBL_HLINE );
 
     CConsole::PutChar( ACS_DBL_URCORNER );
 
-    for ( uint8_t i = 0; i < height; i++ ) {
+    for ( uint8_t i = 0; i < Height; i++ ) {
 
-        CConsole::GotoXY( x, y + i + 1 );
+        CConsole::MoveTo( Left, Top + i + 1 );
         CConsole::PutChar( ACS_DBL_VLINE );
-        
-        //CConsole::SetTextAttr( color );
-        CConsole::PutChar( ' ' );
-
-        for ( uint8_t j = 0; j < width; j++ ) CConsole::PutChar( ' ' );
 
         CConsole::PutChar( ' ' );
 
-        //CConsole::SetTextAttr( color );
+        for ( uint8_t j = 0; j < Width; j++ ) CConsole::PutChar( ' ' );
+
+        CConsole::PutChar( ' ' );
+
         CConsole::PutChar( ACS_DBL_VLINE );
 
     }
 
-    CConsole::GotoXY( x, y + height + 1 );
+    CConsole::MoveTo( Left, Top + Height + 1 );
 
     CConsole::PutChar( ACS_DBL_LLCORNER );
 
-    for ( uint8_t i = 0; i < width + 2; i++ ) CConsole::PutChar( ACS_DBL_HLINE );
+    for ( uint8_t i = 0; i < Width + 2; i++ ) CConsole::PutChar( ACS_DBL_HLINE );
 
     CConsole::PutChar( ACS_DBL_LRCORNER );
 
@@ -167,42 +171,42 @@ void CGame::DrawFrame( uint8_t x, uint8_t y, uint8_t width, uint8_t height,
 /**
  * Отрисовка стакана
  */
-void CGame::DrawGlass( uint8_t x, uint8_t y, uint8_t width, uint8_t height, 
-    uint8_t color, uint8_t bgcolor ) {
+void CGame::DrawGlass( uint8_t Left, uint8_t Top, uint8_t Width, uint8_t Height, 
+        uint8_t Color, uint8_t bgColor ) {
 
-    CConsole::SetTextColor( color );
-    CConsole::SetTextBackground( bgcolor );
+    CConsole::SetTextColor( Color );
+    CConsole::SetTextBackground( bgColor );
 
-    CConsole::GotoXY( x, y );
+    CConsole::MoveTo( Left, Top );
 
     CConsole::PutChar( ACS_ULCORNER );
 
-    for ( uint8_t i = 0; i < width + 2; i++ ) CConsole::PutChar( ACS_HLINE );
+    for ( uint8_t i = 0; i < Width + 2; i++ ) CConsole::PutChar( ACS_HLINE );
 
     CConsole::PutChar( ACS_URCORNER );
 
-    for ( uint8_t i = 0; i < height; i++ ) {
+    for ( uint8_t i = 0; i < Height; i++ ) {
 
-        CConsole::GotoXY( x, y + i + 1 );
+        CConsole::MoveTo( Left, Top + i + 1 );
         CConsole::PutChar( ACS_VLINE );
 
         CConsole::SetTextBackground( BLACK );
         CConsole::PutChar( ' ' );
 
-        for ( uint8_t j = 0; j < width; j++ ) CConsole::PutChar( ' ' );
+        for ( uint8_t j = 0; j < Width; j++ ) CConsole::PutChar( ' ' );
 
         CConsole::PutChar( ' ' );
 
-        CConsole::SetTextBackground( bgcolor );
+        CConsole::SetTextBackground( bgColor );
         CConsole::PutChar( ACS_VLINE );
 
     }
 
-    CConsole::GotoXY( x, y + height + 1 );
+    CConsole::MoveTo( Left, Top + Height + 1 );
 
     CConsole::PutChar( 0xCF );
 
-    for ( uint8_t i = 0; i < width + 2; i++ ) CConsole::PutChar( ACS_DBL_HLINE );
+    for ( uint8_t i = 0; i < Width + 2; i++ ) CConsole::PutChar( ACS_DBL_HLINE );
 
     CConsole::PutChar( 0xCF );
 
@@ -214,6 +218,8 @@ void CGame::DrawGlass( uint8_t x, uint8_t y, uint8_t width, uint8_t height,
  */
 void CGame::DrawFigure(){
     
+    uint16_t offset;
+
     if ( F_State != gsRunning ) return;
 
     CConsole::CursorOff();
@@ -228,8 +234,11 @@ void CGame::DrawFigure(){
         
         for ( uint8_t j = 0; j < 8; j++ ) {
 
-            CConsole::GotoXY( x + j, y + i );
-            CConsole::PutChar( ' ' );
+            CConsole::MoveTo( x + j, y + i );
+
+            offset = ( y - GLASS_OFFSET_TOP ) * GLASS_WIDTH / 2 + ( x - GLASS_OFFSET_LEFT ) / 2;
+
+            ( x - GLASS_OFFSET_LEFT ) % 2 ? CConsole::PutChar( Glass[ offset ] & 0x0F ) : CConsole::PutChar( Glass[ offset ] >> 4 );
 
         } // for
     
@@ -278,7 +287,7 @@ void CGame::DrawFigure(){
             
             if ( Block[ i * 8 + j ] == 'x' ) {
 
-                CConsole::GotoXY( x + j, y + i );
+                CConsole::MoveTo( x + j, y + i );
                 CConsole::PutChar( 0xDB );
 
             } // if
@@ -299,7 +308,7 @@ void CGame::DrawFunctionKeys( CKeys & Keys ) {
 
     char buf[3];
 
-    CConsole::GotoXY( 1, 25 );
+    CConsole::MoveTo( 1, 25 );
 
     // Перебираем функциональные клавиши.
     for ( uint8_t i = 0; i < 10; i++ ) {
@@ -350,6 +359,6 @@ void CGame::Run() {
     CConsole::SetTextAttr( LIGHTGRAY );
     CConsole::ClearScreen();
 
-    CConsole::GotoXY( 1, 25 );
+    CConsole::MoveTo( 1, 25 );
 
 }
