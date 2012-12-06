@@ -68,17 +68,16 @@ CGame::CGame() {
  */
 void CGame::Initialization() {
 
-    x = 20; y = 6;
+    x = 23; 
+    y = GLASS_OFFSET_TOP;
+
     oldx = x; oldy = y;
 
-    FigureColor = clMagenta;
+    FigureColor = clDarkGray;
     FigureType = ftJ;
 
     // Очищаем память стакана.
     for ( uint16_t i = 0; i < ( GLASS_WIDTH / 2 ) * GLASS_HEIGHT; i++ ) Glass[i] = 0;
-
-    // Для тестирования.
-    Glass[ ( 4 * GLASS_WIDTH / 2 ) + 3 ] = 0x12;
     
     // Очистка экрана.
     CConsole::SetTextAttributes( atOff );
@@ -121,9 +120,9 @@ void CGame::DrawTitle() {
 void CGame::DrawFrame( uint8_t Left, uint8_t Top, uint8_t Width, uint8_t Height, 
         EnColor Color, EnColor bgColor ) {
 
-    CConsole::SetTextAttributes( atOff );
-    CConsole::SetBackgroundColor( bgColor );
+    CConsole::SetTextAttributes( atOff );    
     CConsole::SetForegroundColor( Color );
+    CConsole::SetBackgroundColor( bgColor );
 
     CConsole::MoveTo( Left, Top );
 
@@ -146,6 +145,15 @@ void CGame::DrawFrame( uint8_t Left, uint8_t Top, uint8_t Width, uint8_t Height,
 
     CConsole::PutChar( ACS_DBL_URCORNER );
 
+    // Тень.
+    CConsole::SetTextAttributes( atOff );
+    CConsole::SetForegroundColor( clBlack );
+    CConsole::SetBackgroundColor( clBlue );
+    CConsole::PutChar( 0xDC );
+
+    CConsole::SetForegroundColor( Color );
+    CConsole::SetBackgroundColor( bgColor );
+
     for ( uint8_t i = 0; i < Height; i++ ) {
 
         CConsole::MoveTo( Left, Top + i + 1 );
@@ -159,6 +167,14 @@ void CGame::DrawFrame( uint8_t Left, uint8_t Top, uint8_t Width, uint8_t Height,
 
         CConsole::PutChar( ACS_DBL_VLINE );
 
+        // Тень.
+        CConsole::SetTextAttributes( atOff );
+        CConsole::SetForegroundColor( clBlack );
+        CConsole::SetBackgroundColor( clBlue );
+        CConsole::PutChar( 0xDB );
+
+        CConsole::SetForegroundColor( Color );
+        CConsole::SetBackgroundColor( bgColor );
     }
 
     CConsole::MoveTo( Left, Top + Height + 1 );
@@ -168,6 +184,20 @@ void CGame::DrawFrame( uint8_t Left, uint8_t Top, uint8_t Width, uint8_t Height,
     for ( uint8_t i = 0; i < Width + 2; i++ ) CConsole::PutChar( ACS_DBL_HLINE );
 
     CConsole::PutChar( ACS_DBL_LRCORNER );
+    
+    // Тень.
+    CConsole::SetTextAttributes( atOff );
+    CConsole::SetForegroundColor( clBlack );
+    CConsole::SetBackgroundColor( clBlue );
+    CConsole::PutChar( 0xDB );
+
+    CConsole::MoveTo( Left + 1, Top + Height + 2 );
+    
+    CConsole::SetTextAttributes( atOff );
+    CConsole::SetForegroundColor( clBlack );
+    CConsole::SetBackgroundColor( clBlue );
+
+    for ( uint8_t i = 0; i < Width + 4; i++ ) CConsole::PutChar( 0xDF );
 
 }
 
@@ -228,6 +258,18 @@ void CGame::DrawFigure(){
     // Заглушка: если игра не запущена, то ничего не делаем.
     if ( F_State != gsRunning ) return;
 
+    // Проверка столкновения.
+
+    // Если обнаружено столкновение или дно стакана, то сохраняем фигуру
+    // в памяти и перерисовываем стакан.
+    //for ( uint8_t i = 0; i < GLASS_HEIGHT; i++ ) {
+    //    
+    //    for ( uint8_t j = 0; j < GLASS_WIDTH; j++ ) {
+
+    //    }
+
+    //}
+
     // Сохраняем текущие координаты.
     oldx = x; oldy = y;
 
@@ -265,13 +307,13 @@ void CGame::DrawFigure(){
 
     if ( y > 19 ) { 
        
-        y = 6;
+        y = GLASS_OFFSET_TOP;
 
         FigureType = ( EnFigureType ) ( ( uint8_t ) FigureType + 1 );
         FigureType = ( EnFigureType ) ( ( uint8_t ) FigureType % 7 );
 
         FigureColor = ( EnColor ) ( ( uint8_t ) FigureColor + 1 );
-        FigureColor = ( EnColor ) ( ( uint8_t ) FigureColor % 7 + 1 );
+        FigureColor = ( EnColor ) ( ( uint8_t ) FigureColor % 7 + 7 );
 
     }
 
