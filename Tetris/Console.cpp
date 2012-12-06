@@ -195,14 +195,14 @@ void CConsole::ClearEndOfLine() {
 
 void CConsole::CursorOn() {
 
-    WriteString( SPSTR( "\033[25h" ) );
+    WriteString( SPSTR( "\033[?25h" ) );
 
 }
 
 
 void CConsole::CursorOff() {
 
-    WriteString( SPSTR( "\033[25l" ) );
+    WriteString( SPSTR( "\033[?25l" ) );
 
 }
 
@@ -289,5 +289,29 @@ void CConsole::MoveTo( uint8_t Left, uint8_t Top ) {
     PutChar( ( Left / 10 ) + '0' );
     PutChar( ( Left % 10 ) + '0' );
     PutChar( 'f' );
+
+}
+
+
+void CConsole::Move( EnMoveDirection Direction, uint8_t Delta ) {
+
+    WriteString( ESC );
+
+    PutChar( ( Delta / 10 ) + '0' );
+    PutChar( ( Delta % 10 ) + '0' );
+
+    switch ( Direction ) {
+
+        case mdUp: { PutChar( 'A' ); break; }
+
+        case mdDown: { PutChar( 'B' ); break; }
+
+        case mdForward: { PutChar( 'C' ); break; }
+
+        case mdBackward: { PutChar( 'D' ); break; }
+
+        default: PutChar( 'C' );
+
+    }
 
 }
