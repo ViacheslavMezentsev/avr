@@ -56,6 +56,19 @@
 #define ACS_LANTERN	(acs_map['i'])	/* lantern symbol */
 #define ACS_BLOCK	(acs_map['0'])	/* solid square block */
 
+// Text attributes
+enum EnAttributes {
+    
+    atOff = 0,          // All attributes off
+    atBoldOn = 1,
+    atUnderscore = 4,
+    atBlinkOn = 5,
+    atReverseVideoOn = 7,
+    atConcealedOn = 8
+
+};
+
+
 //  Цвета
 enum EnColor {
 
@@ -63,20 +76,21 @@ enum EnColor {
     clBlack = 0,
     clRed, 
     clGreen, 
-    clBrown, 
+    clYellow, 
     clBlue, 
     clMagenta, 
     clCyan,
-    clLightGray,
+    clWhite,
+
 /* light colors */
     clDarkGray,
     clLightRed,
     clLightGreen,
-    clYellow,
+    clLightYellow,
     clLightBlue,
     clLightMagenta,
     clLightCyan,
-    clWhite
+    clLightGray
 
 };
 
@@ -96,9 +110,11 @@ public:
     static void ClearEndOfLine();
     static void CursorOn();
     static void CursorOff();
-    static void SetTextColor( EnColor Color );
-    static void SetTextBackground( EnColor Color );
-    static void SetTextAttr( uint8_t attr );
+    static void SaveCursor();
+    static void RestoreCursor();
+    static void SetForegroundColor( EnColor Color );
+    static void SetBackgroundColor( EnColor Color );
+    static void SetTextAttributes( EnAttributes Attributes );
     static void MoveTo( uint8_t Left, uint8_t Top );
 
 };
