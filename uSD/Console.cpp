@@ -103,52 +103,6 @@ void CConsole::PutChar( uint8_t ch, EnCodePage CodePage ) {
 }
 
 
-char * CConsole::ReadString( char * s ) {
-
-    uint8_t len = 0;
-    uint8_t ch;
-    char * p = s;
-
-    while ( true ) {
-
-        do _delay_ms( 10 ); while ( !( ch = GetChar() ) );
-
-        // enter hit, end of input
-        if ( ( ch == KB_ENTER ) || ( ch == 0x0D ) ) break;
-
-        if ( ch == KB_BACK ) {
-
-            if ( len > 0 ) {
-
-                p[ len-- ] = 0;
-
-                // delete char and go back (if some chars left)
-                PutChar( KB_BACK );
-                PutChar( ' ' );
-                PutChar( KB_BACK );
-
-            }
-
-            continue;
-
-        }
-
-        if ( ( ( ch > 0xAF ) && ( ch < 0xE0 ) ) || ( ch < ' ' ) || ( ch > 0xF3 ) ) continue;
-
-        // print back to screen
-        PutChar( ch );
-
-        p[ len++ ] = ch;
-
-    }
-
-    p[ len ] = 0;
-
-    return s;
-
-}
-
-
 void CConsole::WriteString( FCHAR_PTR s, EnCodePage CodePage, uint8_t Length ) {
 
     uint8_t index = 0;

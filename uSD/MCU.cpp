@@ -8,15 +8,12 @@
 #include "Defines.h"
 #include "Configuration.h"
 #include "Console.h"
-#include "FileManager.h"
+#include "PLC.h"
 #include "MCU.h"
 
 
-struct divmod10_t {
+// -=[ Пользовательские типы ]=-
 
-    uint32_t quot;
-    uint8_t rem;
-};
 
 // -=[ Внешние ссылки ]=-
 
@@ -44,54 +41,6 @@ uint16_t Counter5s = 0;
 *  Р Е А Л И З А Ц И Я
 *  ~~~~~~~~~~~~~~~~~~~
 ************************/
-
-
-divmod10_t divmodu10( uint32_t n ) {
-
-    divmod10_t res;
-
-    // умножаем на 0.8
-    res.quot = n >> 1;
-    res.quot += res.quot >> 1;
-    res.quot += res.quot >> 4;
-    res.quot += res.quot >> 8;
-    res.quot += res.quot >> 16;
-    uint32_t qq = res.quot;
-
-    // делим на 8
-    res.quot >>= 3;
-
-    // вычисляем остаток
-    res.rem = uint8_t( n - ( ( res.quot << 1 ) + ( qq & ~7ul ) ) );
-
-    // корректируем остаток и частное
-    if ( res.rem > 9 ) {
-
-        res.rem -= 10;
-        res.quot++;
-    }
-
-    return res;
-
-}
-
-
-char * utoa_fast_div( uint32_t value, char * buffer ) {
-
-    buffer += 11;
-    * --buffer = 0;
-
-    do {
-
-        divmod10_t res = divmodu10( value );
-        * --buffer = res.rem + '0';
-        value = res.quot;
-
-    } while ( value != 0 );
-
-    return buffer;
-
-}
 
 
 /**
@@ -1088,7 +1037,7 @@ void CMCU::OnTimerCounter2Overflow(){
                 if ( FIFO_IS_EMPTY( uart_rx_fifo ) || ( tmp == VK_ESCAPE ) ) {
 
                     // Создаём событие нажатия на клавишу.
-                    CFileManager::DoKeyDown( VK_ESCAPE, VK_ESCAPE );
+                    CPLC::DoKeyDown( VK_ESCAPE, VK_ESCAPE );
 
                 // Принимаем расширенный код клавишы.
                 } else if ( tmp == '[' ) {
@@ -1104,7 +1053,7 @@ void CMCU::OnTimerCounter2Overflow(){
                         FIFO_POP( uart_rx_fifo );
 
                         // Создаём событие нажатия на клавишу.
-                        CFileManager::DoKeyDown( VK_UP, 0x41 );
+                        CPLC::DoKeyDown( VK_UP, 0x41 );
 
                     } else if ( tmp == 0x42 ) {
 
@@ -1112,7 +1061,23 @@ void CMCU::OnTimerCounter2Overflow(){
                         FIFO_POP( uart_rx_fifo );
                         
                         // Создаём событие нажатия на клавишу.
-                        CFileManager::DoKeyDown( VK_DOWN, 0x42 );
+                        CPLC::DoKeyDown( VK_DOWN, 0x42 );
+
+                    } else if ( tmp == 0x48 ) {
+
+                        // Удаляем символ из буфера.
+                        FIFO_POP( uart_rx_fifo );
+                        
+                        // Создаём событие нажатия на клавишу.
+                        CPLC::DoKeyDown( VK_HOME, 0x48 );
+
+                    } else if ( tmp == 0x4B ) {
+
+                        // Удаляем символ из буфера.
+                        FIFO_POP( uart_rx_fifo );
+                        
+                        // Создаём событие нажатия на клавишу.
+                        CPLC::DoKeyDown( VK_END, 0x4B );
 
                     }
 
@@ -1129,7 +1094,7 @@ void CMCU::OnTimerCounter2Overflow(){
                 if ( FIFO_IS_EMPTY( uart_rx_fifo ) || ( FIFO_FRONT( uart_rx_fifo ) == VK_BACK ) ) {
 
                     // Создаём событие нажатия на клавишу.
-                    CFileManager::DoKeyDown( VK_BACK, VK_BACK );
+                    CPLC::DoKeyDown( VK_BACK, VK_BACK );
 
                 };
 
@@ -1139,22 +1104,36 @@ void CMCU::OnTimerCounter2Overflow(){
                 FIFO_POP( uart_rx_fifo );
 
                 // Создаём событие нажатия на клавишу.
-                CFileManager::DoKeyDown( VK_TAB, VK_TAB );
+                CPLC::DoKeyDown( VK_TAB, VK_TAB );
 
 
-            } else  {
-
-                // Создаём событие нажатия на клавишу.
-                CFileManager::DoKeyDown( tmp, tmp );
+            } else if ( tmp == VK_RETURN ) {
 
                 // Удаляем символ из буфера.
                 FIFO_POP( uart_rx_fifo );
+
+                // Создаём событие нажатия на клавишу.
+                CPLC::DoKeyDown( VK_RETURN, VK_RETURN );
+
+
+            // CP866.
+            } else if ( ( ( tmp > 0x19 ) && ( tmp < 0x7F ) ) 
+                || ( ( tmp > 0x7F ) && ( tmp < 0xB0 ) )
+                || ( ( tmp > 0xBF ) && ( tmp < 0xF2 ) ) ) {
+
+                // Создаём событие нажатия на клавишу.
+                CPLC::DoKeyDown( tmp, tmp );
+
+                // Удаляем символ из буфера.
+                FIFO_POP( uart_rx_fifo );
+
+            } else {
 
             }
 
         }
 
-        CFileManager::DoTimer10ms();
+        CPLC::DoTimer10ms();
 
         Counter10ms = 0;
 
@@ -1162,7 +1141,7 @@ void CMCU::OnTimerCounter2Overflow(){
 
     if ( Counter100ms == 100 ) {
 
-        CFileManager::DoTimer100ms();
+        CPLC::DoTimer100ms();
 
         Counter100ms = 0;
 
@@ -1170,21 +1149,21 @@ void CMCU::OnTimerCounter2Overflow(){
 
     if ( Counter500ms == 500 ) {
 
-        CFileManager::DoTimer500ms();
+        CPLC::DoTimer500ms();
         Counter500ms = 0;
 
     }
 
     if ( Counter1s == 1000 ) {
 
-        CFileManager::DoTimer1s();
+        CPLC::DoTimer1s();
         Counter1s = 0;
 
     }
 
     if ( Counter5s == 5000 ) {
 
-        CFileManager::DoTimer5s();
+        CPLC::DoTimer5s();
         Counter5s = 0;
 
     }

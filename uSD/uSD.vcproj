@@ -97,6 +97,14 @@
 				RelativePath=".\MMC.cpp"
 				>
 			</File>
+			<File
+				RelativePath=".\PLC.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\Viewer.cpp"
+				>
+			</File>
 		</Filter>
 		<Filter
 			Name="Header Files"
@@ -144,11 +152,19 @@
 				>
 			</File>
 			<File
+				RelativePath=".\PLC.h"
+				>
+			</File>
+			<File
 				RelativePath=".\SmartPtr.h"
 				>
 			</File>
 			<File
 				RelativePath=".\Version.h"
+				>
+			</File>
+			<File
+				RelativePath=".\Viewer.h"
 				>
 			</File>
 			<File
