@@ -23,6 +23,18 @@
     //#define __DEBUG__
 #endif
 
+#define ID_TIMER_10MS   0x01
+#define ID_TIMER_100MS  0x02
+#define ID_TIMER_500MS  0x03
+#define ID_TIMER_1S     0x04
+#define ID_TIMER_5S     0x05
+
+#define HWND_MAIN_SCREEN 100
+
+// Размер очереди сообщений в ОЗУ
+// Один элемент занимает в ОЗУ sizeof( MSG ) = 20 байт
+#define MESSAGE_QUEUE_LENGTH 8
+
 // Скорость работы внутреннего USART
 //#define BAUD 9600UL
 //#define BAUD 19200UL
@@ -64,7 +76,7 @@
 //#define Timer_Counter1_Compare_Match_B
 //#define Timer_Counter1_Compare_Match_C
 
-//#define Timer_Counter2_Overflow
+#define Timer_Counter2_Overflow
 //#define Timer_Counter2_Compare_Match
 
 #define USART_Rx_Complete
