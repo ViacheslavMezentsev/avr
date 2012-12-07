@@ -90,6 +90,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\MessagesQueue.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\MMC.cpp"
 				>
 			</File>
@@ -129,6 +133,10 @@
 			</File>
 			<File
 				RelativePath=".\MCU.h"
+				>
+			</File>
+			<File
+				RelativePath=".\MessagesQueue.h"
 				>
 			</File>
 			<File

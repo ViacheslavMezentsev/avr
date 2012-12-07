@@ -7,9 +7,7 @@
 
 #include "Defines.h"
 #include "Configuration.h"
-#include "Version.h"
 #include "Console.h"
-#include "FAT.h"
 #include "FileManager.h"
 #include "MCU.h"
 
@@ -27,26 +25,19 @@ extern FIFO( 16 ) uart_rx_fifo;
 
 // -=[ Постоянные во флеш-памяти ]=-
 
-FLASHSTR_DECLARE( char, szCRLF, "\r\n" );
-
 
 // -=[ Переменные в ОЗУ ]=-
 
-FRESULT res;
-UFDATE FDate;
-UFTIME FTime;
-FILINFO fno;
-DIR dir;
-FATFS fs;
+// The elapsed time is stored as a DWORD value.
+// Therefore, the time will wrap around to zero
+// if the system is run continuously for 49.7 days.
+volatile uint32_t TickCounter = 0;
 
-
-// Версия программы
-char Version[16];
-
-char buffer[16];
-
-char read_buf[ 129 ] = {};
-char write_buf[ 128 ] = { 'w', 'r', 'i', 't', 'e', ' ', 'o', 'k', '\r', '\n', '\0' };
+uint16_t Counter10ms = 0;
+uint16_t Counter100ms = 0;
+uint16_t Counter500ms = 0;
+uint16_t Counter1s = 0;
+uint16_t Counter5s = 0;
 
 
 /***********************
@@ -104,418 +95,12 @@ char * utoa_fast_div( uint32_t value, char * buffer ) {
 
 
 /**
- * Просмотр папки
- */
-FRESULT CMCU::ScanFiles( char * path ) {
-
-    uint8_t len;
-
-    // Монтирование FAT32
-    res = CFAT::Mount( & fs );
-
-    // Открываем директорию (папку)
-    res = CFAT::OpenDir( & dir, path );
-
-    if ( res == FR_OK ) {
-
-        CConsole::WriteString( SPSTR( " Содержимое папки: " ) , CConsole::cp1251 );
-        CConsole::WriteString( path, CConsole::cp1251 );
-        CConsole::WriteString( szCRLF );
-
-        for (;;) {
-
-            res = CFAT::ReadDir( & dir, & fno );
-
-            if ( res != FR_OK || fno.fname[0] == 0 ) break;
-
-            // Вывод даты
-            FDate.Value = fno.fdate;
-
-            // Год
-            uint16_t tmp = 1980U + FDate.fdate.Year;
-
-            CConsole::PutChar( ( uint8_t ) ( tmp / 1000U ) + '0' );
-            tmp %= 1000U;
-
-            CConsole::PutChar( ( uint8_t ) ( tmp / 100 ) + '0' );
-            tmp %= 100;
-
-            CConsole::PutChar( ( uint8_t ) ( tmp / 10 ) + '0' );
-
-            CConsole::PutChar( ( uint8_t ) ( tmp % 10 ) + '0' );
-
-            CConsole::PutChar( '.' );
-
-            // Месяц
-            CConsole::PutChar( FDate.fdate.Month / 10 + '0' );
-            CConsole::PutChar( FDate.fdate.Month % 10 + '0' );
-            CConsole::PutChar( '.' );
-
-            // День
-            CConsole::PutChar( FDate.fdate.Day / 10 + '0' );
-            CConsole::PutChar( FDate.fdate.Day % 10 + '0' );
-
-            CConsole::PutChar( ' ' );
-
-            // Вывод времени
-            FTime.Value = fno.ftime;
-
-            // Часы
-            CConsole::PutChar( FTime.ftime.Hour / 10 + '0' );
-            CConsole::PutChar( FTime.ftime.Hour % 10 + '0' );
-
-            CConsole::PutChar( ':' );
-
-            // Минуты
-            CConsole::PutChar( FTime.ftime.Minute / 10 + '0' );
-            CConsole::PutChar( FTime.ftime.Minute % 10 + '0' );
-
-            CConsole::PutChar( ':' );
-
-            // Секунды
-            CConsole::PutChar( ( FTime.ftime.Second << 1 ) / 10 + '0' );
-            CConsole::PutChar( ( FTime.ftime.Second << 1 ) % 10 + '0' );
-
-            CConsole::PutChar( ' ' );
-
-            // Если объект - папка
-            if ( fno.fattrib & AM_DIR ) {
-
-                CConsole::WriteString( SPSTR( " <DIR> " ), CConsole::cp1251 );
-
-                len = 12;
-
-                do CConsole::PutChar( ' ' ); while ( len-- );
-
-                // Имя
-                CConsole::WriteString( fno.fname, CConsole::cp1251 );
-
-            // Если объект - файл
-            } else {		
-
-                CConsole::WriteString( SPSTR( "       " ), CConsole::cp1251 );
-
-                len = 11 - strlen( utoa_fast_div( fno.fsize, buffer ) );
-
-                do CConsole::PutChar( ' ' ); while ( len-- );
-
-                // Размер
-                CConsole::WriteString( utoa_fast_div( fno.fsize, buffer ) );
-
-                CConsole::PutChar( ' ' );
-
-                // Имя
-                CConsole::WriteString( fno.fname, CConsole::cp1251 );
-
-            }
-
-            CConsole::WriteString( szCRLF );
-
-        }
-
-        // Отмонтируем FatFs
-        res = CFAT::Mount( NULL );
-
-    }
-
-    return res;
-
-}
-
-
-/**
- * Просмотр папки
- */
-FRESULT CMCU::ScanFiles( FCHAR_PTR path ) {
-
-    uint8_t i = 0;
-
-    do {
-
-        read_buf[i] = path[i];
-        i++;
-
-    } while ( path[i] != 0 );
-
-    return ScanFiles( read_buf );
-
-}
-
-
-/**
- * Вывод сообщения: OK | FAIL
- */
-void CMCU::ShowStatusMessage( FRESULT Result ) {
-
-    if ( Result == FR_OK ) {
-
-        CConsole::SetForegroundColor( clLightGreen );
-        CConsole::WriteString( SPSTR( "OK\r\n" ) );
-
-    } else {
-
-        CConsole::SetForegroundColor( clLightRed );
-
-        CConsole::WriteString( SPSTR( "FAIL(" ) );
-        CConsole::PutChar( Result + '0' );
-        CConsole::WriteString( SPSTR( ")\r\n" ) );
-
-    }
-
-    CConsole::SetForegroundColor( clWhite );
-
-}
-
-
-/**
- * Тест драйвера Petit FAT File System
- */
-void CMCU::TestDriver() {
-
-    WORD s1;
-
-    // Монтирование FAT32
-    res = CFAT::Mount( & fs );
-
-    CConsole::WriteString( SPSTR( "Монтирование FAT32 " ), CConsole::cp1251 );
-
-    // Если монтирование было успешным
-    if ( res == FR_OK ) {		
-
-        ShowStatusMessage( res );
-
-        // Открываем файл MainUnit.cpp
-        res = CFAT::Open( SPSTR( "/MainUnit.cpp" ) );
-
-        CConsole::WriteString( SPSTR( "Открываю MainUnit.cpp " ), CConsole::cp1251 );
-
-        ShowStatusMessage( res );
-
-        // Устанваливаем указатель на начало файла MainUnit.cpp
-        res = CFAT::LSeek(0);
-
-        CConsole::WriteString( SPSTR( "Устанавливаем указатель на начало файла MainUnit.cpp " ), CConsole::cp1251 );
-
-        ShowStatusMessage( res );
-
-        // Читаем первые 128 байт из файла MainUnit.cpp
-        res = CFAT::Read( read_buf, 128, & s1 );	
-
-        CConsole::WriteString( SPSTR( "Читаем первые 128 байт из файла MainUnit.cpp " ), CConsole::cp1251 );
-
-        ShowStatusMessage( res );
-
-        CConsole::WriteString( SPSTR( "Содержимое файла MainUnit.cpp:\r\n" ), CConsole::cp1251 );
-
-        // Отображаем содержимое буфера
-        CConsole::WriteString( read_buf, CConsole::cp1251 );	
-
-        CConsole::WriteString( szCRLF );
-
-        res = CFAT::Open( SPSTR( "/write.txt" ) );
-
-        // Открываем файл write.txt
-        CConsole::WriteString( SPSTR( "Открываю write.txt " ), CConsole::cp1251 );	
-
-        ShowStatusMessage( res );
-
-        // Записываем содержимое буфера в файл write.txt
-        res = CFAT::Write( write_buf, strlen( write_buf ), & s1 );	
-
-        CConsole::WriteString( SPSTR( "Записывам \"write ok\" в файл write.txt " ), CConsole::cp1251 );
-
-        ShowStatusMessage( res );
-
-        // Финализируем запись в write.txt
-        res = CFAT::Write( ( const void * ) 0, 0, & s1 );
-
-        CConsole::WriteString( SPSTR( "Окончание записи в write.txt " ), CConsole::cp1251 );
-
-        ShowStatusMessage( res );
-
-        // Устанваливаем указатель на начало файла write.txt
-        res = CFAT::LSeek(0);
-
-        CConsole::WriteString( SPSTR( "Устанавливаем указатель на начало файла write.txt " ), CConsole::cp1251 );
-
-        ShowStatusMessage( res );
-
-        // Очищаем буфер
-        read_buf[0] = 0;
-
-        // Читаем первые 128 байт из файла write.txt
-        res = CFAT::Read( read_buf, 128, & s1 );
-
-        CConsole::WriteString( SPSTR( "Читаем первые 128 байт из файла write.txt " ), CConsole::cp1251 );
-
-        ShowStatusMessage( res );
-
-        CConsole::WriteString( SPSTR( "Содержимое файла write.txt:\r\n" ), CConsole::cp1251 );	
-
-        // Читаем первые 128 байт из файла write.txt
-        CConsole::WriteString( read_buf );
-
-        // Отмонтируем FatFs
-        res = CFAT::Mount( NULL );
-
-        CConsole::WriteString( SPSTR( "Отмонтирование FAT32 " ), CConsole::cp1251 );
-
-        ShowStatusMessage( res );
-
-    } else {
-
-        ShowStatusMessage( res );
-    }
-
-}
-
-
-/**
- * Командная оболочка
- */
-void CMCU::CommandShell() {
-
-    char * cmd;
-
-    CConsole::SetTextAttributes( atOff );
-    CConsole::SetBackgroundColor( clBlack );
-    CConsole::SetForegroundColor( clLightGray );
-    CConsole::ClearScreen();
-
-    CConsole::MoveTo( 1, 25 );
-
-    CConsole::WriteString( SPSTR( "Командная оболочка, версия " ), CConsole::cp1251 );
-    CConsole::WriteString( Version );
-    CConsole::WriteString( szCRLF );
-
-    CConsole::WriteString( SPSTR( "Дата сборки проекта: " ), CConsole::cp1251 );
-    CConsole::WriteString( CVersion::GetBuildDateString(), CConsole::cp1251 );
-
-    CConsole::WriteString( SPSTR( "\r\nАвтор: Мезенцев Вячеслав (unihomelab@ya.ru)\r\n\r\n" ), CConsole::cp1251 );
-
-    while ( true ) {
-
-        // Выводим приглашение
-        CConsole::SetTextAttributes( atOff );
-        CConsole::CursorOn();
-        CConsole::SetForegroundColor( clLightGreen );
-        CConsole::WriteString( SPSTR( "[ATmega16]$ " ) );
-
-        // Считываем ввод пользователя
-        CConsole::SetForegroundColor( clLightGray );
-
-        cmd = CConsole::ReadString( buffer );
-
-        // Если пустая команда, то переходим на следующую строку
-        if ( cmd[0] == 0 ) {
-
-            CConsole::WriteString( szCRLF );
-
-        // Выводим справку
-        } else if ( ( cmd[0] == 'h' ) && ( cmd[1] == 0 ) ) {
-
-            CConsole::SetForegroundColor( clWhite );
-            CConsole::WriteString( SPSTR( "\r\nДоступные команды:\r\n" ), CConsole::cp1251 );
-
-            CConsole::SetForegroundColor( clLightRed );
-            CConsole::PutChar( 'h' );
-
-            CConsole::SetForegroundColor( clWhite );
-            CConsole::WriteString( SPSTR( " - (help) вывод подсказки.\r\n" ), CConsole::cp1251 );
-
-            CConsole::SetForegroundColor( clLightRed );
-            CConsole::PutChar( 't' );
-
-            CConsole::SetForegroundColor( clWhite );
-            CConsole::WriteString( SPSTR( " - (test) тест драйвера Petit FAT File System.\r\n" ), CConsole::cp1251 );
-
-            CConsole::SetForegroundColor( clLightRed );
-            CConsole::PutChar( 'd' );
-
-            CConsole::SetForegroundColor( clWhite );
-            CConsole::WriteString( SPSTR( " - (dir) просмотр папки.\r\n" ), CConsole::cp1251 );
-
-            CConsole::SetForegroundColor( clLightRed );
-            CConsole::PutChar( 'f' );
-
-            CConsole::SetForegroundColor( clWhite );
-            CConsole::WriteString( SPSTR( " - (file manager) вызов файлового менеджера.\r\n" ), CConsole::cp1251 );
-
-
-        // Тестирование драйвера
-        } else if ( ( cmd[0] == 't' ) && ( cmd[1] == 0 ) ) {
-
-            CConsole::WriteString( szCRLF );
-            TestDriver();
-
-
-        // Промотр папки
-        } else if ( ( cmd[0] == 'd' ) && ( cmd[1] == 0 ) ) {
-
-            CConsole::WriteString( szCRLF );
-            ShowStatusMessage( ScanFiles( SPSTR( "/" ) ) );
-
-
-        // Запуск файлового менеджера
-        } else if ( ( cmd[0] == 'f' ) && ( cmd[1] == 0 ) ) {
-
-            CFileManager::Initialization();
-            CFileManager::Run();
-
-            CConsole::SetTextAttributes( atOff );
-            CConsole::SetBackgroundColor( clBlack );
-            CConsole::SetForegroundColor( clLightGray );
-            CConsole::ClearScreen();
-
-            CConsole::MoveTo( 1, 25 );
-
-
-        // Выводим сообщение о неподдерживаемой команде
-        } else {
-
-            CConsole::SetForegroundColor( clWhite );
-            CConsole::WriteString( SPSTR( "\r\nКоманда не поддерживается. Введите " ), CConsole::cp1251 );
-
-            CConsole::SetForegroundColor( clLightRed );
-            CConsole::PutChar( 'h' );
-
-            CConsole::SetForegroundColor( clWhite );
-            CConsole::WriteString( SPSTR( " (help) для помощи.\r\n" ), CConsole::cp1251 );
-
-        }
-
-    }
-
-}
-
-
-/**
  * Главный (основной) поток программы
  */
 HRESULT CMCU::MainThreadProcedure(){
 
-    char szDot[] = ".";
-
-    // Вычисление строки с версией программы
-    strcat( Version, utoa_fast_div( CVersion::GetMajor(), buffer ) );
-    strcat( Version, szDot );
-
-    strcat( Version, utoa_fast_div( CVersion::GetMinor(), buffer ) );
-    strcat( Version, szDot );
-
-    strcat( Version, utoa_fast_div( CVersion::GetRevision(), buffer ) );
-    strcat( Version, szDot );
-
-    strcat( Version, utoa_fast_div( CVersion::GetBuild(), buffer ) );
-
     // Разрешаем прерывания
     __enable_interrupt();
-
-    // Запускаем командную оболочку
-    CommandShell();
-
-    // Размонтируем
-    CFAT::Mount( NULL );
 
     // Все проверки прошли успешно, объект в рабочем состоянии
     return NO_ERROR;
@@ -541,7 +126,7 @@ void CMCU::Initialization(){
     //Timer1Init();
 
     // Настройка таймера/счётчика 2 [ATmega16]
-    //Timer2Init();
+    Timer2Init();
 
     // Настройка внутреннего сторожевого таймера [ATmega16]
     //InternalWDTInit();
@@ -613,7 +198,7 @@ void CMCU::ControlRegistersInit(){
     // Timer/Counter Interrupt Mask Register
     // [ Регистр маски прерываний от таймеров/счётчиков ][ATmega16]
     //           00000000 - Initial Value
-    //TIMSK = BIN8(00000000); // BIN8() не зависит от уровня оптимизации
+    TIMSK = BIN8(01000000); // BIN8() не зависит от уровня оптимизации
     //           ||||||||
     //           76543210
     //           |||||||+- 0, rw, TOIE0:  - Timer/Counter0 Overflow Interrupt Enable
@@ -742,7 +327,7 @@ void CMCU::ADCInit(){
  */
 void CMCU::Timer0Init(){
 
-    // [ATmega16] Table 42, p. 85. Clock Select Bit Description
+    // [ATmega16] Table. Clock Select Bit Description
     // +----+----+----+-----------------------------------------------------------------+
     // |CSn2|CSn1|CSn0| Description                                                     ¦
     // +----+----+----+-----------------------------------------------------------------+
@@ -885,6 +470,20 @@ void CMCU::Timer1Init(){
  * Настройка таймера/счётчика 2
  */
 void CMCU::Timer2Init(){
+
+    // [ATmega16] Table. Clock Select Bit Description
+    // +----+----+----+-----------------------------------------------------------------+
+    // |CSn2|CSn1|CSn0| Description                                                     ¦
+    // +----+----+----+-----------------------------------------------------------------+
+    // | 0  | 0  | 0  | No clock source. (Таймер/счетчик остановлен)                    |
+    // | 0  | 0  | 1  | clkT0S/(No prescaling)                                          |
+    // | 0  | 1  | 0  | clkT0S/8    (From prescaler)                                    |
+    // | 0  | 1  | 1  | clkT0S/32   (From prescaler)                                    |
+    // | 1  | 0  | 0  | clkT0S/64   (From prescaler)                                    |
+    // | 1  | 0  | 1  | clkT0S/128  (From prescaler)                                    |
+    // | 1  | 1  | 0  | clkT0S/256  (From prescaler)                                    |
+    // | 1  | 1  | 1  | clkT0S/1024 (From prescaler)                                    |
+    // +----+----+----+-----------------------------------------------------------------+
 
     // Timer/Counter2 Control Register
     // [ Регистр управления Таймером/Счётчиком 2 ][ATmega16]
@@ -1454,6 +1053,141 @@ void CMCU::OnTimerCounter2CompareMatch(){
  * Timer/Counter2 Overflow
  */
 void CMCU::OnTimerCounter2Overflow(){
+
+    uint8_t tmp;
+
+    // Системный таймер (1 мсек)
+    TickCounter++;
+
+    Counter10ms++;
+    Counter100ms++;
+    Counter500ms++;
+    Counter1s++;
+    Counter5s++;
+
+    // Восстанавливаем счётчик
+    TCNT2 = 0xFF - F_CPU / 64000UL;
+
+    if ( Counter10ms == 10 ) {
+
+        // Проверяем буфер приёмника.
+        if ( !FIFO_IS_EMPTY( uart_rx_fifo ) ) {
+
+            tmp = FIFO_FRONT( uart_rx_fifo );
+
+            // Если первый символ - ESC.
+            if ( tmp == VK_ESCAPE ) {
+
+                // Удаляем символ из буфера.
+                FIFO_POP( uart_rx_fifo );
+
+                tmp = FIFO_FRONT( uart_rx_fifo );
+
+                // Если буфер опустел или следующий символ опять ESC, то посылаем сообщение,
+                // что пришёл одиночный ESC.
+                if ( FIFO_IS_EMPTY( uart_rx_fifo ) || ( tmp == VK_ESCAPE ) ) {
+
+                    // Создаём событие нажатия на клавишу.
+                    CFileManager::DoKeyDown( VK_ESCAPE, VK_ESCAPE );
+
+                // Принимаем расширенный код клавишы.
+                } else if ( tmp == '[' ) {
+
+                    // Удаляем символ из буфера.
+                    FIFO_POP( uart_rx_fifo );
+
+                    tmp = FIFO_FRONT( uart_rx_fifo );
+
+                    if ( tmp == 0x41 ) {
+
+                        // Удаляем символ из буфера.
+                        FIFO_POP( uart_rx_fifo );
+
+                        // Создаём событие нажатия на клавишу.
+                        CFileManager::DoKeyDown( VK_UP, 0x41 );
+
+                    } else if ( tmp == 0x42 ) {
+
+                        // Удаляем символ из буфера.
+                        FIFO_POP( uart_rx_fifo );
+                        
+                        // Создаём событие нажатия на клавишу.
+                        CFileManager::DoKeyDown( VK_DOWN, 0x42 );
+
+                    }
+
+                }
+
+
+            } else if ( tmp == VK_BACK ) {
+
+                // Удаляем символ из буфера.
+                FIFO_POP( uart_rx_fifo );
+
+                // Если буфер опустел или следующий символ опять BACK, то посылаем сообщение,
+                // что пришёл одиночный BACK.
+                if ( FIFO_IS_EMPTY( uart_rx_fifo ) || ( FIFO_FRONT( uart_rx_fifo ) == VK_BACK ) ) {
+
+                    // Создаём событие нажатия на клавишу.
+                    CFileManager::DoKeyDown( VK_BACK, VK_BACK );
+
+                };
+
+            } else if ( tmp == VK_TAB ) {
+
+                // Удаляем символ из буфера.
+                FIFO_POP( uart_rx_fifo );
+
+                // Создаём событие нажатия на клавишу.
+                CFileManager::DoKeyDown( VK_TAB, VK_TAB );
+
+
+            } else  {
+
+                // Создаём событие нажатия на клавишу.
+                CFileManager::DoKeyDown( tmp, tmp );
+
+                // Удаляем символ из буфера.
+                FIFO_POP( uart_rx_fifo );
+
+            }
+
+        }
+
+        CFileManager::DoTimer10ms();
+
+        Counter10ms = 0;
+
+    }
+
+    if ( Counter100ms == 100 ) {
+
+        CFileManager::DoTimer100ms();
+
+        Counter100ms = 0;
+
+    }
+
+    if ( Counter500ms == 500 ) {
+
+        CFileManager::DoTimer500ms();
+        Counter500ms = 0;
+
+    }
+
+    if ( Counter1s == 1000 ) {
+
+        CFileManager::DoTimer1s();
+        Counter1s = 0;
+
+    }
+
+    if ( Counter5s == 5000 ) {
+
+        CFileManager::DoTimer5s();
+        Counter5s = 0;
+
+    }
 
 }
 

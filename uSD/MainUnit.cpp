@@ -21,7 +21,9 @@
 
 #include "Defines.h"
 #include "Configuration.h"
+#include "Console.h"
 #include "MCU.h"
+#include "FileManager.h"
 
 
 // Точка входа в основную программу
@@ -30,9 +32,9 @@ int main() {
     // Инициализация микроконтроллера
     CMCU::Initialization();
 
-    // Запуск основного потока
-    HRESULT hResult = CMCU::MainThreadProcedure();
+    CFileManager::Initialization();
 
-    return 0;
+    // Запуск основного потока
+    return CFileManager::WinMain();
 
 }

@@ -50,15 +50,10 @@ public:
 	static void OnEEPROMReady();
 	static void OnAnalogComparator();
 	static void OnTWISerialInterface();
-	static void OnStoreProgramMemoryRead();
-    static void CommandShell();
+	static void OnStoreProgramMemoryRead();    
 	static HRESULT MainThreadProcedure();
 
 private:
-    inline static FRESULT ScanFiles( char * path );
-    inline static FRESULT ScanFiles( FCHAR_PTR path );
-    inline static void ShowStatusMessage( FRESULT Result );
-    inline static void TestDriver();
     inline static void PortsInit();
 	inline static void ADCInit();
 	inline static void Timer0Init();
