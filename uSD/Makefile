@@ -82,8 +82,8 @@ OBJDIR = obj
 
 
 # List C++ source files here. (C dependencies are automatically generated.)
-CPPSRC = MMC.cpp FAT.cpp MessagesQueue.cpp
-CPPSRC += ISRList.cpp MCU.cpp Console.cpp FileManager.cpp MainUnit.cpp
+CPPSRC = MMC.cpp FAT.cpp MessagesQueue.cpp Viewer.cpp FileManager.cpp
+CPPSRC += ISRList.cpp MCU.cpp Console.cpp PLC.cpp MainUnit.cpp
 
 
 

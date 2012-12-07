@@ -2,93 +2,125 @@
 
 <project>
   <fileVersion>2</fileVersion>
-  <fileChecksum>2750481068</fileChecksum>
+  <fileChecksum>2851709517</fileChecksum>
   <configuration>
     <name>Debug</name>
     <outputs>
-      <file>$TOOLKIT_DIR$\inc\iomacro.h</file>
-      <file>$TOOLKIT_DIR$\inc\dlib\c\ycheck.h</file>
-      <file>$TOOLKIT_DIR$\src\template\cfg3soim.xcl</file>
-      <file>$PROJ_DIR$\Debug\Obj\ISRList.r90</file>
-      <file>$TOOLKIT_DIR$\src\template\cfgm16.xcl</file>
-      <file>$PROJ_DIR$\Debug\List\Project.html</file>
-      <file>$PROJ_DIR$\..\Console.h</file>
-      <file>$TOOLKIT_DIR$\inc\inavr.h</file>
-      <file>$PROJ_DIR$\Debug\Obj\MMC.r90</file>
-      <file>$PROJ_DIR$\Debug\List\MMC.s90</file>
-      <file>$PROJ_DIR$\Debug\List\MCU.s90</file>
-      <file>$TOOLKIT_DIR$\inc\dlib\c\stdint.h</file>
-      <file>$PROJ_DIR$\Debug\Obj\FileManager.pbi</file>
-      <file>$PROJ_DIR$\..\MCU.h</file>
-      <file>$PROJ_DIR$\Debug\List\MainUnit.s90</file>
-      <file>$PROJ_DIR$\Debug\Obj\MainUnit.r90</file>
-      <file>$PROJ_DIR$\Debug\List\FAT.lst</file>
-      <file>$TOOLKIT_DIR$\inc\dlib\c\string.h</file>
-      <file>$PROJ_DIR$\Debug\List\MCU.lst</file>
-      <file>$PROJ_DIR$\Debug\List\MMC.lst</file>
-      <file>$PROJ_DIR$\Debug\Obj\Project.pbd</file>
-      <file>$PROJ_DIR$\Debug\List\MainUnit.lst</file>
-      <file>$PROJ_DIR$\Debug\List\Console.s90</file>
-      <file>$TOOLKIT_DIR$\inc\dlib\c\DLib_Defaults.h</file>
-      <file>$TOOLKIT_DIR$\inc\dlib\c\xencoding_limits.h</file>
-      <file>$PROJ_DIR$\Debug\List\FAT.s90</file>
+      <file>$PROJ_DIR$\..\kbd.h</file>
       <file>$TOOLKIT_DIR$\inc\iom16.h</file>
       <file>$PROJ_DIR$\..\FAT.h</file>
-      <file>$PROJ_DIR$\Debug\Obj\MCU.r90</file>
-      <file>$PROJ_DIR$\Debug\Obj\Console.r90</file>
-      <file>$PROJ_DIR$\..\FileManager.cpp</file>
+      <file>$PROJ_DIR$\Debug\Obj\Viewer.r90</file>
       <file>$TOOLKIT_DIR$\inc\dlib\c\stdarg.h</file>
       <file>$TOOLKIT_DIR$\lib\dlib\dlAVR-3s-ec_mul-sf-n.r90</file>
       <file>$TOOLKIT_DIR$\inc\bitdefinitions\iom16.inc</file>
       <file>$TOOLKIT_DIR$\inc\dlib\c\yvals.h</file>
       <file>$PROJ_DIR$\..\Version.h</file>
+      <file>$PROJ_DIR$\..\MCU.h</file>
+      <file>$PROJ_DIR$\Debug\List\FAT.lst</file>
+      <file>$TOOLKIT_DIR$\inc\dlib\c\stdlib.h</file>
+      <file>$PROJ_DIR$\Debug\List\ISRList.s90</file>
+      <file>$TOOLKIT_DIR$\lib\dlib\dlAVR-3s-ec_mul-sf-n.h</file>
+      <file>$TOOLKIT_DIR$\inc\intrinsics.h</file>
+      <file>$PROJ_DIR$\Debug\List\PLC.s90</file>
+      <file>$PROJ_DIR$\..\FileManager.h</file>
+      <file>$PROJ_DIR$\Debug\List\MCU.lst</file>
+      <file>$PROJ_DIR$\Debug\Obj\FAT.pbi</file>
+      <file>$TOOLKIT_DIR$\inc\dlib\c\stdint.h</file>
+      <file>$TOOLKIT_DIR$\inc\iomacro.h</file>
+      <file>$TOOLKIT_DIR$\src\template\cfg3soim.xcl</file>
+      <file>$PROJ_DIR$\Debug\List\MessagesQueue.lst</file>
+      <file>$PROJ_DIR$\Debug\Obj\MessagesQueue.pbi</file>
+      <file>$PROJ_DIR$\..\MessagesQueue.h</file>
+      <file>$PROJ_DIR$\Debug\Obj\MessagesQueue.r90</file>
+      <file>$PROJ_DIR$\Debug\Obj\PLC.r90</file>
+      <file>$PROJ_DIR$\..\PLC.h</file>
+      <file>$PROJ_DIR$\..\Defines.h</file>
+      <file>$PROJ_DIR$\..\FileManager.cpp</file>
+      <file>$PROJ_DIR$\Debug\Obj\Console.pbi</file>
+      <file>$PROJ_DIR$\..\iccout_ubrof8.d90</file>
+      <file>$PROJ_DIR$\Debug\Obj\FAT.r90</file>
+      <file>$PROJ_DIR$\..\Configuration.h</file>
+      <file>$PROJ_DIR$\Debug\List\ISRList.lst</file>
+      <file>$PROJ_DIR$\Debug\Obj\ISRList.pbi</file>
+      <file>$TOOLKIT_DIR$\inc\dlib\c\ystdio.h</file>
+      <file>$TOOLKIT_DIR$\inc\ina90.h</file>
+      <file>$PROJ_DIR$\Debug\Obj\MMC.pbi</file>
       <file>$TOOLKIT_DIR$\inc\dlib\c\pgmspace.h</file>
       <file>$PROJ_DIR$\..\fifo.h</file>
       <file>$TOOLKIT_DIR$\inc\dlib\c\stdio.h</file>
-      <file>$PROJ_DIR$\Debug\Obj\MainUnit.pbi</file>
-      <file>$PROJ_DIR$\..\MMC.cpp</file>
-      <file>$TOOLKIT_DIR$\inc\dlib\c\DLib_Product.h</file>
-      <file>$TOOLKIT_DIR$\inc\comp_a90.h</file>
-      <file>$PROJ_DIR$\..\Project.hex</file>
-      <file>$PROJ_DIR$\..\MMC.h</file>
-      <file>$PROJ_DIR$\..\windows.h</file>
-      <file>$PROJ_DIR$\Debug\List\ISRList.lst</file>
-      <file>$PROJ_DIR$\..\Console.cpp</file>
-      <file>$PROJ_DIR$\..\iccout_ubrof8.d90</file>
-      <file>$PROJ_DIR$\Debug\Obj\Console.pbi</file>
-      <file>$PROJ_DIR$\Debug\List\Console.lst</file>
-      <file>$TOOLKIT_DIR$\inc\dlib\c\ysizet.h</file>
-      <file>$PROJ_DIR$\..\Configuration.h</file>
-      <file>$PROJ_DIR$\Debug\Obj\FAT.pbi</file>
-      <file>$PROJ_DIR$\..\readme.txt</file>
-      <file>$PROJ_DIR$\..\MCU.cpp</file>
-      <file>$PROJ_DIR$\..\kbd.h</file>
+      <file>$PROJ_DIR$\Debug\Obj\MMC.r90</file>
+      <file>$PROJ_DIR$\Debug\List\MCU.s90</file>
+      <file>$TOOLKIT_DIR$\src\template\cfgm16.xcl</file>
       <file>$TOOLKIT_DIR$\inc\dlib\c\DLib_Threads.h</file>
-      <file>$PROJ_DIR$\..\Defines.h</file>
-      <file>$PROJ_DIR$\Debug\Obj\FAT.r90</file>
-      <file>$PROJ_DIR$\..\MainUnit.cpp</file>
-      <file>$PROJ_DIR$\..\FAT.cpp</file>
-      <file>$TOOLKIT_DIR$\inc\ina90.h</file>
-      <file>$PROJ_DIR$\..\ISRList.cpp</file>
-      <file>$PROJ_DIR$\Debug\List\ISRList.s90</file>
-      <file>$PROJ_DIR$\Debug\Obj\ISRList.pbi</file>
-      <file>$PROJ_DIR$\Debug\Obj\MMC.pbi</file>
-      <file>$TOOLKIT_DIR$\inc\dlib\c\stdlib.h</file>
-      <file>$TOOLKIT_DIR$\inc\dlib\c\ystdio.h</file>
-      <file>$TOOLKIT_DIR$\inc\intrinsics.h</file>
+      <file>$PROJ_DIR$\..\Console.cpp</file>
+      <file>$TOOLKIT_DIR$\inc\dlib\c\string.h</file>
+      <file>$PROJ_DIR$\Debug\List\MessagesQueue.s90</file>
+      <file>$PROJ_DIR$\Debug\Obj\MCU.r90</file>
+      <file>$PROJ_DIR$\Debug\List\MainUnit.s90</file>
+      <file>$PROJ_DIR$\Debug\Obj\MainUnit.r90</file>
+      <file>$PROJ_DIR$\Debug\List\FAT.s90</file>
+      <file>$PROJ_DIR$\Debug\List\Console.s90</file>
+      <file>$PROJ_DIR$\Debug\Obj\Console.r90</file>
+      <file>$PROJ_DIR$\Debug\List\MMC.lst</file>
       <file>$PROJ_DIR$\Debug\List\FileManager.s90</file>
-      <file>$TOOLKIT_DIR$\lib\dlib\dlAVR-3s-ec_mul-sf-n.h</file>
-      <file>$PROJ_DIR$\Debug\Obj\MCU.pbi</file>
-      <file>$PROJ_DIR$\..\FileManager.h</file>
+      <file>$PROJ_DIR$\Debug\Obj\Project.pbd</file>
       <file>$PROJ_DIR$\Debug\List\FileManager.lst</file>
       <file>$PROJ_DIR$\Debug\Obj\FileManager.r90</file>
+      <file>$TOOLKIT_DIR$\inc\dlib\c\DLib_Defaults.h</file>
+      <file>$TOOLKIT_DIR$\inc\dlib\c\xencoding_limits.h</file>
+      <file>$PROJ_DIR$\Debug\Obj\MainUnit.pbi</file>
+      <file>$PROJ_DIR$\..\Console.h</file>
+      <file>$PROJ_DIR$\Debug\List\MainUnit.lst</file>
+      <file>$TOOLKIT_DIR$\inc\dlib\c\DLib_Product.h</file>
+      <file>$PROJ_DIR$\..\MMC.h</file>
+      <file>$PROJ_DIR$\..\windows.h</file>
+      <file>$TOOLKIT_DIR$\inc\comp_a90.h</file>
+      <file>$PROJ_DIR$\..\Project.hex</file>
+      <file>$PROJ_DIR$\Debug\List\MMC.s90</file>
+      <file>$PROJ_DIR$\Debug\Obj\ISRList.r90</file>
+      <file>$TOOLKIT_DIR$\inc\inavr.h</file>
+      <file>$PROJ_DIR$\Debug\Obj\MCU.pbi</file>
+      <file>$PROJ_DIR$\Debug\List\Project.html</file>
+      <file>$PROJ_DIR$\Debug\List\Console.lst</file>
+      <file>$TOOLKIT_DIR$\inc\dlib\c\ysizet.h</file>
+      <file>$PROJ_DIR$\..\FAT.cpp</file>
+      <file>$PROJ_DIR$\..\MMC.cpp</file>
+      <file>$PROJ_DIR$\..\PLC.cpp</file>
+      <file>$PROJ_DIR$\..\readme.txt</file>
+      <file>$PROJ_DIR$\..\Viewer.cpp</file>
+      <file>$TOOLKIT_DIR$\inc\dlib\c\ycheck.h</file>
+      <file>$PROJ_DIR$\Debug\Obj\PLC.pbi</file>
+      <file>$PROJ_DIR$\Debug\Obj\Viewer.pbi</file>
+      <file>$PROJ_DIR$\Debug\List\PLC.lst</file>
+      <file>$PROJ_DIR$\..\Viewer.h</file>
+      <file>$PROJ_DIR$\Debug\List\Viewer.lst</file>
+      <file>$PROJ_DIR$\Debug\List\Viewer.s90</file>
+      <file>$PROJ_DIR$\Debug\Obj\FileManager.pbi</file>
+      <file>$PROJ_DIR$\..\ISRList.cpp</file>
+      <file>$PROJ_DIR$\..\MainUnit.cpp</file>
+      <file>$PROJ_DIR$\..\MCU.cpp</file>
+      <file>$PROJ_DIR$\..\MessagesQueue.cpp</file>
     </outputs>
     <file>
-      <name>$PROJ_DIR$\Debug\Obj\Project.pbd</name>
+      <name>$PROJ_DIR$\..\FileManager.cpp</name>
+      <outputs>
+        <tool>
+          <name>ICCAVR</name>
+          <file> 56 58 59</file>
+        </tool>
+        <tool>
+          <name>BICOMP</name>
+          <file> 89</file>
+        </tool>
+      </outputs>
       <inputs>
         <tool>
-          <name>BILINK</name>
-          <file> 49 53 12 65 72 66 39</file>
+          <name>ICCAVR</name>
+          <file> 28 14 19 82 7 60 13 65 61 45 39 47 76 41 36 4 11 1 20 6 37 72 68 67 40 33 8 63 2 27 16</file>
+        </tool>
+        <tool>
+          <name>BICOMP</name>
+          <file> 28 14 19 82 7 60 65 61 45 39 47 76 41 36 4 11 1 20 6 37 72 68 67 40 33 8 63 2 27 16</file>
         </tool>
       </inputs>
     </file>
@@ -97,53 +129,39 @@
       <outputs>
         <tool>
           <name>XLINK</name>
-          <file> 43 5 48</file>
+          <file> 69 74 31</file>
         </tool>
       </outputs>
     </file>
     <file>
-      <name>$PROJ_DIR$\..\FileManager.cpp</name>
+      <name>$PROJ_DIR$\..\Console.cpp</name>
       <outputs>
         <tool>
           <name>ICCAVR</name>
-          <file> 70 74 75</file>
+          <file> 53 75 54</file>
         </tool>
         <tool>
           <name>BICOMP</name>
-          <file> 12</file>
+          <file> 30</file>
         </tool>
       </outputs>
       <inputs>
         <tool>
           <name>ICCAVR</name>
-          <file> 58 69 11 1 34 23 71 41 24 57 36 17 51 38 68 31 67 26 0 33 62 7 42 45 37 52 6 27 73</file>
+          <file> 28 14 19 82 7 60 13 65 61 45 39 47 76 41 36 4 11 1 20 6 37 72 68 67 40 33 0 63</file>
         </tool>
         <tool>
           <name>BICOMP</name>
-          <file> 58 69 11 1 34 23 41 24 57 36 17 51 38 68 31 67 26 0 33 62 7 42 45 37 52 6 27 73</file>
+          <file> 28 14 19 82 7 60 65 61 45 39 47 76 41 36 4 11 1 20 6 37 72 68 67 40 33 0 63</file>
         </tool>
       </inputs>
     </file>
     <file>
-      <name>$PROJ_DIR$\..\MMC.cpp</name>
-      <outputs>
-        <tool>
-          <name>ICCAVR</name>
-          <file> 9 19 8</file>
-        </tool>
-        <tool>
-          <name>BICOMP</name>
-          <file> 66</file>
-        </tool>
-      </outputs>
+      <name>$PROJ_DIR$\Debug\Obj\Project.pbd</name>
       <inputs>
         <tool>
-          <name>ICCAVR</name>
-          <file> 58 69 11 1 34 23 71 41 24 57 36 17 51 38 68 31 67 26 0 33 62 7 42 45 37 52 44</file>
-        </tool>
-        <tool>
-          <name>BICOMP</name>
-          <file> 58 69 11 1 34 23 41 24 57 36 17 51 38 68 31 67 26 0 33 62 7 42 45 37 52 44</file>
+          <name>BILINK</name>
+          <file> 30 18 89 35 73 38 62 23 83 84</file>
         </tool>
       </inputs>
     </file>
@@ -152,78 +170,13 @@
       <outputs>
         <tool>
           <name>XLINK</name>
-          <file> 5 48</file>
+          <file> 74 31</file>
         </tool>
       </outputs>
       <inputs>
         <tool>
           <name>XLINK</name>
-          <file> 4 2 29 59 75 3 28 8 15 32</file>
-        </tool>
-      </inputs>
-    </file>
-    <file>
-      <name>$PROJ_DIR$\..\Console.cpp</name>
-      <outputs>
-        <tool>
-          <name>ICCAVR</name>
-          <file> 22 50 29</file>
-        </tool>
-        <tool>
-          <name>BICOMP</name>
-          <file> 49</file>
-        </tool>
-      </outputs>
-      <inputs>
-        <tool>
-          <name>ICCAVR</name>
-          <file> 58 69 11 1 34 23 71 41 24 57 36 17 51 38 68 31 67 26 0 33 62 7 42 45 37 52 56 6</file>
-        </tool>
-        <tool>
-          <name>BICOMP</name>
-          <file> 58 69 11 1 34 23 41 24 57 36 17 51 38 68 31 67 26 0 33 62 7 42 45 37 52 56 6</file>
-        </tool>
-      </inputs>
-    </file>
-    <file>
-      <name>$PROJ_DIR$\..\MCU.cpp</name>
-      <outputs>
-        <tool>
-          <name>ICCAVR</name>
-          <file> 10 18 28</file>
-        </tool>
-        <tool>
-          <name>BICOMP</name>
-          <file> 72</file>
-        </tool>
-      </outputs>
-      <inputs>
-        <tool>
-          <name>ICCAVR</name>
-          <file> 58 69 11 1 34 23 71 41 24 57 36 17 51 38 68 31 67 26 0 33 62 7 42 45 37 52 35 6 27 73 13</file>
-        </tool>
-        <tool>
-          <name>BICOMP</name>
-          <file> 58 69 11 1 34 23 41 24 57 36 17 51 38 68 31 67 26 0 33 62 7 42 45 37 52 35 6 27 73 13</file>
-        </tool>
-      </inputs>
-    </file>
-    <file>
-      <name>$PROJ_DIR$\..\MainUnit.cpp</name>
-      <outputs>
-        <tool>
-          <name>ICCAVR</name>
-          <file> 14 21 15</file>
-        </tool>
-        <tool>
-          <name>BICOMP</name>
-          <file> 39</file>
-        </tool>
-      </outputs>
-      <inputs>
-        <tool>
-          <name>ICCAVR</name>
-          <file> 58 69 11 1 34 23 71 41 24 57 36 17 51 38 68 31 67 26 0 33 62 7 42 45 37 52 13 27</file>
+          <file> 44 21 54 32 59 71 49 42 51 25 26 3 5</file>
         </tool>
       </inputs>
     </file>
@@ -232,21 +185,90 @@
       <outputs>
         <tool>
           <name>ICCAVR</name>
-          <file> 25 16 59</file>
+          <file> 52 10 32</file>
         </tool>
         <tool>
           <name>BICOMP</name>
-          <file> 53</file>
+          <file> 18</file>
         </tool>
       </outputs>
       <inputs>
         <tool>
           <name>ICCAVR</name>
-          <file> 58 69 11 1 34 23 71 41 24 57 36 17 51 38 68 31 67 26 0 33 62 7 42 45 37 52 44 27</file>
+          <file> 28 14 19 82 7 60 13 65 61 45 39 47 76 41 36 4 11 1 20 6 37 72 68 67 40 33 66 2</file>
         </tool>
         <tool>
           <name>BICOMP</name>
-          <file> 58 69 11 1 34 23 41 24 57 36 17 51 38 68 31 67 26 0 33 62 7 42 45 37 52 44 27</file>
+          <file> 28 14 19 82 7 60 65 61 45 39 47 76 41 36 4 11 1 20 6 37 72 68 67 40 33 66 2</file>
+        </tool>
+      </inputs>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\..\MMC.cpp</name>
+      <outputs>
+        <tool>
+          <name>ICCAVR</name>
+          <file> 70 55 42</file>
+        </tool>
+        <tool>
+          <name>BICOMP</name>
+          <file> 38</file>
+        </tool>
+      </outputs>
+      <inputs>
+        <tool>
+          <name>ICCAVR</name>
+          <file> 28 14 19 82 7 60 13 65 61 45 39 47 76 41 36 4 11 1 20 6 37 72 68 67 40 33 66</file>
+        </tool>
+        <tool>
+          <name>BICOMP</name>
+          <file> 28 14 19 82 7 60 65 61 45 39 47 76 41 36 4 11 1 20 6 37 72 68 67 40 33 66</file>
+        </tool>
+      </inputs>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\..\PLC.cpp</name>
+      <outputs>
+        <tool>
+          <name>ICCAVR</name>
+          <file> 15 85 26</file>
+        </tool>
+        <tool>
+          <name>BICOMP</name>
+          <file> 83</file>
+        </tool>
+      </outputs>
+      <inputs>
+        <tool>
+          <name>ICCAVR</name>
+          <file> 28 14 19 82 7 60 13 65 61 45 39 47 76 41 36 4 11 1 20 6 37 72 68 67 40 33 8 24 63 9 2 16 86 27</file>
+        </tool>
+        <tool>
+          <name>BICOMP</name>
+          <file> 28 14 19 82 7 60 65 61 45 39 47 76 41 36 4 11 1 20 6 37 72 68 67 40 33 8 24 63 9 2 16 86 27</file>
+        </tool>
+      </inputs>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\..\Viewer.cpp</name>
+      <outputs>
+        <tool>
+          <name>ICCAVR</name>
+          <file> 88 87 3</file>
+        </tool>
+        <tool>
+          <name>BICOMP</name>
+          <file> 84</file>
+        </tool>
+      </outputs>
+      <inputs>
+        <tool>
+          <name>ICCAVR</name>
+          <file> 28 14 19 82 7 60 13 65 61 45 39 47 76 41 36 4 11 1 20 6 37 72 68 67 40 33 8 63 2 27 16 86</file>
+        </tool>
+        <tool>
+          <name>BICOMP</name>
+          <file> 28 14 19 82 7 60 65 61 45 39 47 76 41 36 4 11 1 20 6 37 72 68 67 40 33 8 63 2 27 16 86</file>
         </tool>
       </inputs>
     </file>
@@ -255,21 +277,90 @@
       <outputs>
         <tool>
           <name>ICCAVR</name>
-          <file> 64 46 3</file>
+          <file> 12 34 71</file>
         </tool>
         <tool>
           <name>BICOMP</name>
-          <file> 65</file>
+          <file> 35</file>
         </tool>
       </outputs>
       <inputs>
         <tool>
           <name>ICCAVR</name>
-          <file> 58 69 11 1 34 23 71 41 24 57 36 17 51 38 68 31 67 26 0 33 62 7 42 45 37 52 13 27</file>
+          <file> 28 14 19 82 7 60 13 65 61 45 39 47 76 41 36 4 11 1 20 6 37 72 68 67 40 33 9 2</file>
         </tool>
         <tool>
           <name>BICOMP</name>
-          <file> 58 69 11 1 34 23 41 24 57 36 17 51 38 68 31 67 26 0 33 62 7 42 45 37 52 13 27</file>
+          <file> 28 14 19 82 7 60 65 61 45 39 47 76 41 36 4 11 1 20 6 37 72 68 67 40 33 9 2</file>
+        </tool>
+      </inputs>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\..\MainUnit.cpp</name>
+      <outputs>
+        <tool>
+          <name>ICCAVR</name>
+          <file> 50 64 51</file>
+        </tool>
+        <tool>
+          <name>BICOMP</name>
+          <file> 62</file>
+        </tool>
+      </outputs>
+      <inputs>
+        <tool>
+          <name>ICCAVR</name>
+          <file> 28 14 19 82 7 60 13 65 61 45 39 47 76 41 36 4 11 1 20 6 37 72 68 67 40 33 27</file>
+        </tool>
+        <tool>
+          <name>BICOMP</name>
+          <file> 28 14 19 82 7 60 65 61 45 39 47 76 41 36 4 11 1 20 6 37 72 68 67 40 33 27</file>
+        </tool>
+      </inputs>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\..\MCU.cpp</name>
+      <outputs>
+        <tool>
+          <name>ICCAVR</name>
+          <file> 43 17 49</file>
+        </tool>
+        <tool>
+          <name>BICOMP</name>
+          <file> 73</file>
+        </tool>
+      </outputs>
+      <inputs>
+        <tool>
+          <name>ICCAVR</name>
+          <file> 28 14 19 82 7 60 13 65 61 45 39 47 76 41 36 4 11 1 20 6 37 72 68 67 40 33 63 27 9 2</file>
+        </tool>
+        <tool>
+          <name>BICOMP</name>
+          <file> 28 14 19 82 7 60 65 61 45 39 47 76 41 36 4 11 1 20 6 37 72 68 67 40 33 63 27 9 2</file>
+        </tool>
+      </inputs>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\..\MessagesQueue.cpp</name>
+      <outputs>
+        <tool>
+          <name>ICCAVR</name>
+          <file> 48 22 25</file>
+        </tool>
+        <tool>
+          <name>BICOMP</name>
+          <file> 23</file>
+        </tool>
+      </outputs>
+      <inputs>
+        <tool>
+          <name>ICCAVR</name>
+          <file> 28 14 19 82 7 60 13 65 61 45 39 47 76 41 36 4 11 1 20 6 37 72 68 67 40 33 24</file>
+        </tool>
+        <tool>
+          <name>BICOMP</name>
+          <file> 28 14 19 82 7 60 65 61 45 39 47 76 41 36 4 11 1 20 6 37 72 68 67 40 33 24</file>
         </tool>
       </inputs>
     </file>
@@ -277,48 +368,22 @@
   <configuration>
     <name>Release</name>
     <outputs>
-      <file>$TOOLKIT_DIR$\inc\iomacro.h</file>
-      <file>$PROJ_DIR$\Release\Obj\ModBusRegisterDigital.pbi</file>
-      <file>$PROJ_DIR$\Release\Obj\TimeChipUnit.pbi</file>
-      <file>$PROJ_DIR$\Release\Obj\SinchronizeMemoryUnit.r90</file>
-      <file>$PROJ_DIR$\MainArchive.h</file>
-      <file>$TOOLKIT_DIR$\inc\bitdefinitions\iom128.inc</file>
-      <file>$TOOLKIT_DIR$\inc\dlib\ycheck.h</file>
-      <file>$TOOLKIT_DIR$\inc\inavr.h</file>
-      <file>$PROJ_DIR$\Release\Obj\DigitalInputUnit.r90</file>
-      <file>$PROJ_DIR$\Release\Obj\StringExtended.pbi</file>
-      <file>$PROJ_DIR$\Release\Obj\SoftTimers.r90</file>
-      <file>$PROJ_DIR$\ModBusUnit.h</file>
-      <file>$PROJ_DIR$\I2CUnit.h</file>
-      <file>$PROJ_DIR$\Release\Obj\ModBusRegisterInputCoil.pbi</file>
-      <file>$PROJ_DIR$\ModBusRegisterInputCoil.cpp</file>
-      <file>$PROJ_DIR$\Release\Obj\ADCUnit.r90</file>
-      <file>$PROJ_DIR$\IV5IV6Unit.cpp</file>
-      <file>$PROJ_DIR$\Release\Obj\initsubs.pbi</file>
-      <file>$PROJ_DIR$\DisplayUnit.cpp</file>
-      <file>$PROJ_DIR$\Release\Obj\MainArchive.pbi</file>
       <file>$PROJ_DIR$\I2CUnit.cpp</file>
       <file>$PROJ_DIR$\MenuClassesUnit.h</file>
       <file>$PROJ_DIR$\Release\Obj\ExternFlashUnit.r90</file>
-      <file>$TOOLKIT_DIR$\inc\dlib\DLib_Defaults.h</file>
-      <file>$PROJ_DIR$\Release\Obj\I2CUnit.r90</file>
-      <file>$PROJ_DIR$\Release\Obj\UserInterfaceUnit.pbi</file>
-      <file>$PROJ_DIR$\Release\Obj\UserInterfaceFunctionUnit.pbi</file>
-      <file>$PROJ_DIR$\Release\Obj\SettingsUnit.pbi</file>
-      <file>$PROJ_DIR$\ExternFlashUnit.h</file>
       <file>$PROJ_DIR$\Release\Obj\SystemUnit.pbi</file>
       <file>$PROJ_DIR$\DisplayUnit.h</file>
       <file>$PROJ_DIR$\MMCCardUnit.cpp</file>
       <file>$PROJ_DIR$\TimeChipUnit.cpp</file>
-      <file>$PROJ_DIR$\UserInterfaceFunctionUnit.cpp</file>
       <file>$PROJ_DIR$\Release\Obj\ModBusUnit.r90</file>
       <file>$PROJ_DIR$\Release\Obj\ExternFlashUnit.pbi</file>
       <file>$PROJ_DIR$\MMCCardUnit.h</file>
       <file>$TOOLKIT_DIR$\inc\dlib\stdint.h</file>
-      <file>$PROJ_DIR$\Release\Obj\StringExtended.r90</file>
-      <file>$TOOLKIT_DIR$\inc\dlib\stdio.h</file>
-      <file>$PROJ_DIR$\ArchivesUnit.cpp</file>
+      <file>$PROJ_DIR$\UserInterfaceFunctionUnit.cpp</file>
       <file>$PROJ_DIR$\UserInterfaceFunctionUnit.h</file>
+      <file>$TOOLKIT_DIR$\inc\dlib\stdio.h</file>
+      <file>$PROJ_DIR$\Release\Obj\StringExtended.r90</file>
+      <file>$PROJ_DIR$\ArchivesUnit.cpp</file>
       <file>$PROJ_DIR$\RelayUnit.h</file>
       <file>$PROJ_DIR$\ModBusRegisterDigital.cpp</file>
       <file>$PROJ_DIR$\MainUnit.h</file>
@@ -342,15 +407,15 @@
       <file>$PROJ_DIR$\Release\Obj\SinchronizeMemoryUnit.pbi</file>
       <file>$PROJ_DIR$\MenuClassesUnit.cpp</file>
       <file>$PROJ_DIR$\MainArchive.cpp</file>
+      <file>$TOOLKIT_DIR$\inc\intrinsics.h</file>
       <file>$PROJ_DIR$\SoftTimers.cpp</file>
       <file>$TOOLKIT_DIR$\inc\dlib\string.h</file>
       <file>$PROJ_DIR$\Release\Obj\bl_mva_8.pbd</file>
       <file>$PROJ_DIR$\AnalogChannelFormulUnit.cpp</file>
-      <file>$TOOLKIT_DIR$\inc\comp_a90.h</file>
-      <file>$TOOLKIT_DIR$\inc\dlib\DLib_Product.h</file>
       <file>$PROJ_DIR$\UserInterfaceUnit.cpp</file>
-      <file>$PROJ_DIR$\Release\Obj\DigitalInputUnit.pbi</file>
+      <file>$TOOLKIT_DIR$\inc\dlib\DLib_Product.h</file>
       <file>$PROJ_DIR$\SystemUnit.cpp</file>
+      <file>$PROJ_DIR$\Release\Obj\DigitalInputUnit.pbi</file>
       <file>$TOOLKIT_DIR$\inc\dlib\yvals.h</file>
       <file>$PROJ_DIR$\Release\Obj\IV5IV6Unit.r90</file>
       <file>$PROJ_DIR$\initsubs.cpp</file>
@@ -372,12 +437,11 @@
       <file>$PROJ_DIR$\SoftTimers.h</file>
       <file>$PROJ_DIR$\Release\Obj\MainUnit.pbi</file>
       <file>$PROJ_DIR$\ModBusUnit.cpp</file>
-      <file>$TOOLKIT_DIR$\inc\ina90.h</file>
-      <file>$TOOLKIT_DIR$\inc\iom128.h</file>
       <file>$PROJ_DIR$\Release\Obj\MMCCardUnit.pbi</file>
       <file>$PROJ_DIR$\Release\Obj\ModBusArchives.r90</file>
-      <file>$PROJ_DIR$\MainUnit.cpp</file>
       <file>$PROJ_DIR$\SystemUnit.h</file>
+      <file>$TOOLKIT_DIR$\inc\iom128.h</file>
+      <file>$PROJ_DIR$\MainUnit.cpp</file>
       <file>$PROJ_DIR$\Release\Obj\ArchivesUnit.r90</file>
       <file>$PROJ_DIR$\Release\Obj\MenuClassesUnit.pbi</file>
       <file>$PROJ_DIR$\SinchronizeMemoryUnit.cpp</file>
@@ -386,12 +450,11 @@
       <file>$PROJ_DIR$\TimeChipUnit.h</file>
       <file>$PROJ_DIR$\Release\Obj\RelayUnit.pbi</file>
       <file>$PROJ_DIR$\AnalogChannelFormulUnit.h</file>
-      <file>$TOOLKIT_DIR$\inc\intrinsics.h</file>
-      <file>$PROJ_DIR$\StringsTable.h</file>
-      <file>$PROJ_DIR$\Defines.h</file>
       <file>$TOOLKIT_DIR$\inc\dlib\ysizet.h</file>
-      <file>$PROJ_DIR$\ModBusArchives.cpp</file>
+      <file>$PROJ_DIR$\Defines.h</file>
+      <file>$PROJ_DIR$\StringsTable.h</file>
       <file>$PROJ_DIR$\Release\Obj\IV5IV6Unit.pbi</file>
+      <file>$PROJ_DIR$\ModBusArchives.cpp</file>
       <file>$PROJ_DIR$\Release\Obj\RelayUnit.r90</file>
       <file>$PROJ_DIR$\Release\Obj\ModBusRegisterInputCoil.r90</file>
       <file>$PROJ_DIR$\StringExtended.h</file>
@@ -406,80 +469,51 @@
       <file>$PROJ_DIR$\RelayUnit.cpp</file>
       <file>$PROJ_DIR$\Release\Obj\MMCCardUnit.r90</file>
       <file>$PROJ_DIR$\Release\Obj\MenuClassesUnit.r90</file>
+      <file>$PROJ_DIR$\Release\Obj\TimeChipUnit.pbi</file>
+      <file>$PROJ_DIR$\Release\Obj\SinchronizeMemoryUnit.r90</file>
+      <file>$PROJ_DIR$\Release\Obj\ModBusRegisterDigital.pbi</file>
+      <file>$PROJ_DIR$\MainArchive.h</file>
+      <file>$TOOLKIT_DIR$\inc\bitdefinitions\iom128.inc</file>
+      <file>$PROJ_DIR$\Release\Obj\DigitalInputUnit.r90</file>
+      <file>$TOOLKIT_DIR$\inc\dlib\ycheck.h</file>
+      <file>$PROJ_DIR$\Release\Obj\SoftTimers.r90</file>
+      <file>$PROJ_DIR$\Release\Obj\StringExtended.pbi</file>
+      <file>$PROJ_DIR$\ModBusUnit.h</file>
+      <file>$PROJ_DIR$\I2CUnit.h</file>
+      <file>$PROJ_DIR$\Release\Obj\ModBusRegisterInputCoil.pbi</file>
+      <file>$PROJ_DIR$\ModBusRegisterInputCoil.cpp</file>
+      <file>$PROJ_DIR$\Release\Obj\ADCUnit.r90</file>
+      <file>$TOOLKIT_DIR$\inc\iomacro.h</file>
+      <file>$TOOLKIT_DIR$\inc\dlib\DLib_Defaults.h</file>
+      <file>$PROJ_DIR$\Release\Obj\I2CUnit.r90</file>
+      <file>$PROJ_DIR$\Release\Obj\UserInterfaceUnit.pbi</file>
+      <file>$PROJ_DIR$\Release\Obj\UserInterfaceFunctionUnit.pbi</file>
+      <file>$PROJ_DIR$\Release\Obj\SettingsUnit.pbi</file>
+      <file>$PROJ_DIR$\ExternFlashUnit.h</file>
+      <file>$PROJ_DIR$\IV5IV6Unit.cpp</file>
+      <file>$PROJ_DIR$\Release\Obj\initsubs.pbi</file>
+      <file>$PROJ_DIR$\DisplayUnit.cpp</file>
+      <file>$TOOLKIT_DIR$\inc\ina90.h</file>
+      <file>$TOOLKIT_DIR$\inc\comp_a90.h</file>
+      <file>$TOOLKIT_DIR$\inc\inavr.h</file>
+      <file>$PROJ_DIR$\Release\Obj\MainArchive.pbi</file>
     </outputs>
-    <file>
-      <name>$PROJ_DIR$\ModBusRegisterInputCoil.cpp</name>
-      <outputs>
-        <tool>
-          <name>ICCAVR</name>
-          <file> 116</file>
-        </tool>
-        <tool>
-          <name>BICOMP</name>
-          <file> 13</file>
-        </tool>
-      </outputs>
-      <inputs>
-        <tool>
-          <name>BICOMP</name>
-          <file> 111 37 6 74 23 70 56 90 96 0 5 95 7 109 69 60 11 51 47 108</file>
-        </tool>
-      </inputs>
-    </file>
-    <file>
-      <name>$PROJ_DIR$\IV5IV6Unit.cpp</name>
-      <outputs>
-        <tool>
-          <name>ICCAVR</name>
-          <file> 75</file>
-        </tool>
-        <tool>
-          <name>BICOMP</name>
-          <file> 114</file>
-        </tool>
-      </outputs>
-      <inputs>
-        <tool>
-          <name>BICOMP</name>
-          <file> 111 37 6 74 23 70 56 90 96 0 5 95 7 109 69 60 48 66 112</file>
-        </tool>
-      </inputs>
-    </file>
-    <file>
-      <name>$PROJ_DIR$\DisplayUnit.cpp</name>
-      <outputs>
-        <tool>
-          <name>ICCAVR</name>
-          <file> 50</file>
-        </tool>
-        <tool>
-          <name>BICOMP</name>
-          <file> 79</file>
-        </tool>
-      </outputs>
-      <inputs>
-        <tool>
-          <name>BICOMP</name>
-          <file> 111 37 6 74 23 70 56 90 96 0 5 95 7 109 69 60 30 100</file>
-        </tool>
-      </inputs>
-    </file>
     <file>
       <name>$PROJ_DIR$\I2CUnit.cpp</name>
       <outputs>
         <tool>
           <name>ICCAVR</name>
-          <file> 24</file>
+          <file> 117</file>
         </tool>
         <tool>
           <name>BICOMP</name>
-          <file> 83</file>
+          <file> 57</file>
         </tool>
       </outputs>
       <inputs>
         <tool>
           <name>BICOMP</name>
-          <file> 111 37 6 74 23 70 56 90 96 0 5 95 7 109 69 60 12</file>
+          <file> 83 10 107 48 116 45 30 64 72 115 105 125 127 39 126 34 111</file>
         </tool>
       </inputs>
     </file>
@@ -488,17 +522,17 @@
       <outputs>
         <tool>
           <name>ICCAVR</name>
-          <file> 127</file>
+          <file> 99</file>
         </tool>
         <tool>
           <name>BICOMP</name>
-          <file> 97</file>
+          <file> 69</file>
         </tool>
       </outputs>
       <inputs>
         <tool>
           <name>BICOMP</name>
-          <file> 111 37 6 74 23 70 56 90 96 0 5 95 7 109 69 60 36 28 100</file>
+          <file> 83 10 107 48 116 45 30 64 72 115 105 125 127 39 126 34 9 121 71</file>
         </tool>
       </inputs>
     </file>
@@ -507,17 +541,17 @@
       <outputs>
         <tool>
           <name>ICCAVR</name>
-          <file> 121</file>
+          <file> 93</file>
         </tool>
         <tool>
           <name>BICOMP</name>
-          <file> 2</file>
+          <file> 101</file>
         </tool>
       </outputs>
       <inputs>
         <tool>
           <name>BICOMP</name>
-          <file> 111 37 6 74 23 70 56 90 96 0 5 95 7 109 69 60 106 66 112</file>
+          <file> 83 10 107 48 116 45 30 64 72 115 105 125 127 39 126 34 79 41 82</file>
         </tool>
       </inputs>
     </file>
@@ -526,45 +560,36 @@
       <outputs>
         <tool>
           <name>ICCAVR</name>
-          <file> 59</file>
+          <file> 33</file>
         </tool>
         <tool>
           <name>BICOMP</name>
-          <file> 26</file>
+          <file> 119</file>
         </tool>
       </outputs>
       <inputs>
         <tool>
           <name>BICOMP</name>
-          <file> 111 37 6 74 23 70 56 90 96 0 5 95 7 109 69 60 104 21 41 30 106 108 28 51 61 46 48 42 11 47 53 119 39 112 117 66 36</file>
+          <file> 83 10 107 48 116 45 30 64 72 115 105 125 127 39 126 34 77 1 12 4 79 81 121 25 35 20 22 16 110 21 27 91 13 82 89 41 9</file>
         </tool>
       </inputs>
-    </file>
-    <file>
-      <name>[ROOT_NODE]</name>
-      <outputs>
-        <tool>
-          <name>XLINK</name>
-          <file> 118</file>
-        </tool>
-      </outputs>
     </file>
     <file>
       <name>$PROJ_DIR$\ArchivesUnit.cpp</name>
       <outputs>
         <tool>
           <name>ICCAVR</name>
-          <file> 101</file>
+          <file> 74</file>
         </tool>
         <tool>
           <name>BICOMP</name>
-          <file> 89</file>
+          <file> 63</file>
         </tool>
       </outputs>
       <inputs>
         <tool>
           <name>BICOMP</name>
-          <file> 111 37 6 74 23 70 56 90 96 0 5 95 7 109 69 60 61 106 4 36 28 51 108 47 42 66 112</file>
+          <file> 83 10 107 48 116 45 30 64 72 115 105 125 127 39 126 34 35 79 104 9 121 25 81 21 16 41 82</file>
         </tool>
       </inputs>
     </file>
@@ -573,17 +598,17 @@
       <outputs>
         <tool>
           <name>ICCAVR</name>
-          <file> 49</file>
+          <file> 23</file>
         </tool>
         <tool>
           <name>BICOMP</name>
-          <file> 1</file>
+          <file> 103</file>
         </tool>
       </outputs>
       <inputs>
         <tool>
           <name>BICOMP</name>
-          <file> 111 37 6 74 23 70 56 90 96 0 5 95 7 109 69 60 11 106 51 108 61 66 112</file>
+          <file> 83 10 107 48 116 45 30 64 72 115 105 125 127 39 126 34 110 79 25 81 35 41 82</file>
         </tool>
       </inputs>
     </file>
@@ -592,244 +617,7 @@
       <outputs>
         <tool>
           <name>ICCAVR</name>
-          <file> 15</file>
-        </tool>
-        <tool>
-          <name>BICOMP</name>
-          <file> 80</file>
-        </tool>
-      </outputs>
-      <inputs>
-        <tool>
-          <name>BICOMP</name>
-          <file> 111 37 6 74 23 70 56 90 96 0 5 95 7 109 69 60 46 51 61 106</file>
-        </tool>
-      </inputs>
-    </file>
-    <file>
-      <name>$PROJ_DIR$\MenuClassesUnit.cpp</name>
-      <outputs>
-        <tool>
-          <name>ICCAVR</name>
-          <file> 128</file>
-        </tool>
-        <tool>
-          <name>BICOMP</name>
-          <file> 102</file>
-        </tool>
-      </outputs>
-      <inputs>
-        <tool>
-          <name>BICOMP</name>
-          <file> 111 37 6 74 23 70 56 90 96 0 5 95 7 109 69 60 21 30 48 51 53 119 39 112</file>
-        </tool>
-      </inputs>
-    </file>
-    <file>
-      <name>$PROJ_DIR$\MainArchive.cpp</name>
-      <outputs>
-        <tool>
-          <name>ICCAVR</name>
-          <file> 86</file>
-        </tool>
-        <tool>
-          <name>BICOMP</name>
-          <file> 19</file>
-        </tool>
-      </outputs>
-      <inputs>
-        <tool>
-          <name>BICOMP</name>
-          <file> 111 37 6 74 23 70 56 90 96 0 5 95 7 109 69 60 4 106 61 36 28 51 108 47 42 66 112</file>
-        </tool>
-      </inputs>
-    </file>
-    <file>
-      <name>$PROJ_DIR$\SoftTimers.cpp</name>
-      <outputs>
-        <tool>
-          <name>ICCAVR</name>
-          <file> 10</file>
-        </tool>
-        <tool>
-          <name>BICOMP</name>
-          <file> 123</file>
-        </tool>
-      </outputs>
-      <inputs>
-        <tool>
-          <name>BICOMP</name>
-          <file> 111 37 6 74 23 70 56 90 96 0 5 95 7 109 69 60 92</file>
-        </tool>
-      </inputs>
-    </file>
-    <file>
-      <name>$PROJ_DIR$\Release\Obj\bl_mva_8.pbd</name>
-      <inputs>
-        <tool>
-          <name>BILINK</name>
-          <file> 80 120 89 72 79 35 83 114 97 19 93 102 55 87 1 13 54 107 27 62 123 9 29 2 26 25 17</file>
-        </tool>
-      </inputs>
-    </file>
-    <file>
-      <name>$PROJ_DIR$\AnalogChannelFormulUnit.cpp</name>
-      <outputs>
-        <tool>
-          <name>ICCAVR</name>
-          <file> 88</file>
-        </tool>
-        <tool>
-          <name>BICOMP</name>
-          <file> 120</file>
-        </tool>
-      </outputs>
-      <inputs>
-        <tool>
-          <name>BICOMP</name>
-          <file> 111 37 6 74 23 70 56 90 96 0 5 95 7 109 69 60 108 51 42 53 119 117 66 112 39 48</file>
-        </tool>
-      </inputs>
-    </file>
-    <file>
-      <name>$PROJ_DIR$\UserInterfaceUnit.cpp</name>
-      <outputs>
-        <tool>
-          <name>ICCAVR</name>
-          <file> 82</file>
-        </tool>
-        <tool>
-          <name>BICOMP</name>
-          <file> 25</file>
-        </tool>
-      </outputs>
-      <inputs>
-        <tool>
-          <name>BICOMP</name>
-          <file> 111 37 6 74 23 70 56 90 96 0 5 95 7 109 69 60 110 104 21 41 53 119 39 112</file>
-        </tool>
-      </inputs>
-    </file>
-    <file>
-      <name>$PROJ_DIR$\SystemUnit.cpp</name>
-      <outputs>
-        <tool>
-          <name>ICCAVR</name>
-          <file> 45</file>
-        </tool>
-        <tool>
-          <name>BICOMP</name>
-          <file> 29</file>
-        </tool>
-      </outputs>
-      <inputs>
-        <tool>
-          <name>BICOMP</name>
-          <file> 111 37 6 74 23 70 56 90 96 0 5 95 7 109 69 60 100 30 106 48 42 51 47 46 11 21 41 108 122 61</file>
-        </tool>
-      </inputs>
-    </file>
-    <file>
-      <name>$PROJ_DIR$\initsubs.cpp</name>
-      <outputs>
-        <tool>
-          <name>ICCAVR</name>
-          <file> 58</file>
-        </tool>
-        <tool>
-          <name>BICOMP</name>
-          <file> 17</file>
-        </tool>
-      </outputs>
-      <inputs>
-        <tool>
-          <name>BICOMP</name>
-          <file> 111 37 6 74 23 70 56 90 96 0 5 95 7 109 69 60 52</file>
-        </tool>
-      </inputs>
-    </file>
-    <file>
-      <name>$PROJ_DIR$\ModBusRegisterCoil.cpp</name>
-      <outputs>
-        <tool>
-          <name>ICCAVR</name>
-          <file> 84</file>
-        </tool>
-        <tool>
-          <name>BICOMP</name>
-          <file> 87</file>
-        </tool>
-      </outputs>
-      <inputs>
-        <tool>
-          <name>BICOMP</name>
-          <file> 111 37 6 74 23 70 56 90 96 0 5 95 7 109 69 60 11 51 42</file>
-        </tool>
-      </inputs>
-    </file>
-    <file>
-      <name>$PROJ_DIR$\ExternFlashUnit.cpp</name>
-      <outputs>
-        <tool>
-          <name>ICCAVR</name>
-          <file> 22</file>
-        </tool>
-        <tool>
-          <name>BICOMP</name>
-          <file> 35</file>
-        </tool>
-      </outputs>
-      <inputs>
-        <tool>
-          <name>BICOMP</name>
-          <file> 111 37 6 74 23 70 56 90 96 0 5 95 7 109 69 60 28 100</file>
-        </tool>
-      </inputs>
-    </file>
-    <file>
-      <name>$PROJ_DIR$\StringExtended.cpp</name>
-      <outputs>
-        <tool>
-          <name>ICCAVR</name>
-          <file> 38</file>
-        </tool>
-        <tool>
-          <name>BICOMP</name>
-          <file> 9</file>
-        </tool>
-      </outputs>
-      <inputs>
-        <tool>
-          <name>BICOMP</name>
-          <file> 111 37 6 74 23 70 56 90 96 0 5 95 7 109 69 60 117 66 112 39 105</file>
-        </tool>
-      </inputs>
-    </file>
-    <file>
-      <name>$PROJ_DIR$\DigitalInputUnit.cpp</name>
-      <outputs>
-        <tool>
-          <name>ICCAVR</name>
-          <file> 8</file>
-        </tool>
-        <tool>
-          <name>BICOMP</name>
-          <file> 72</file>
-        </tool>
-      </outputs>
-      <inputs>
-        <tool>
-          <name>BICOMP</name>
-          <file> 111 37 6 74 23 70 56 90 96 0 5 95 7 109 69 60 47 51</file>
-        </tool>
-      </inputs>
-    </file>
-    <file>
-      <name>$PROJ_DIR$\ModBusUnit.cpp</name>
-      <outputs>
-        <tool>
-          <name>ICCAVR</name>
-          <file> 34</file>
+          <file> 114</file>
         </tool>
         <tool>
           <name>BICOMP</name>
@@ -839,7 +627,244 @@
       <inputs>
         <tool>
           <name>BICOMP</name>
-          <file> 111 37 6 74 23 70 56 90 96 0 5 95 7 109 69 60 11 51</file>
+          <file> 83 10 107 48 116 45 30 64 72 115 105 125 127 39 126 34 20 25 35 79</file>
+        </tool>
+      </inputs>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\MenuClassesUnit.cpp</name>
+      <outputs>
+        <tool>
+          <name>ICCAVR</name>
+          <file> 100</file>
+        </tool>
+        <tool>
+          <name>BICOMP</name>
+          <file> 75</file>
+        </tool>
+      </outputs>
+      <inputs>
+        <tool>
+          <name>BICOMP</name>
+          <file> 83 10 107 48 116 45 30 64 72 115 105 125 127 39 126 34 1 4 22 25 27 91 13 82</file>
+        </tool>
+      </inputs>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\MainArchive.cpp</name>
+      <outputs>
+        <tool>
+          <name>ICCAVR</name>
+          <file> 60</file>
+        </tool>
+        <tool>
+          <name>BICOMP</name>
+          <file> 128</file>
+        </tool>
+      </outputs>
+      <inputs>
+        <tool>
+          <name>BICOMP</name>
+          <file> 83 10 107 48 116 45 30 64 72 115 105 125 127 39 126 34 104 79 35 9 121 25 81 21 16 41 82</file>
+        </tool>
+      </inputs>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\SoftTimers.cpp</name>
+      <outputs>
+        <tool>
+          <name>ICCAVR</name>
+          <file> 108</file>
+        </tool>
+        <tool>
+          <name>BICOMP</name>
+          <file> 95</file>
+        </tool>
+      </outputs>
+      <inputs>
+        <tool>
+          <name>BICOMP</name>
+          <file> 83 10 107 48 116 45 30 64 72 115 105 125 127 39 126 34 66</file>
+        </tool>
+      </inputs>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\Release\Obj\bl_mva_8.pbd</name>
+      <inputs>
+        <tool>
+          <name>BILINK</name>
+          <file> 54 92 63 47 53 8 57 85 69 128 67 75 29 61 103 112 28 80 120 36 95 109 3 101 119 118 123</file>
+        </tool>
+      </inputs>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\AnalogChannelFormulUnit.cpp</name>
+      <outputs>
+        <tool>
+          <name>ICCAVR</name>
+          <file> 62</file>
+        </tool>
+        <tool>
+          <name>BICOMP</name>
+          <file> 92</file>
+        </tool>
+      </outputs>
+      <inputs>
+        <tool>
+          <name>BICOMP</name>
+          <file> 83 10 107 48 116 45 30 64 72 115 105 125 127 39 126 34 81 25 16 27 91 89 41 82 13 22</file>
+        </tool>
+      </inputs>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\UserInterfaceUnit.cpp</name>
+      <outputs>
+        <tool>
+          <name>ICCAVR</name>
+          <file> 56</file>
+        </tool>
+        <tool>
+          <name>BICOMP</name>
+          <file> 118</file>
+        </tool>
+      </outputs>
+      <inputs>
+        <tool>
+          <name>BICOMP</name>
+          <file> 83 10 107 48 116 45 30 64 72 115 105 125 127 39 126 34 84 77 1 12 27 91 13 82</file>
+        </tool>
+      </inputs>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\SystemUnit.cpp</name>
+      <outputs>
+        <tool>
+          <name>ICCAVR</name>
+          <file> 19</file>
+        </tool>
+        <tool>
+          <name>BICOMP</name>
+          <file> 3</file>
+        </tool>
+      </outputs>
+      <inputs>
+        <tool>
+          <name>BICOMP</name>
+          <file> 83 10 107 48 116 45 30 64 72 115 105 125 127 39 126 34 71 4 79 22 16 25 21 20 110 1 12 81 94 35</file>
+        </tool>
+      </inputs>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\initsubs.cpp</name>
+      <outputs>
+        <tool>
+          <name>ICCAVR</name>
+          <file> 32</file>
+        </tool>
+        <tool>
+          <name>BICOMP</name>
+          <file> 123</file>
+        </tool>
+      </outputs>
+      <inputs>
+        <tool>
+          <name>BICOMP</name>
+          <file> 83 10 107 48 116 45 30 64 72 115 105 125 127 39 126 34 26</file>
+        </tool>
+      </inputs>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\ModBusRegisterCoil.cpp</name>
+      <outputs>
+        <tool>
+          <name>ICCAVR</name>
+          <file> 58</file>
+        </tool>
+        <tool>
+          <name>BICOMP</name>
+          <file> 61</file>
+        </tool>
+      </outputs>
+      <inputs>
+        <tool>
+          <name>BICOMP</name>
+          <file> 83 10 107 48 116 45 30 64 72 115 105 125 127 39 126 34 110 25 16</file>
+        </tool>
+      </inputs>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\ExternFlashUnit.cpp</name>
+      <outputs>
+        <tool>
+          <name>ICCAVR</name>
+          <file> 2</file>
+        </tool>
+        <tool>
+          <name>BICOMP</name>
+          <file> 8</file>
+        </tool>
+      </outputs>
+      <inputs>
+        <tool>
+          <name>BICOMP</name>
+          <file> 83 10 107 48 116 45 30 64 72 115 105 125 127 39 126 34 121 71</file>
+        </tool>
+      </inputs>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\StringExtended.cpp</name>
+      <outputs>
+        <tool>
+          <name>ICCAVR</name>
+          <file> 14</file>
+        </tool>
+        <tool>
+          <name>BICOMP</name>
+          <file> 109</file>
+        </tool>
+      </outputs>
+      <inputs>
+        <tool>
+          <name>BICOMP</name>
+          <file> 83 10 107 48 116 45 30 64 72 115 105 125 127 39 126 34 89 41 82 13 78</file>
+        </tool>
+      </inputs>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\DigitalInputUnit.cpp</name>
+      <outputs>
+        <tool>
+          <name>ICCAVR</name>
+          <file> 106</file>
+        </tool>
+        <tool>
+          <name>BICOMP</name>
+          <file> 47</file>
+        </tool>
+      </outputs>
+      <inputs>
+        <tool>
+          <name>BICOMP</name>
+          <file> 83 10 107 48 116 45 30 64 72 115 105 125 127 39 126 34 21 25</file>
+        </tool>
+      </inputs>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\ModBusUnit.cpp</name>
+      <outputs>
+        <tool>
+          <name>ICCAVR</name>
+          <file> 7</file>
+        </tool>
+        <tool>
+          <name>BICOMP</name>
+          <file> 28</file>
+        </tool>
+      </outputs>
+      <inputs>
+        <tool>
+          <name>BICOMP</name>
+          <file> 83 10 107 48 116 45 30 64 72 115 105 125 127 39 126 34 110 25</file>
         </tool>
       </inputs>
     </file>
@@ -848,17 +873,17 @@
       <outputs>
         <tool>
           <name>ICCAVR</name>
-          <file> 125</file>
+          <file> 97</file>
         </tool>
         <tool>
           <name>BICOMP</name>
-          <file> 93</file>
+          <file> 67</file>
         </tool>
       </outputs>
       <inputs>
         <tool>
           <name>BICOMP</name>
-          <file> 111 37 6 74 23 70 56 90 96 0 5 95 7 109 69 60 44 100 48 106 36 28 46 30 51 108 42 66 112</file>
+          <file> 83 10 107 48 116 45 30 64 72 115 105 125 127 39 126 34 18 71 22 79 9 121 20 4 25 81 16 41 82</file>
         </tool>
       </inputs>
     </file>
@@ -867,17 +892,17 @@
       <outputs>
         <tool>
           <name>ICCAVR</name>
-          <file> 3</file>
+          <file> 102</file>
         </tool>
         <tool>
           <name>BICOMP</name>
-          <file> 62</file>
+          <file> 36</file>
         </tool>
       </outputs>
       <inputs>
         <tool>
           <name>BICOMP</name>
-          <file> 111 37 6 74 23 70 56 90 96 0 5 95 7 109 69 60 122 28 106 66 112</file>
+          <file> 83 10 107 48 116 45 30 64 72 115 105 125 127 39 126 34 94 121 79 41 82</file>
         </tool>
       </inputs>
     </file>
@@ -886,17 +911,17 @@
       <outputs>
         <tool>
           <name>ICCAVR</name>
-          <file> 98</file>
+          <file> 70</file>
         </tool>
         <tool>
           <name>BICOMP</name>
-          <file> 55</file>
+          <file> 29</file>
         </tool>
       </outputs>
       <inputs>
         <tool>
           <name>BICOMP</name>
-          <file> 111 37 6 74 23 70 56 90 96 0 5 95 7 109 69 60 11 61 106 66 112</file>
+          <file> 83 10 107 48 116 45 30 64 72 115 105 125 127 39 126 34 110 35 79 41 82</file>
         </tool>
       </inputs>
     </file>
@@ -905,17 +930,17 @@
       <outputs>
         <tool>
           <name>ICCAVR</name>
-          <file> 78</file>
+          <file> 52</file>
         </tool>
         <tool>
           <name>BICOMP</name>
-          <file> 27</file>
+          <file> 120</file>
         </tool>
       </outputs>
       <inputs>
         <tool>
           <name>BICOMP</name>
-          <file> 111 37 6 74 23 70 56 90 96 0 5 95 7 109 69 60 51 122 28 108 36 53 119</file>
+          <file> 83 10 107 48 116 45 30 64 72 115 105 125 127 39 126 34 25 94 121 81 9 27 91</file>
         </tool>
       </inputs>
     </file>
@@ -924,19 +949,85 @@
       <outputs>
         <tool>
           <name>ICCAVR</name>
-          <file> 115</file>
+          <file> 87</file>
         </tool>
         <tool>
           <name>BICOMP</name>
-          <file> 107</file>
+          <file> 80</file>
         </tool>
       </outputs>
       <inputs>
         <tool>
           <name>BICOMP</name>
-          <file> 111 37 6 74 23 70 56 90 96 0 5 95 7 109 69 60 42 66 112</file>
+          <file> 83 10 107 48 116 45 30 64 72 115 105 125 127 39 126 34 16 41 82</file>
         </tool>
       </inputs>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\ModBusRegisterInputCoil.cpp</name>
+      <outputs>
+        <tool>
+          <name>ICCAVR</name>
+          <file> 88</file>
+        </tool>
+        <tool>
+          <name>BICOMP</name>
+          <file> 112</file>
+        </tool>
+      </outputs>
+      <inputs>
+        <tool>
+          <name>BICOMP</name>
+          <file> 83 10 107 48 116 45 30 64 72 115 105 125 127 39 126 34 110 25 21 81</file>
+        </tool>
+      </inputs>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\IV5IV6Unit.cpp</name>
+      <outputs>
+        <tool>
+          <name>ICCAVR</name>
+          <file> 49</file>
+        </tool>
+        <tool>
+          <name>BICOMP</name>
+          <file> 85</file>
+        </tool>
+      </outputs>
+      <inputs>
+        <tool>
+          <name>BICOMP</name>
+          <file> 83 10 107 48 116 45 30 64 72 115 105 125 127 39 126 34 22 41 82</file>
+        </tool>
+      </inputs>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\DisplayUnit.cpp</name>
+      <outputs>
+        <tool>
+          <name>ICCAVR</name>
+          <file> 24</file>
+        </tool>
+        <tool>
+          <name>BICOMP</name>
+          <file> 53</file>
+        </tool>
+      </outputs>
+      <inputs>
+        <tool>
+          <name>BICOMP</name>
+          <file> 83 10 107 48 116 45 30 64 72 115 105 125 127 39 126 34 4 71</file>
+        </tool>
+      </inputs>
+    </file>
+    <file>
+      <name>[ROOT_NODE]</name>
+      <outputs>
+        <tool>
+          <name>XLINK</name>
+          <file> 90</file>
+        </tool>
+      </outputs>
     </file>
     <forcedrebuild>
       <name>[MULTI_TOOL]</name>

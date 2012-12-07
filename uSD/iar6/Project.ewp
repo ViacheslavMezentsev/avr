@@ -63,7 +63,7 @@
         </option>
         <option>
           <name>SCCStackSize</name>
-          <state>0x60</state>
+          <state>0x80</state>
         </option>
         <option>
           <name>SCExtCStack</name>
@@ -2023,10 +2023,19 @@
     <name>$PROJ_DIR$\..\MCU.cpp</name>
   </file>
   <file>
+    <name>$PROJ_DIR$\..\MessagesQueue.cpp</name>
+  </file>
+  <file>
     <name>$PROJ_DIR$\..\MMC.cpp</name>
   </file>
   <file>
+    <name>$PROJ_DIR$\..\PLC.cpp</name>
+  </file>
+  <file>
     <name>$PROJ_DIR$\..\readme.txt</name>
+  </file>
+  <file>
+    <name>$PROJ_DIR$\..\Viewer.cpp</name>
   </file>
 </project>
 

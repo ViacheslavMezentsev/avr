@@ -139,7 +139,6 @@ public:
 
     static uint8_t GetChar();
     static void PutChar( uint8_t ch, EnCodePage CodePage = cp866 );
-    static char * ReadString( char * s );
     static void WriteString( FCHAR_PTR Value, EnCodePage CodePage = cp866, uint8_t Length = 0 );
     static void WriteString( const char * Value, EnCodePage CodePage = cp866, uint8_t Length = 0 );
     static void ClearScreen();
