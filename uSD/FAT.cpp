@@ -1032,12 +1032,22 @@ FRESULT CFAT::Read( void * Buffer, WORD ByteToRead, WORD * BytesRead ) {
 
 FRESULT CFAT::Write( const void * Buffer, WORD ByteToWrite, WORD * BytesWritten ) {
 
+#if _USE_WRITE
+
     return pf_write( Buffer, ByteToWrite, BytesWritten );
+
+#else
+
+    return FR_NOT_ENABLED;
+
+#endif
 
 }
 
 
 FRESULT CFAT::Write( FCHAR_PTR Buffer, WORD ByteToWrite, WORD * BytesWritten ) {
+
+#if _USE_WRITE
 
 	WORD wcnt;
     DWORD sect, remain;   	
@@ -1143,6 +1153,12 @@ fw_abort:
 
 	fs->flag = 0;
 	return FR_DISK_ERR;
+
+#else
+
+    return FR_NOT_ENABLED;
+
+#endif
 
 }
 
