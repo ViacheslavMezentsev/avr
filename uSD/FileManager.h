@@ -34,6 +34,8 @@ public:
     uint8_t Line;
 
     char Path[ 128 ];
+
+    FILINFO * pFileInfo;
     FILINFO FileInfo;
 
 };
@@ -44,6 +46,8 @@ class CFileManager {
 private:  
     static void DrawMainMenu();
     static void DrawPanel( CPanel & Panel );
+    static void WriteDateTime( CPanel & Panel, FILINFO & fno );
+    static void HightlightPanel( CPanel & Panel );
     static void DrawCommandLine( CPanel & Panel );
     static void DrawFunctionKeys( CKeys & Keys );
 

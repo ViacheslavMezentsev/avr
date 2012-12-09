@@ -89,9 +89,9 @@ public:
 private:
 
     inline static void SPIRelease();
-    inline static void SPIWrite( BYTE Data );
-    inline static BYTE SPIRead();    
-    inline static BYTE SendCommand( BYTE Command, DWORD Argument ); 
+    static void SPIWrite( BYTE Data );
+    static BYTE SPIRead();    
+    static BYTE SendCommand( BYTE Command, DWORD Argument ); 
 
 };
 

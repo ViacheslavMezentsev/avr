@@ -5,6 +5,7 @@ class CViewer {
 
 private:  
 
+    inline static void DrawTitle( char * Caption );
     inline static void FormActivate();
     inline static void FormKeyDown( uint16_t Key );
 
