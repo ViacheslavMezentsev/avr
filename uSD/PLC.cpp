@@ -325,45 +325,6 @@ void CPLC::DoTimer100ms(){
 }
 
 
-void CPLC::DoTimer500ms(){
-
-    TimerCounter0OverflowMessage.hwnd = GetActiveWindow();  // handle to window
-    TimerCounter0OverflowMessage.message = WM_TIMER;        // WM_TIMER
-    TimerCounter0OverflowMessage.wParam = ID_TIMER_500MS;   // timer identifier
-    TimerCounter0OverflowMessage.lParam = 0;                // timer callback (TIMERPROC)
-
-    ProcessMessages();
-
-}
-
-
-void CPLC::DoTimer1s(){
-
-    // Обновляем системное время, если доступны внешние данные
-
-    // Формируем сообщение
-    TimerCounter0OverflowMessage.hwnd = GetActiveWindow();  // handle to window
-    TimerCounter0OverflowMessage.message = WM_TIMER;        // WM_TIMER
-    TimerCounter0OverflowMessage.wParam = ID_TIMER_1S;      // timer identifier
-    TimerCounter0OverflowMessage.lParam = 0;                // timer callback (TIMERPROC)
-
-    ProcessMessages();
-
-}
-
-
-void CPLC::DoTimer5s(){
-
-    TimerCounter0OverflowMessage.hwnd = GetActiveWindow();  // handle to window
-    TimerCounter0OverflowMessage.message = WM_TIMER;        // WM_TIMER
-    TimerCounter0OverflowMessage.wParam = ID_TIMER_5S;      // timer identifier
-    TimerCounter0OverflowMessage.lParam = 0;                // timer callback (TIMERPROC)
-
-    ProcessMessages();
-
-}
-
-
 /**
  * Клавиша нажата
  */

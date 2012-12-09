@@ -62,13 +62,29 @@ LRESULT CViewer::WindowProc( HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam 
 }
 
 
+/**
+ * Отрисовка заголовка окна
+ */
+void CViewer::DrawTitle( char * Caption ) {
+
+    CConsole::SetTextAttributes( atOff );        
+    CConsole::MoveTo( 1, 1 );
+
+    CConsole::SetForegroundColor( clBlack );
+    CConsole::SetBackgroundColor( clWhite );
+    CConsole::WriteString( Caption );
+
+    CConsole::ClearEndOfLine();
+
+}
+
+
 void CViewer::FormActivate() {
 
     uint16_t Counter;
     WORD wSize;   
 
-    CConsole::CursorOff();                   
-    CFileManager::DrawFrame( 1, 2, 78, 21, clLightGray, clBlue );
+    CConsole::CursorOff();                       
 
     // Монтирование FAT32
     res = CFAT::Mount( & fs );
@@ -91,6 +107,11 @@ void CViewer::FormActivate() {
         }
 
         strcat( CommandString, CFileManager::pCurrentPanel->FileInfo.fname );
+
+        // Отображаем название файла в заголовке окна.
+        DrawTitle( CommandString );
+
+        CFileManager::DrawFrame( 1, 2, 78, 21, clLightGray, clBlue );
 
         res = CFAT::Open( CommandString );
 

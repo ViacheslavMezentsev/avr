@@ -40,9 +40,6 @@ class CPLC {
         static void Sleep(DWORD dwMilliseconds);
         static void DoTimer10ms();
         static void DoTimer100ms();
-        static void DoTimer500ms();
-        static void DoTimer1s();
-        static void DoTimer5s();
         static HWND GetActiveWindow();
         static HWND SetActiveWindow(HWND hWnd);
         static void DoKeyDown(uint8_t KeyCode, uint8_t KeyData);

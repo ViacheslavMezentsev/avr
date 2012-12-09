@@ -1147,27 +1147,6 @@ void CMCU::OnTimerCounter2Overflow(){
 
     }
 
-    if ( Counter500ms == 500 ) {
-
-        CPLC::DoTimer500ms();
-        Counter500ms = 0;
-
-    }
-
-    if ( Counter1s == 1000 ) {
-
-        CPLC::DoTimer1s();
-        Counter1s = 0;
-
-    }
-
-    if ( Counter5s == 5000 ) {
-
-        CPLC::DoTimer5s();
-        Counter5s = 0;
-
-    }
-
 }
 
 
