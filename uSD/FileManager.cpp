@@ -754,7 +754,7 @@ void CFileManager::FormKeyDown( uint16_t Key ) {
 
         case VK_END: { 
                        
-            pCurrentPanel->ItemIndex = pCurrentPanel->Height - 2;
+            pCurrentPanel->ItemIndex = pCurrentPanel->ItemsCount - 1;
 
             CConsole::CursorOff();
             CConsole::SaveCursor();
