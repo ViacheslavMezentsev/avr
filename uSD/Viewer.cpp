@@ -15,6 +15,9 @@ extern char CommandString[ 128 ];
 extern FRESULT res;
 extern FATFS fs;
 
+extern char * utoa_fast_div( uint32_t value, char * buffer );
+
+
 // -=[ Постоянные во флеш-памяти ]=-
 
 
@@ -76,24 +79,32 @@ void CViewer::DrawTitle( char * Caption ) {
 
     CConsole::ClearEndOfLine();
 
+    CConsole::MoveTo( 60, 1 );
+    CConsole::WriteString( SPSTR( "CP1251" ) );
+
+    CConsole::MoveTo( 70, 1 );
+    CConsole::WriteString( utoa_fast_div(  CFileManager::pCurrentPanel->FileInfo.fsize, buffer ) );
+
 }
 
 
+/**
+ * Реакция на активацию окна.
+ */
 void CViewer::FormActivate() {
 
-    uint16_t Counter;
-    WORD wSize;   
+    WORD wSize = 0;   
 
     CConsole::CursorOff();                       
 
-    // Монтирование FAT32
+    // Монтирование FAT32.
     res = CFAT::Mount( & fs );
 
-    // Если монтирование было успешным
+    // Если монтирование было успешным.
     if ( res == FR_OK ) {		
 
-        // Открываем файл
-        CommandString[0] = 0;
+        // Присоеденяем к пути имя выбранного файла.
+        CommandString[0] = 0;        
         
         strcat( CommandString, CFileManager::pCurrentPanel->Path );
 
@@ -111,40 +122,52 @@ void CViewer::FormActivate() {
         // Отображаем название файла в заголовке окна.
         DrawTitle( CommandString );
 
-        CFileManager::DrawFrame( 1, 2, 78, 21, clLightGray, clBlue );
+        // Заполняем фон.
+        CConsole::SetTextAttributes( atOff );    
+        CConsole::SetForegroundColor( clLightGray );
+        CConsole::SetBackgroundColor( clBlue );
 
+        for ( uint8_t i = 2; i < 25; i++ ) {
+
+            CConsole::MoveTo( 1, i );
+            CConsole::ClearEndOfLine();
+        }
+
+        CConsole::MoveTo( 1, 2 );
+
+        uint8_t row = 0;
+
+        // Открываем файл.
         res = CFAT::Open( CommandString );
 
-        Counter = 0;
-
-        // Читаем
-        res = CFAT::Read( & buffer, 15, & wSize );
-
-        CConsole::MoveTo( 2, 3 );
+        // Читаем файл по блокам.
+        res = CFAT::Read( & CommandString, 128, & wSize );
 
         while ( ( res == FR_OK ) && ( wSize > 0 ) ) {
+            
+            for ( uint8_t i = 0; i < wSize; i++ ) {
 
-            for ( uint8_t i = 0; i < 15; i++ ) {
+                if ( ( CommandString[i] != 0x0D ) 
+                    && ( CommandString[i] != 0x0A ) ) {
 
-                if ( buffer[i] == 0x0D ) continue;
-                
-                if ( buffer[i] == 0x0A ) {
+                    CConsole::PutChar( CommandString[i], CConsole::cp1251 );
 
-                    CConsole::WriteString( SPSTR( "\r\n" ) );
-                    CConsole::Move( mdForward, 1 ); 
-                    Counter++;
+                } else {
 
-                    continue;
+                    if ( CommandString[i] == 0x0D ) {
+                    
+                        row++;
+                        if ( row > 22 ) break;
+                    }
 
+                    CConsole::PutChar( CommandString[i] );
                 }
 
-                CConsole::PutChar( buffer[i] , CConsole::cp1251 );
+            } // while
 
-            }
+            if ( row > 22 ) break;
 
-            if ( Counter > 19 ) break;
-
-            res = CFAT::Read( & buffer, 15, & wSize );
+            res = CFAT::Read( & CommandString, 128, & wSize );
 
         }
 
@@ -152,6 +175,10 @@ void CViewer::FormActivate() {
 
     // Отмонтируем FatFs
     res = CFAT::Mount( NULL );
+
+    // Очищаем буфер.
+    CommandString[0] = 0;
+
 }
 
 

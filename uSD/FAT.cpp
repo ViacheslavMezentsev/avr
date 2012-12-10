@@ -1165,19 +1165,37 @@ fw_abort:
 
 FRESULT CFAT::LSeek( DWORD Offset ) {
 
+#if _USE_LSEEK
+
     return pf_lseek( Offset );
+
+#else
+
+    return FR_NOT_ENABLED;
+
+#endif
 
 }
 
 
 FRESULT CFAT::OpenDir( DIR * DirObject, const char * DirName ) {
 
+#if _USE_DIR
+
     return pf_opendir( DirObject, DirName );
+
+#else
+
+    return FR_NOT_ENABLED;
+
+#endif
 
 }
 
 
 FRESULT CFAT::OpenDir( DIR * DirObject, FCHAR_PTR DirName ) {
+
+#if _USE_DIR
 
 	FRESULT res;
 	BYTE sp[ 12 ], dir[ 32 ];
@@ -1235,6 +1253,12 @@ FRESULT CFAT::OpenDir( DIR * DirObject, FCHAR_PTR DirName ) {
 	}
 
 	return res;
+
+#else
+
+    return FR_NOT_ENABLED;
+
+#endif
 
 }
 

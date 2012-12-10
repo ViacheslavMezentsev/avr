@@ -49,15 +49,17 @@ void CFileManager::Initialization() {
     LeftPanel.Top = 2;
     LeftPanel.Width = 38;
     LeftPanel.Height = 20;
-    LeftPanel.Line = 0;
-    LeftPanel.pFileInfo = NULL;
+
+    LeftPanel.ItemIndex = 0;
+    LeftPanel.ItemsCount = 0;
 
     RightPanel.Left = 41;
     RightPanel.Top = 2;
     RightPanel.Width = 38;
     RightPanel.Height = 20;
-    RightPanel.Line = 0;
-    RightPanel.pFileInfo = NULL;
+
+    RightPanel.ItemIndex = 0;
+    RightPanel.ItemsCount = 0;
 
     for ( uint8_t i = 0; i < 127; i++ ) {
         
@@ -221,17 +223,18 @@ void CFileManager::HightlightPanel( CPanel & Panel ) {
 
     CConsole::PutChar( ' ' );
 
-    if ( Panel.pFileInfo != NULL ) {
+    if ( Panel.ItemsCount != 0 ) {
 
         if ( & Panel == pCurrentPanel ) {
 
+            CConsole::SetTextAttributes( atOff );
             CConsole::SetForegroundColor( clBlack );
             CConsole::SetBackgroundColor( clWhite );
 
         }
 
         // Отображаем разделители для выделенной строки.
-        CConsole::MoveTo( Panel.Left + 13, Panel.Line + Panel.Top + 2 );
+        CConsole::MoveTo( Panel.Left + 13, Panel.ItemIndex + Panel.Top + 2 );
 
         CConsole::PutChar( ACS_VLINE );
         CConsole::Move( mdForward, 10 );
@@ -242,7 +245,7 @@ void CFileManager::HightlightPanel( CPanel & Panel ) {
         CConsole::SetForegroundColor( clLightGray );
         CConsole::SetBackgroundColor( clBlue );
 
-        CConsole::MoveTo( Panel.Left + 1, Panel.Line + Panel.Top + 2 );
+        CConsole::MoveTo( Panel.Left + 1, Panel.ItemIndex + Panel.Top + 2 );
 
         // Обображаем данные элемента для выделенной строки.
         // Если объект - папка.
@@ -266,7 +269,7 @@ void CFileManager::HightlightPanel( CPanel & Panel ) {
 
             while ( len-- ) CConsole::PutChar( ' ' );
 
-            CConsole::MoveTo( Panel.Left + 14, Panel.Line + Panel.Top + 2 );
+            CConsole::MoveTo( Panel.Left + 14, Panel.ItemIndex + Panel.Top + 2 );
 
             CConsole::WriteString( SPSTR( "  [Папка] " ), CConsole::cp1251 );
 
@@ -291,7 +294,7 @@ void CFileManager::HightlightPanel( CPanel & Panel ) {
 
             while ( len-- ) CConsole::PutChar( ' ' );
 
-            CConsole::MoveTo( Panel.Left + 14, Panel.Line + Panel.Top + 2 );
+            CConsole::MoveTo( Panel.Left + 14, Panel.ItemIndex + Panel.Top + 2 );
 
             len = 9 - strlen( utoa_fast_div( Panel.FileInfo.fsize, buffer ) );
 
@@ -301,7 +304,7 @@ void CFileManager::HightlightPanel( CPanel & Panel ) {
 
         }
 
-        CConsole::MoveTo( Panel.Left + 25, Panel.Line + Panel.Top + 2 );
+        CConsole::MoveTo( Panel.Left + 25, Panel.ItemIndex + Panel.Top + 2 );
 
         WriteDateTime( Panel, Panel.FileInfo );
 
@@ -310,9 +313,7 @@ void CFileManager::HightlightPanel( CPanel & Panel ) {
 }
 
 
-void CFileManager::DrawPanel( CPanel & Panel ) {
-       
-    uint8_t len;
+void CFileManager::DrawPanel( CPanel & Panel ) {           
 
     DrawFrame( Panel.Left, Panel.Top, Panel.Width, Panel.Height, clLightGray, clBlue );
 
@@ -379,7 +380,10 @@ void CFileManager::DrawPanel( CPanel & Panel ) {
     // Монтирование
     res = CFAT::Mount( & fs );
 
-    Panel.pFileInfo = NULL;
+    // Устанавливаем признак отсутствия данных об элементе.
+    Panel.ItemsCount = 0;
+
+    uint8_t len;
 
     // Открываем директорию (папку)
     res = CFAT::OpenDir( & dir, Panel.Path );
@@ -394,11 +398,13 @@ void CFileManager::DrawPanel( CPanel & Panel ) {
 
             if ( res != FR_OK || fno.fname[0] == 0 ) break;
 
+            // Увеличиваем счётчик количества элементов.
+            Panel.ItemsCount++;
+
             // Сохраняем описание выбранного элемента.
-            if ( Panel.Line == ( i - Panel.Top - 2 ) ) {
+            if ( Panel.ItemIndex == ( i - Panel.Top - 2 ) ) {
             
                 Panel.FileInfo = fno;
-                Panel.pFileInfo = & Panel.FileInfo;
             }
 
             // Если объект - папка
@@ -446,6 +452,8 @@ void CFileManager::DrawPanel( CPanel & Panel ) {
         } // for
 
     } // if
+
+    if ( Panel.ItemIndex > Panel.ItemsCount - 1 ) Panel.ItemIndex = Panel.ItemsCount - 1;
 
     // Подсвечиваем выбранный элемент таблицы.
     HightlightPanel( Panel );
@@ -501,7 +509,8 @@ void CFileManager::DrawFunctionKeys( CKeys & Keys ) {
             // Разделитель
             CConsole::PutChar( ' ' );
             
-            CConsole::WriteString( utoa_fast_div( i, buf ) );
+            CConsole::WriteString( SPSTR( "ESC" ) );
+            //CConsole::WriteString( utoa_fast_div( i, buf ) );
             
             // Разделитель
             CConsole::PutChar( ' ' );
@@ -636,7 +645,7 @@ void CFileManager::FormKeyDown( uint16_t Key ) {
 
                 strcat( pCurrentPanel->Path, pCurrentPanel->FileInfo.fname );
                 
-                pCurrentPanel->Line = 0;
+                pCurrentPanel->ItemIndex = 0;
 
                 CConsole::CursorOff();
 
@@ -678,7 +687,7 @@ void CFileManager::FormKeyDown( uint16_t Key ) {
 
                 pCurrentPanel->Path[ tmp + 1 ] = 0;
 
-                pCurrentPanel->Line = 0;
+                pCurrentPanel->ItemIndex = 0;
 
                 CConsole::CursorOff();
 
@@ -695,9 +704,9 @@ void CFileManager::FormKeyDown( uint16_t Key ) {
 
         case VK_UP: { 
         
-            if ( pCurrentPanel->Line != 0 ) {
+            if ( pCurrentPanel->ItemIndex != 0 ) {
 
-                pCurrentPanel->Line--;
+                pCurrentPanel->ItemIndex--;
                 
                 CConsole::CursorOff();
                 CConsole::SaveCursor();
@@ -713,9 +722,9 @@ void CFileManager::FormKeyDown( uint16_t Key ) {
 
         case VK_DOWN: { 
         
-            if ( pCurrentPanel->Line < pCurrentPanel->Height - 1 ) {
+            if ( pCurrentPanel->ItemIndex < pCurrentPanel->Height - 1 ) {
                 
-                pCurrentPanel->Line++;
+                pCurrentPanel->ItemIndex++;
 
                 CConsole::CursorOff();
                 CConsole::SaveCursor();
@@ -731,7 +740,7 @@ void CFileManager::FormKeyDown( uint16_t Key ) {
 
         case VK_HOME: { 
                        
-            pCurrentPanel->Line = 0;
+            pCurrentPanel->ItemIndex = 0;
 
             CConsole::CursorOff();
             CConsole::SaveCursor();
@@ -745,7 +754,7 @@ void CFileManager::FormKeyDown( uint16_t Key ) {
 
         case VK_END: { 
                        
-            pCurrentPanel->Line = pCurrentPanel->Height - 2;
+            pCurrentPanel->ItemIndex = pCurrentPanel->Height - 2;
 
             CConsole::CursorOff();
             CConsole::SaveCursor();

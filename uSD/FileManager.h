@@ -26,16 +26,20 @@ class CPanel {
 
 public:
 
+    // Размеры панели.
     uint8_t Left;
     uint8_t Top;
     uint8_t Width;
     uint8_t Height;
     
-    uint8_t Line;
+    // Текущий элемент и их общее число.
+    uint8_t ItemIndex;
+    uint16_t ItemsCount;
 
+    // Текущий путь.
     char Path[ 128 ];
 
-    FILINFO * pFileInfo;
+    // Информация о выбранном элементе.
     FILINFO FileInfo;
 
 };
