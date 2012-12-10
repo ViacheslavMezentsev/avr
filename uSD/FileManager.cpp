@@ -139,7 +139,7 @@ void CFileManager::DrawMainMenu() {
     CConsole::WriteString( SPSTR( " (iar)" ) );
 #endif
 
-    CConsole::ClearEndOfLine();
+    CConsole::ClearLine( CConsole::cmFromCursorToEnd );
 
 }
 
@@ -480,7 +480,7 @@ void CFileManager::DrawCommandLine( CPanel & Panel ) {
     CConsole::SetForegroundColor( clLightGray );
 
     CConsole::SaveCursor();
-    CConsole::ClearEndOfLine();
+    CConsole::ClearLine( CConsole::cmFromCursorToEnd );
     CConsole::RestoreCursor();
 
     CConsole::CursorOn();
@@ -523,7 +523,7 @@ void CFileManager::DrawFunctionKeys( CKeys & Keys ) {
     }
 
     // «аполн€ем пустое пространство до конца строки.
-    CConsole::ClearEndOfLine();
+    CConsole::ClearLine( CConsole::cmFromCursorToEnd );
 
 }
 

@@ -77,7 +77,7 @@ void CViewer::DrawTitle( char * Caption ) {
     CConsole::SetBackgroundColor( clWhite );
     CConsole::WriteString( Caption );
 
-    CConsole::ClearEndOfLine();
+    CConsole::ClearLine( CConsole::cmFromCursorToEnd );
 
     CConsole::MoveTo( 60, 1 );
     CConsole::WriteString( SPSTR( "CP1251" ) );
@@ -130,7 +130,7 @@ void CViewer::FormActivate() {
         for ( uint8_t i = 2; i < 25; i++ ) {
 
             CConsole::MoveTo( 1, i );
-            CConsole::ClearEndOfLine();
+            CConsole::ClearLine( CConsole::cmFromCursorToEnd );
         }
 
         CConsole::MoveTo( 1, 2 );

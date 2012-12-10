@@ -1,5 +1,4 @@
-#ifndef _CONSOLE_H_
-#define _CONSOLE_H_
+#pragma once
 
 /**
  * Класс CConsole
@@ -12,11 +11,12 @@
  * 
  * Почта: mailto:unihomelab@ya.ru
  * 
+ * http://citforum.ru/operating_systems/freebsd/ansi.shtml
+ * http://subscribe.ru/archive/comp.soft.prog.shellandawk/200301/27191228.html
+ *
  */
 
-#define BLINK 128
-
-//defines max coordinates for checking overflow
+// Максимальные размеры окна.
 #define MAX_X 80
 #define MAX_Y 25
 
@@ -105,10 +105,10 @@ enum EnAttributes {
 };
 
 
-//  Цвета
+//  Цвета.
 enum EnColor {
 
-/* dark colors */
+    // Тёмные.
     clBlack = 0,
     clRed, 
     clGreen, 
@@ -118,7 +118,7 @@ enum EnColor {
     clCyan,
     clWhite,
 
-/* light colors */
+    // Светлые.
     clDarkGray,
     clLightRed,
     clLightGreen,
@@ -137,12 +137,23 @@ public:
 
     enum EnCodePage { cp866 = 0, cp1251 };
 
+    enum EnClearMode {
+               
+        cmFromCursorToEnd = 0,
+        cmFromBeginToCursor,        
+        cmAll
+
+    };
+
+public:
+
     static uint8_t GetChar();
     static void PutChar( uint8_t ch, EnCodePage CodePage = cp866 );
     static void WriteString( FCHAR_PTR Value, EnCodePage CodePage = cp866, uint8_t Length = 0 );
     static void WriteString( const char * Value, EnCodePage CodePage = cp866, uint8_t Length = 0 );
-    static void ClearScreen();
-    static void ClearEndOfLine();
+    static void ClearScreen( EnClearMode Mode = cmAll );
+    static void ClearLine( EnClearMode Mode = cmFromCursorToEnd );
+    static void ClearForward( uint8_t Count );
     static void CursorOn();
     static void CursorOff();
     static void SaveCursor();
@@ -154,5 +165,3 @@ public:
     static void Move( EnMoveDirection Direction, uint8_t Delta );
 
 };
-
-#endif // _CONSOLE_H_
