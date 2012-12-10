@@ -133,20 +133,76 @@ void CConsole::WriteString( const char * s, EnCodePage CodePage, uint8_t Length 
 }
 
 
-void CConsole::ClearScreen() {
+/**
+ * Очистить экран.
+ */
+void CConsole::ClearScreen( EnClearMode Mode ) {
 
-    WriteString( SPSTR( "\033[2J" ) );
+    WriteString( ESC );
+
+    switch ( Mode ) {
+
+        // Очистить от курсора до конца экрана.
+        case cmFromCursorToEnd: { PutChar( '0' ); break; }
+
+        // Очистить от начала экрана до курсора.
+        case cmFromBeginToCursor: { PutChar( '1' ); break; }
+
+        // Очистить весь экран.
+        case cmAll: { PutChar( '2' ); break; }
+
+        default: PutChar( '2' );
+
+    }
+
+    PutChar( 'J' );
 
 }
 
 
-void CConsole::ClearEndOfLine() {
+/**
+ * Очистка строки.
+ */
+void CConsole::ClearLine( EnClearMode Mode ) {
 
-    WriteString( SPSTR( "\033[K" ) );
+    WriteString( ESC );
+
+    switch ( Mode ) {
+
+        // Очистить от курсора до конца экрана.
+        case cmFromCursorToEnd: { PutChar( '0' ); break; }
+
+        // Очистить от начала экрана до курсора.
+        case cmFromBeginToCursor: { PutChar( '1' ); break; }
+
+        // Очистить весь экран.
+        case cmAll: { PutChar( '2' ); break; }
+
+        default: PutChar( '0' );
+
+    }
+
+    PutChar( 'K' );
 
 }
 
 
+/**
+ * Очистить n знаков от позиции курсора.
+ */
+void CConsole::ClearForward( uint8_t Count ) {
+
+    WriteString( ESC );
+    PutChar( ( Count / 10 ) + '0' );
+    PutChar( ( Count % 10 ) + '0' );
+    PutChar( 'X' );
+
+}
+
+
+/**
+ * Спрятать курсор.
+ */
 void CConsole::CursorOn() {
 
     WriteString( SPSTR( "\033[?25h" ) );
@@ -154,6 +210,9 @@ void CConsole::CursorOn() {
 }
 
 
+/**
+ * Показать курсор.
+ */
 void CConsole::CursorOff() {
 
     WriteString( SPSTR( "\033[?25l" ) );
@@ -161,6 +220,9 @@ void CConsole::CursorOff() {
 }
 
 
+/**
+ * Запомнить положение курсора.
+ */
 void CConsole::SaveCursor() {
 
     WriteString( SPSTR( "\033[s" ) );
@@ -168,6 +230,9 @@ void CConsole::SaveCursor() {
 }
 
 
+/**
+ * Восстановить запомненное положение курсора.
+ */
 void CConsole::RestoreCursor() {
 
     WriteString( SPSTR( "\033[u" ) );
@@ -175,6 +240,9 @@ void CConsole::RestoreCursor() {
 }
 
 
+/**
+ * 
+ */
 void CConsole::SetForegroundColor( EnColor Color ) {
 
     if ( Color & 0x8 ) {
@@ -198,6 +266,9 @@ void CConsole::SetForegroundColor( EnColor Color ) {
 }
 
 
+/**
+ * 
+ */
 void CConsole::SetBackgroundColor( EnColor Color ) {
 
     if ( Color & 0x8 ) {
@@ -221,6 +292,9 @@ void CConsole::SetBackgroundColor( EnColor Color ) {
 }
 
 
+/**
+ * Изменение атрибутов.
+ */
 void CConsole::SetTextAttributes( EnAttributes Attributes ) {
 
     WriteString( ESC );
@@ -230,6 +304,9 @@ void CConsole::SetTextAttributes( EnAttributes Attributes ) {
 }
 
 
+/**
+ * Переместить в позицию Left и строку Top.
+ */
 void CConsole::MoveTo( uint8_t Left, uint8_t Top ) {
 
     if ( Left == 0 || Top == 0 ) return;
@@ -247,6 +324,9 @@ void CConsole::MoveTo( uint8_t Left, uint8_t Top ) {
 }
 
 
+/**
+ * 
+ */
 void CConsole::Move( EnMoveDirection Direction, uint8_t Delta ) {
 
     WriteString( ESC );
@@ -256,12 +336,16 @@ void CConsole::Move( EnMoveDirection Direction, uint8_t Delta ) {
 
     switch ( Direction ) {
 
+        // Вверх на n строк.
         case mdUp: { PutChar( 'A' ); break; }
 
+        // Вниз на n строк.
         case mdDown: { PutChar( 'B' ); break; }
 
+        // Вправо на n позиций.
         case mdForward: { PutChar( 'C' ); break; }
 
+        // Влево на n позиций.
         case mdBackward: { PutChar( 'D' ); break; }
 
         default: PutChar( 'C' );
