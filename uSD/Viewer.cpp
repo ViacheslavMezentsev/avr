@@ -10,6 +10,7 @@
 
 // -=[ Внешние ссылки ]=-
 
+extern char szROOT[2];
 extern char buffer[ 16 ];
 extern char CommandString[ 128 ];
 extern FRESULT res;
@@ -91,9 +92,7 @@ void CViewer::DrawTitle( char * Caption ) {
 /**
  * Реакция на активацию окна.
  */
-void CViewer::FormActivate() {
-
-    WORD wSize = 0;   
+void CViewer::FormActivate() {       
 
     CConsole::CursorOff();                       
 
@@ -104,18 +103,9 @@ void CViewer::FormActivate() {
     if ( res == FR_OK ) {		
 
         // Присоеденяем к пути имя выбранного файла.
-        CommandString[0] = 0;        
+        strcpy( CommandString, CFileManager::pCurrentPanel->Path );
         
-        strcat( CommandString, CFileManager::pCurrentPanel->Path );
-
-        wSize = strlen( CommandString );
-
-        if ( strlen( CFileManager::pCurrentPanel->Path ) > 1 ) {
-        
-            CommandString[ wSize ] = '/';                            
-            CommandString[ wSize + 1 ] = 0;
-
-        }
+        if ( strcmp( CommandString, szROOT ) != 0 ) strcat( CommandString, szROOT );
 
         strcat( CommandString, CFileManager::pCurrentPanel->FileInfo.fname );
 
@@ -136,10 +126,11 @@ void CViewer::FormActivate() {
         CConsole::MoveTo( 1, 2 );
 
         uint8_t row = 0;
+        WORD wSize = 0;
 
         // Открываем файл.
         res = CFAT::Open( CommandString );
-
+        
         // Читаем файл по блокам.
         res = CFAT::Read( & CommandString, 128, & wSize );
 

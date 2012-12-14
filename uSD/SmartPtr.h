@@ -106,9 +106,10 @@ public:
 
     inline T * operator & () {
             
-        return ( T * ) & _address;
+        return ( T * ) _address;
 
     }
+
 
     // Операция разъименовывания указателя. Здесь осуществляется чтение по указателю.
     inline const T operator *() const {

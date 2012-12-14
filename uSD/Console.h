@@ -57,6 +57,29 @@
 #define ACS_BLOCK	(acs_map['0'])	/* solid square block */
 
 
+// Text attributes
+enum EnAttributes {
+
+    atOff               = 0,    // Reset all attributes
+    atIntensityBold     = 1,
+    atIntensityFaint    = 2,    // (not widely supported)
+    atItalicOn          = 3,    // (not widely supported)
+    atUnderlineSingle   = 4,    // (not widely supported)
+    atBlinkSlow         = 5,
+    atBlinkRapid        = 6,
+    atImageNegative     = 7,
+    atConceal           = 8,    // (not widely supported)
+
+    atUnderlineDouble   = 21,   //
+    atIntensityNormal   = 22,   // not bold and not faint
+    atUnderlineNone     = 24,   //
+    atBlinkOff          = 25,   //
+    atImagePositive     = 27,   //
+    atReveal            = 28    // conceal off
+
+};
+
+
 enum EnMoveDirection {
 
     // Cursor Up: Moves the cursor up by the specified number of lines without
@@ -78,29 +101,6 @@ enum EnMoveDirection {
     // columns without changing lines. If the cursor is already in the leftmost
     // column, ANSI.SYS ignores this sequence.
     mdBackward
-
-};
-
-
-// Text attributes
-enum EnAttributes {
-
-    atOff               = 0,    // Reset all attributes
-    atIntensityBold     = 1,
-    atIntensityFaint    = 2,    // (not widely supported)
-    atItalicOn          = 3,    // (not widely supported)
-    atUnderlineSingle   = 4,    // (not widely supported)
-    atBlinkSlow         = 5,
-    atBlinkRapid        = 6,
-    atImageNegative     = 7,
-    atConceal           = 8,    // (not widely supported)
-
-    atUnderlineDouble   = 21,   //
-    atIntensityNormal   = 22,   // not bold and not faint
-    atUnderlineNone     = 24,   //
-    atBlinkOff          = 25,   //
-    atImagePositive     = 27,   //
-    atReveal            = 28    // conceal off
 
 };
 
@@ -163,5 +163,7 @@ public:
     static void SetTextAttributes( EnAttributes Attributes );
     static void MoveTo( uint8_t Left, uint8_t Top );
     static void Move( EnMoveDirection Direction, uint8_t Delta );
+    static void DrawFrame( uint8_t Left, uint8_t Top, uint8_t Width, uint8_t Height, 
+        EnColor Color, EnColor bgColor, char * Caption );
 
 };

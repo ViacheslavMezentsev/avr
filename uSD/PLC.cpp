@@ -13,6 +13,7 @@
 #include "MCU.h"
 #include "FileManager.h"
 #include "Viewer.h"
+#include "Player.h"
 #include "PLC.h"
 
 
@@ -264,9 +265,13 @@ LRESULT CPLC::DispatchMessage( const MSG * lpMsg ) {
 
 	    return CFileManager::WindowProc( lpMsg->hwnd, lpMsg->message, lpMsg->wParam, lpMsg->lParam );
 
-    } else if ( lpMsg->hwnd == HWND_MAIN_VIEWER ) {
+    } else if ( lpMsg->hwnd == HWND_VIEWER ) {
 
         return CViewer::WindowProc( lpMsg->hwnd, lpMsg->message, lpMsg->wParam, lpMsg->lParam );
+
+    } else if ( lpMsg->hwnd == HWND_PLAYER ) {
+
+        return CPlayer::WindowProc( lpMsg->hwnd, lpMsg->message, lpMsg->wParam, lpMsg->lParam );
 
     } else {
 

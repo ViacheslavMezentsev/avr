@@ -34,6 +34,8 @@ CPanel * CFileManager::pCurrentPanel = & LeftPanel;
 
 char CommandString[ 128 ];
 
+char szROOT[2] = "/";
+
 
 /***********************
 *  Р Е А Л И З А Ц И Я
@@ -41,9 +43,34 @@ char CommandString[ 128 ];
 ************************/
 
 
-void CFileManager::Initialization() {
+#if defined( __ICCAVR__ )
 
-    FLASHSTR_DECLARE( char, initpath, "/" );
+char * strstr_P( const char * s1, PGM_P s2 ){
+
+    int n;
+
+    if ( * s2 ) {
+
+        while ( * s1 ) {
+
+            for ( n = 0; * ( s1 + n ) == * ( s2 + n ); n++ ) {
+
+                if ( !*( s2 + n + 1 ) ) return ( char * ) s1;
+            }
+
+            s1++;
+        }
+
+        return NULL;
+
+    } else return ( char * ) s1;
+
+}
+
+#endif
+
+
+void CFileManager::Initialization() {
 
     LeftPanel.Left = 1;
     LeftPanel.Top = 2;
@@ -61,18 +88,8 @@ void CFileManager::Initialization() {
     RightPanel.ItemIndex = 0;
     RightPanel.ItemsCount = 0;
 
-    for ( uint8_t i = 0; i < 127; i++ ) {
-        
-        if ( initpath[i] == 0 ) {
-            
-            LeftPanel.Path[i] = 0;
-            RightPanel.Path[i] = 0;
-            break;
-        }
-
-        LeftPanel.Path[i] = initpath[i];
-        RightPanel.Path[i] = initpath[i];
-    }
+    strcpy( LeftPanel.Path, szROOT );
+    strcpy( RightPanel.Path, szROOT );
 
     // Очищаем командрую строку.
     CommandString[0] = 0;
@@ -81,51 +98,11 @@ void CFileManager::Initialization() {
 
 
 /**
- * Отрисовка окна с рамкой
- */
-void CFileManager::DrawFrame( uint8_t Left, uint8_t Top, uint8_t Width, uint8_t Height, 
-        EnColor Color, EnColor bgColor ) {
-
-    CConsole::SetTextAttributes( atOff );    
-    CConsole::SetForegroundColor( Color );
-    CConsole::SetBackgroundColor( bgColor );
-
-    CConsole::MoveTo( Left, Top );
-
-    CConsole::PutChar( ACS_DBL_ULCORNER );
-
-    for ( uint8_t i = 0; i < Width; i++ ) CConsole::PutChar( ACS_DBL_HLINE );
-
-    CConsole::PutChar( ACS_DBL_URCORNER );
-    
-    for ( uint8_t i = 0; i < Height; i++ ) {
-
-        CConsole::MoveTo( Left, Top + i + 1 );
-        CConsole::PutChar( ACS_DBL_VLINE );
-
-        for ( uint8_t i = 0; i < Width; i++ ) CConsole::PutChar( ' ' );
-
-        CConsole::PutChar( ACS_DBL_VLINE );
-
-    }
-
-    CConsole::MoveTo( Left, Top + Height + 1 );
-
-    CConsole::PutChar( ACS_DBL_LLCORNER );
-
-    for ( uint8_t i = 0; i < Width; i++ ) CConsole::PutChar( ACS_DBL_HLINE );
-
-    CConsole::PutChar( ACS_DBL_LRCORNER );
-    
-}
-
-
-/**
  * Отрисовка заголовка окна
  */
 void CFileManager::DrawMainMenu() {
 
-    CConsole::SetTextAttributes( atOff );        
+    CConsole::SetTextAttributes( atOff );
     CConsole::MoveTo( 1, 1 );
 
     CConsole::SetForegroundColor( clBlack );
@@ -200,12 +177,12 @@ void CFileManager::HightlightPanel( CPanel & Panel ) {
 
     len /= 2;
 
-    CConsole::MoveTo( Panel.Left + len, 2 );
-    
+    CConsole::MoveTo( Panel.Left + len, Panel.Top );
+
     CConsole::PutChar( ' ' );
 
-    if ( & Panel == pCurrentPanel ) {        
-    
+    if ( & Panel == pCurrentPanel ) {
+
         CConsole::SetTextAttributes( atOff );
         CConsole::SetForegroundColor( clBlack );
         CConsole::SetBackgroundColor( clWhite );
@@ -218,8 +195,8 @@ void CFileManager::HightlightPanel( CPanel & Panel ) {
     } else {
 
         CConsole::WriteString( Panel.Path );
-        
-    }   
+
+    }
 
     CConsole::PutChar( ' ' );
 
@@ -252,13 +229,13 @@ void CFileManager::HightlightPanel( CPanel & Panel ) {
         if ( Panel.FileInfo.fattrib & AM_DIR ) {
 
             if ( & Panel == pCurrentPanel ) {
-                
+
                 CConsole::SetTextAttributes( atOff );
                 CConsole::SetForegroundColor( clBlack );
                 CConsole::SetBackgroundColor( clWhite );
 
             } else {
-                
+
                 CConsole::SetForegroundColor( clLightGreen );
             }
 
@@ -277,13 +254,13 @@ void CFileManager::HightlightPanel( CPanel & Panel ) {
         } else {
 
             if ( & Panel == pCurrentPanel ) {
-                
+
                 CConsole::SetTextAttributes( atOff );
                 CConsole::SetForegroundColor( clBlack );
                 CConsole::SetBackgroundColor( clWhite );
 
             } else {
-                
+
                 CConsole::SetForegroundColor( clLightGray );
             }
 
@@ -313,9 +290,9 @@ void CFileManager::HightlightPanel( CPanel & Panel ) {
 }
 
 
-void CFileManager::DrawPanel( CPanel & Panel ) {           
+void CFileManager::DrawPanel( CPanel & Panel ) {
 
-    DrawFrame( Panel.Left, Panel.Top, Panel.Width, Panel.Height, clLightGray, clBlue );
+    CConsole::DrawFrame( Panel.Left, Panel.Top, Panel.Width, Panel.Height, clLightGray, clBlue, Panel.Path );
 
     CConsole::SetForegroundColor( clLightYellow );
 
@@ -332,7 +309,7 @@ void CFileManager::DrawPanel( CPanel & Panel ) {
 
     CConsole::WriteString( SPSTR( "Дата   Время" ), CConsole::cp1251 );
 
-    CConsole::SetForegroundColor( clLightGray );    
+    CConsole::SetForegroundColor( clLightGray );
 
     // Отображаем разделительные линии таблицы.
     for ( uint8_t i = Panel.Top + 1; i < Panel.Top + Panel.Height + 1; i++ ) {
@@ -403,7 +380,7 @@ void CFileManager::DrawPanel( CPanel & Panel ) {
 
             // Сохраняем описание выбранного элемента.
             if ( Panel.ItemIndex == ( i - Panel.Top - 2 ) ) {
-            
+
                 Panel.FileInfo = fno;
             }
 
@@ -446,7 +423,7 @@ void CFileManager::DrawPanel( CPanel & Panel ) {
             }
 
             CConsole::MoveTo( Panel.Left + 25, i );
-            
+
             WriteDateTime( Panel, fno );
 
         } // for
@@ -467,12 +444,12 @@ void CFileManager::DrawPanel( CPanel & Panel ) {
 void CFileManager::DrawCommandLine( CPanel & Panel ) {
 
     // Выводим приглашение
-    CConsole::SetTextAttributes( atOff );    
+    CConsole::SetTextAttributes( atOff );
     CConsole::SetForegroundColor( clLightGreen );
     CConsole::SetBackgroundColor( clBlack );
 
     CConsole::MoveTo( 1, 24 );
-    
+
     CConsole::PutChar( '[' );
     CConsole::WriteString( Panel.Path );
     CConsole::WriteString( SPSTR( "]$ " ) );
@@ -493,8 +470,6 @@ void CFileManager::DrawCommandLine( CPanel & Panel ) {
  */
 void CFileManager::DrawFunctionKeys( CKeys & Keys ) {
 
-    char buf[3];
-
     CConsole::SetTextAttributes( atOff );
     CConsole::MoveTo( 1, 25 );
 
@@ -502,16 +477,16 @@ void CFileManager::DrawFunctionKeys( CKeys & Keys ) {
     for ( uint8_t i = 0; i < 10; i++ ) {
 
         if ( Keys[i] != 0 ) {
-            
+
             CConsole::SetForegroundColor( clRed );
             CConsole::SetBackgroundColor( clWhite );
-            
+
             // Разделитель
             CConsole::PutChar( ' ' );
-            
+
             CConsole::WriteString( SPSTR( "ESC" ) );
             //CConsole::WriteString( utoa_fast_div( i, buf ) );
-            
+
             // Разделитель
             CConsole::PutChar( ' ' );
 
@@ -566,7 +541,7 @@ LRESULT CFileManager::WindowProc( HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lP
                 case ID_TIMER_1S: { Form1secTimer(); break; }
 
                 case ID_TIMER_5S: { Form5secTimer(); break; }
-                
+
             }
 
             break;
@@ -594,10 +569,10 @@ void CFileManager::FormActivate() {
     CConsole::MoveTo( 1, 1 );
 
     DrawMainMenu();
-    
+
     DrawPanel( LeftPanel );
-    DrawPanel( RightPanel );            
-    
+    DrawPanel( RightPanel );
+
     DrawFunctionKeys( Keys );
 
     // Выводим приглашение командной строки.
@@ -616,8 +591,8 @@ void CFileManager::FormKeyDown( uint16_t Key ) {
 
         case VK_ESCAPE: { break; }
 
-        case VK_RETURN: { 
-            
+        case VK_RETURN: {
+
             // Если командная строка не пустая, то передаём содержимое на исполнение.
             tmp = strlen( CommandString );
 
@@ -634,48 +609,64 @@ void CFileManager::FormKeyDown( uint16_t Key ) {
             // Если объект - папка
             if ( pCurrentPanel->FileInfo.fattrib & AM_DIR ) {
 
-                tmp = strlen( pCurrentPanel->Path );
-
-                if ( tmp > 1 ) {
-                
-                    CFileManager::pCurrentPanel->Path[ tmp ] = '/';                            
-                    CFileManager::pCurrentPanel->Path[ tmp + 1 ] = 0;
-
-                }
+                // Присоеденяем к пути имя выбранного файла.
+                if ( strcmp( pCurrentPanel->Path, szROOT ) != 0 ) strcat( pCurrentPanel->Path, szROOT );
 
                 strcat( pCurrentPanel->Path, pCurrentPanel->FileInfo.fname );
-                
+
                 pCurrentPanel->ItemIndex = 0;
 
                 CConsole::CursorOff();
 
                 DrawPanel( * pCurrentPanel );
-                
+
                 // Выводим приглашение командной строки.
                 DrawCommandLine( * pCurrentPanel );
 
-            // Если объект - файл
-            } else {
+                // Если объект - файл.
+                } else {
 
-                CPLC::SetActiveWindow( HWND_MAIN_VIEWER );
 
-            }
+                    #ifdef __GNUC__
 
-            break; 
+                        if ( strstr_P( pCurrentPanel->FileInfo.fname, ( PGM_P ) & SPSTR( ".TXT" ) ) != NULL ) {
+
+                    #elif defined( __ICCAVR__ )
+
+                        if ( strstr_P( pCurrentPanel->FileInfo.fname, SPSTR( ".TXT" ) ) != NULL ) {
+
+                    #endif
+                            CPLC::SetActiveWindow( HWND_VIEWER );
+
+                    #ifdef __GNUC__
+
+                        } else if ( strstr_P( pCurrentPanel->FileInfo.fname, ( PGM_P ) & SPSTR( ".WAV" ) ) != NULL ) {
+
+                    #elif defined( __ICCAVR__ )
+
+                        } else if ( strstr_P( pCurrentPanel->FileInfo.fname, SPSTR( ".WAV" ) ) != NULL ) {
+
+                    #endif
+                            CPLC::SetActiveWindow( HWND_PLAYER );
+
+                        }
+
+                }
+
+            break;
 
         }
 
-        case VK_BACK: { 
+        case VK_BACK: {
 
             tmp = strlen( CommandString );
 
             // Удаляем предыдущий символ, если буфер командной строки не пуст.
             if ( tmp > 0 ) {
-            
+
                 CConsole::PutChar( VK_BACK );
-                CConsole::PutChar( ' ' );
-                CConsole::PutChar( VK_BACK );
-                 
+                CConsole::ClearForward(1);
+
                 CommandString[ --tmp ] = 0;
 
             // Если буфер пуст, то переходим в верхнюю папку.
@@ -692,22 +683,22 @@ void CFileManager::FormKeyDown( uint16_t Key ) {
                 CConsole::CursorOff();
 
                 DrawPanel( * pCurrentPanel );
-                
+
                 // Выводим приглашение командной строки.
                 DrawCommandLine( * pCurrentPanel );
 
             }
 
-            break; 
+            break;
 
         }
 
-        case VK_UP: { 
-        
+        case VK_UP: {
+
             if ( pCurrentPanel->ItemIndex != 0 ) {
 
                 pCurrentPanel->ItemIndex--;
-                
+
                 CConsole::CursorOff();
                 CConsole::SaveCursor();
                 DrawPanel( * pCurrentPanel );
@@ -716,14 +707,14 @@ void CFileManager::FormKeyDown( uint16_t Key ) {
 
             }
 
-            break; 
+            break;
 
         }
 
-        case VK_DOWN: { 
-        
+        case VK_DOWN: {
+
             if ( pCurrentPanel->ItemIndex < pCurrentPanel->Height - 1 ) {
-                
+
                 pCurrentPanel->ItemIndex++;
 
                 CConsole::CursorOff();
@@ -734,12 +725,12 @@ void CFileManager::FormKeyDown( uint16_t Key ) {
 
             }
 
-            break; 
+            break;
 
         }
 
-        case VK_HOME: { 
-                       
+        case VK_HOME: {
+
             pCurrentPanel->ItemIndex = 0;
 
             CConsole::CursorOff();
@@ -748,12 +739,12 @@ void CFileManager::FormKeyDown( uint16_t Key ) {
             CConsole::RestoreCursor();
             CConsole::CursorOn();
 
-            break; 
+            break;
 
         }
 
-        case VK_END: { 
-                       
+        case VK_END: {
+
             pCurrentPanel->ItemIndex = pCurrentPanel->ItemsCount - 1;
 
             CConsole::CursorOff();
@@ -762,11 +753,11 @@ void CFileManager::FormKeyDown( uint16_t Key ) {
             CConsole::RestoreCursor();
             CConsole::CursorOn();
 
-            break; 
+            break;
 
         }
 
-        case VK_TAB: { 
+        case VK_TAB: {
 
             CConsole::CursorOff();
 
@@ -776,20 +767,20 @@ void CFileManager::FormKeyDown( uint16_t Key ) {
                 HightlightPanel( LeftPanel );
 
             } else {
-        
+
                 pCurrentPanel = & LeftPanel;
                 HightlightPanel( RightPanel );
             }
-            
-            HightlightPanel( * pCurrentPanel );            
-            
+
+            HightlightPanel( * pCurrentPanel );
+
             // Выводим приглашение командной строки.
             DrawCommandLine( * pCurrentPanel );
 
-            break; 
+            break;
 
         }
-        
+
         default: {
 
             // Выводим символ на экран.

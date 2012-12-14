@@ -98,6 +98,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\Player.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\PLC.cpp"
 				>
 			</File>
@@ -149,6 +153,10 @@
 			</File>
 			<File
 				RelativePath=".\MMC.h"
+				>
+			</File>
+			<File
+				RelativePath=".\Player.h"
 				>
 			</File>
 			<File
