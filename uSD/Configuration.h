@@ -30,7 +30,8 @@
 #define ID_TIMER_5S     0x05
 
 #define HWND_MAIN_SCREEN 100
-#define HWND_MAIN_VIEWER 101
+#define HWND_VIEWER 101
+#define HWND_PLAYER 102
 
 // Размер очереди сообщений в ОЗУ
 // Один элемент занимает в ОЗУ sizeof( MSG ) = 20 байт

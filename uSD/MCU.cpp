@@ -1213,6 +1213,11 @@ void CMCU::OnUSARTRxComplete( uint8_t data ){
 
     if ( !FIFO_IS_FULL( uart_rx_fifo ) ) {
 
+        // ƒобавл€ем однократную задержку дл€ таймера.
+        // Ёто нужно дл€ того, чтобы таймер не сработал между моментами
+        // прин€ти€ очередного байта в коротких посылках.
+        TCNT2 = 0x00;
+
         FIFO_PUSH( uart_rx_fifo, data );
     }
 

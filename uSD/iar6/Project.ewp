@@ -2029,6 +2029,9 @@
     <name>$PROJ_DIR$\..\MMC.cpp</name>
   </file>
   <file>
+    <name>$PROJ_DIR$\..\Player.cpp</name>
+  </file>
+  <file>
     <name>$PROJ_DIR$\..\PLC.cpp</name>
   </file>
   <file>

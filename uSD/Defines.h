@@ -63,7 +63,7 @@
 
     #define SPSTR(s) (__extension__({ \
         static char __c[] PROGMEM = (s); \
-        FlashPtr<char> _c(__c); _c; }))
+        FlashPtr<char> _c(__c); _c; })) 
 
 #elif defined( __ICCAVR__ )
 
@@ -152,7 +152,7 @@
     #define FLASHARR_DECLARE( type, name, size, init ) \
         __flash type name[size] = init;
 
-    #define SPSTR(s) ( FCHAR_PTR )(s)
+    #define SPSTR(s) (FCHAR_PTR)(s)
 
 #endif
 

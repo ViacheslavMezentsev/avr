@@ -169,13 +169,13 @@ void CConsole::ClearLine( EnClearMode Mode ) {
 
     switch ( Mode ) {
 
-        // Очистить от курсора до конца экрана.
+        // Очистить от курсора до конца строки.
         case cmFromCursorToEnd: { PutChar( '0' ); break; }
 
-        // Очистить от начала экрана до курсора.
+        // Очистить от начала строки до курсора.
         case cmFromBeginToCursor: { PutChar( '1' ); break; }
 
-        // Очистить весь экран.
+        // Очистить всю строку.
         case cmAll: { PutChar( '2' ); break; }
 
         default: PutChar( '0' );
@@ -349,6 +349,59 @@ void CConsole::Move( EnMoveDirection Direction, uint8_t Delta ) {
         case mdBackward: { PutChar( 'D' ); break; }
 
         default: PutChar( 'C' );
+
+    }
+
+}
+
+
+/**
+ * Отрисовка окна с рамкой
+ */
+void CConsole::DrawFrame( uint8_t Left, uint8_t Top, uint8_t Width, uint8_t Height,
+        EnColor Color, EnColor bgColor, char * Caption ) {
+
+    SetTextAttributes( atOff );
+    SetForegroundColor( Color );
+    SetBackgroundColor( bgColor );
+
+    MoveTo( Left, Top );
+
+    PutChar( ACS_DBL_ULCORNER );
+
+    for ( uint8_t i = 0; i < Width; i++ ) PutChar( ACS_DBL_HLINE );
+
+    PutChar( ACS_DBL_URCORNER );
+
+    MoveTo( Left, Top + Height + 1 );
+
+    PutChar( ACS_DBL_LLCORNER );
+
+    for ( uint8_t i = 0; i < Width; i++ ) PutChar( ACS_DBL_HLINE );
+
+    PutChar( ACS_DBL_LRCORNER );
+
+    // Отображаем путь в заголовке панели.
+    uint8_t len = Width - strlen( Caption );
+
+    len /= 2;
+
+    MoveTo( Left + len, Top );
+
+    PutChar( ' ' );
+
+    WriteString( Caption );
+
+    PutChar( ' ' );
+
+    for ( uint8_t i = 0; i < Height; i++ ) {
+
+        MoveTo( Left, Top + i + 1 );
+        PutChar( ACS_DBL_VLINE );
+
+        for ( uint8_t i = 0; i < Width; i++ ) PutChar( ' ' );
+
+        PutChar( ACS_DBL_VLINE );
 
     }
 
