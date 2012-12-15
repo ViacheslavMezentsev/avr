@@ -191,8 +191,8 @@ CPPFLAGS += -Wa,-adhlns=$(<:%.cpp=$(OBJDIR)/%.lst)
 CPPFLAGS += $(patsubst %,-I%,$(EXTRAINCDIRS))
 #CPPFLAGS += $(CSTANDARD)
 # Внимание. Те функции которые не вызываются, не включаются в исходный бинарник
-#CPPFLAGS += -ffunction-sections
-#CPPFLAGS += -fdata-sections
+CPPFLAGS += -ffunction-sections
+CPPFLAGS += -fdata-sections
 
 #---------------- Assembler Options ----------------
 #  -Wa,...:   tell GCC to pass this to the assembler.
@@ -266,7 +266,7 @@ LDFLAGS += $(patsubst %,-L%,$(EXTRALIBDIRS))
 LDFLAGS += $(PRINTF_LIB) $(SCANF_LIB) $(MATH_LIB)
 #LDFLAGS += -T linker_script.x
 # Внимание. Те функции которые не вызываются, не включаются в исходный бинарник
-#LDFLAGS += -Wl,-gc-sections
+LDFLAGS += -Wl,-gc-sections
 
 
 

@@ -1420,7 +1420,7 @@ FRESULT CFAT::CreateName( DIR * DirObject, FCHAR_PTR * path ) {
 
 	}
 	
-    // Rerurn pointer to the next segment
+    // Return pointer to the next segment
     path[0] = ( FCHAR_PTR ) ( & p + si );
 
 	// Set last segment flag if end of path

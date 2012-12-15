@@ -71,23 +71,25 @@ char * strstr_P( const char * s1, PGM_P s2 ){
 
 
 void CFileManager::Initialization() {
-
+    
     LeftPanel.Left = 1;
     LeftPanel.Top = 2;
     LeftPanel.Width = 38;
     LeftPanel.Height = 20;
-
-    LeftPanel.ItemIndex = 0;
-    LeftPanel.ItemsCount = 0;
 
     RightPanel.Left = 41;
     RightPanel.Top = 2;
     RightPanel.Width = 38;
     RightPanel.Height = 20;
 
+    // Переменные для работы с текущим выбранным элементом.
+    LeftPanel.ItemIndex = 0;
+    LeftPanel.ItemsCount = 0;
+
     RightPanel.ItemIndex = 0;
     RightPanel.ItemsCount = 0;
 
+    // Иницициализируем начальный путь для каждой панели.
     strcpy( LeftPanel.Path, szROOT );
     strcpy( RightPanel.Path, szROOT );
 
@@ -102,11 +104,9 @@ void CFileManager::Initialization() {
  */
 void CFileManager::DrawMainMenu() {
 
-    CConsole::SetTextAttributes( atOff );
     CConsole::MoveTo( 1, 1 );
+    CConsole::SetColor( clBlack, clWhite );    
 
-    CConsole::SetForegroundColor( clBlack );
-    CConsole::SetBackgroundColor( clWhite );
     CConsole::WriteString( SPSTR( "Файловый менеджер, ATmega16 @ 16 МГц, версия сборки: " ), CConsole::cp1251 );
     CConsole::WriteString( Version );
 
@@ -168,9 +168,7 @@ void CFileManager::WriteDateTime( CPanel & Panel, FILINFO & fno ) {
  */
 void CFileManager::HightlightPanel( CPanel & Panel ) {
 
-    CConsole::SetTextAttributes( atOff );
-    CConsole::SetForegroundColor( clLightGray );
-    CConsole::SetBackgroundColor( clBlue );
+    CConsole::SetColor( clLightGray, clBlue );
 
     // Отображаем путь в заголовке панели.
     uint8_t len = Panel.Width - strlen( Panel.Path );
@@ -183,14 +181,9 @@ void CFileManager::HightlightPanel( CPanel & Panel ) {
 
     if ( & Panel == pCurrentPanel ) {
 
-        CConsole::SetTextAttributes( atOff );
-        CConsole::SetForegroundColor( clBlack );
-        CConsole::SetBackgroundColor( clWhite );
-
+        CConsole::SetColor( clBlack, clWhite );
         CConsole::WriteString( Panel.Path );
-
-        CConsole::SetForegroundColor( clLightGray );
-        CConsole::SetBackgroundColor( clBlue );
+        CConsole::SetColor( clLightGray, clBlue );
 
     } else {
 
@@ -202,13 +195,7 @@ void CFileManager::HightlightPanel( CPanel & Panel ) {
 
     if ( Panel.ItemsCount != 0 ) {
 
-        if ( & Panel == pCurrentPanel ) {
-
-            CConsole::SetTextAttributes( atOff );
-            CConsole::SetForegroundColor( clBlack );
-            CConsole::SetBackgroundColor( clWhite );
-
-        }
+        if ( & Panel == pCurrentPanel ) CConsole::SetColor( clBlack, clWhite );
 
         // Отображаем разделители для выделенной строки.
         CConsole::MoveTo( Panel.Left + 13, Panel.ItemIndex + Panel.Top + 2 );
@@ -219,25 +206,14 @@ void CFileManager::HightlightPanel( CPanel & Panel ) {
         CConsole::Move( mdForward, 8 );
         CConsole::PutChar( ACS_VLINE );
 
-        CConsole::SetForegroundColor( clLightGray );
-        CConsole::SetBackgroundColor( clBlue );
-
+        CConsole::SetColor( clLightGray, clBlue );
         CConsole::MoveTo( Panel.Left + 1, Panel.ItemIndex + Panel.Top + 2 );
 
         // Обображаем данные элемента для выделенной строки.
         // Если объект - папка.
         if ( Panel.FileInfo.fattrib & AM_DIR ) {
 
-            if ( & Panel == pCurrentPanel ) {
-
-                CConsole::SetTextAttributes( atOff );
-                CConsole::SetForegroundColor( clBlack );
-                CConsole::SetBackgroundColor( clWhite );
-
-            } else {
-
-                CConsole::SetForegroundColor( clLightGreen );
-            }
+            ( & Panel == pCurrentPanel ) ? CConsole::SetColor( clBlack, clWhite ) : CConsole::SetForegroundColor( clLightGreen );
 
             // Имя
             CConsole::WriteString( Panel.FileInfo.fname );
@@ -253,16 +229,7 @@ void CFileManager::HightlightPanel( CPanel & Panel ) {
         // Если объект - файл.
         } else {
 
-            if ( & Panel == pCurrentPanel ) {
-
-                CConsole::SetTextAttributes( atOff );
-                CConsole::SetForegroundColor( clBlack );
-                CConsole::SetBackgroundColor( clWhite );
-
-            } else {
-
-                CConsole::SetForegroundColor( clLightGray );
-            }
+            ( & Panel == pCurrentPanel ) ? CConsole::SetColor( clBlack, clWhite ) : CConsole::SetForegroundColor( clLightGray );
 
             // Имя
             CConsole::WriteString( Panel.FileInfo.fname );
@@ -444,10 +411,7 @@ void CFileManager::DrawPanel( CPanel & Panel ) {
 void CFileManager::DrawCommandLine( CPanel & Panel ) {
 
     // Выводим приглашение
-    CConsole::SetTextAttributes( atOff );
-    CConsole::SetForegroundColor( clLightGreen );
-    CConsole::SetBackgroundColor( clBlack );
-
+    CConsole::SetColor( clLightGreen, clBlack );
     CConsole::MoveTo( 1, 24 );
 
     CConsole::PutChar( '[' );
@@ -470,7 +434,6 @@ void CFileManager::DrawCommandLine( CPanel & Panel ) {
  */
 void CFileManager::DrawFunctionKeys( CKeys & Keys ) {
 
-    CConsole::SetTextAttributes( atOff );
     CConsole::MoveTo( 1, 25 );
 
     // Перебираем функциональные клавиши.
@@ -478,8 +441,7 @@ void CFileManager::DrawFunctionKeys( CKeys & Keys ) {
 
         if ( Keys[i] != 0 ) {
 
-            CConsole::SetForegroundColor( clRed );
-            CConsole::SetBackgroundColor( clWhite );
+            CConsole::SetColor( clRed, clWhite );
 
             // Разделитель
             CConsole::PutChar( ' ' );
@@ -560,12 +522,9 @@ LRESULT CFileManager::WindowProc( HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lP
 void CFileManager::FormActivate() {
 
     CConsole::CursorOff();
-
-    CConsole::SetTextAttributes( atOff );
-    CConsole::SetBackgroundColor( clBlack );
-    CConsole::SetForegroundColor( clLightGray );
+    CConsole::SetColor( clLightGray, clBlack );
+    
     CConsole::ClearScreen();
-
     CConsole::MoveTo( 1, 1 );
 
     DrawMainMenu();

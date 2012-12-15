@@ -293,6 +293,18 @@ void CConsole::SetBackgroundColor( EnColor Color ) {
 
 
 /**
+ * 
+ */
+void CConsole::SetColor( EnColor ForegroundColor, EnColor BackgroundColor ) {
+
+    SetTextAttributes( atOff );    
+    SetForegroundColor( ForegroundColor );
+    SetBackgroundColor( BackgroundColor );
+
+}
+
+
+/**
  * Изменение атрибутов.
  */
 void CConsole::SetTextAttributes( EnAttributes Attributes ) {
@@ -361,15 +373,21 @@ void CConsole::Move( EnMoveDirection Direction, uint8_t Delta ) {
 void CConsole::DrawFrame( uint8_t Left, uint8_t Top, uint8_t Width, uint8_t Height,
         EnColor Color, EnColor bgColor, char * Caption ) {
 
-    SetTextAttributes( atOff );
-    SetForegroundColor( Color );
-    SetBackgroundColor( bgColor );
-
+    SetColor( Color, bgColor );
     MoveTo( Left, Top );
+
+    // Отображаем путь в заголовке панели.
+    uint8_t len = Width - strlen( Caption );
+
+    len /= 2;
 
     PutChar( ACS_DBL_ULCORNER );
 
-    for ( uint8_t i = 0; i < Width; i++ ) PutChar( ACS_DBL_HLINE );
+    for ( uint8_t i = 0; i < len; i++ ) PutChar( ACS_DBL_HLINE );
+    
+    Move( mdForward, Width - ( len << 1 ) );
+
+    for ( uint8_t i = 0; i < len; i++ ) PutChar( ACS_DBL_HLINE );
 
     PutChar( ACS_DBL_URCORNER );
 
@@ -380,11 +398,6 @@ void CConsole::DrawFrame( uint8_t Left, uint8_t Top, uint8_t Width, uint8_t Heig
     for ( uint8_t i = 0; i < Width; i++ ) PutChar( ACS_DBL_HLINE );
 
     PutChar( ACS_DBL_LRCORNER );
-
-    // Отображаем путь в заголовке панели.
-    uint8_t len = Width - strlen( Caption );
-
-    len /= 2;
 
     MoveTo( Left + len, Top );
 

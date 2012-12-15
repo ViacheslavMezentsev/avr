@@ -92,7 +92,7 @@ build: "C:\Program Files\Atmel\Atmel Studio 6.0\extensions\Atmel\AVRGCC\3.3.2.31
 clean: "C:\Program Files\Atmel\Atmel Studio 6.0\extensions\Atmel\AVRGCC\3.3.2.31\AVRToolchain\bin\make.exe" clean
 build all: "C:\Program Files\Atmel\Atmel Studio 6.0\extensions\Atmel\AVRGCC\3.3.2.31\AVRToolchain\bin\make.exe" build all
 
-Директивы препроцессора: 
+Директивы препроцессора:
 Debug: __GNUC__;__AVR_ATmega16__;__DEBUG__
 Release: __GNUC__;__AVR_ATmega16__
 
