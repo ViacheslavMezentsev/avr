@@ -133,6 +133,9 @@ enum EnColor {
 
 class CConsole {
 
+private:
+
+
 public:
 
     enum EnCodePage { cp866 = 0, cp1251 };
@@ -160,6 +163,7 @@ public:
     static void RestoreCursor();
     static void SetForegroundColor( EnColor Color );
     static void SetBackgroundColor( EnColor Color );
+    static void SetColor( EnColor ForegroundColor, EnColor BackgroundColor );
     static void SetTextAttributes( EnAttributes Attributes );
     static void MoveTo( uint8_t Left, uint8_t Top );
     static void Move( EnMoveDirection Direction, uint8_t Delta );

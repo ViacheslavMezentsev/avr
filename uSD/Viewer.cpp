@@ -71,13 +71,10 @@ LRESULT CViewer::WindowProc( HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam 
  */
 void CViewer::DrawTitle( char * Caption ) {
 
-    CConsole::SetTextAttributes( atOff );        
+    CConsole::SetColor( clBlack, clWhite );
     CConsole::MoveTo( 1, 1 );
 
-    CConsole::SetForegroundColor( clBlack );
-    CConsole::SetBackgroundColor( clWhite );
     CConsole::WriteString( Caption );
-
     CConsole::ClearLine( CConsole::cmFromCursorToEnd );
 
     CConsole::MoveTo( 60, 1 );
@@ -113,9 +110,7 @@ void CViewer::FormActivate() {
         DrawTitle( CommandString );
 
         // Заполняем фон.
-        CConsole::SetTextAttributes( atOff );    
-        CConsole::SetForegroundColor( clLightGray );
-        CConsole::SetBackgroundColor( clBlue );
+        CConsole::SetColor( clLightGray, clBlue );
 
         for ( uint8_t i = 2; i < 25; i++ ) {
 
