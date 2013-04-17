@@ -39,7 +39,7 @@ extern MSG EmptyMsg;
 char Version[ 16 ]; // Версия программы
 char buffer[ 16 ];
 
-// Дискриптор активного окна
+// Дескриптор активного окна
 HWND hwndActiveWindow;
 
 // Временные "ящики" для хранения промежуточного сообщения
@@ -187,8 +187,7 @@ int CPLC::WinMain() {
 
     }
 
-    // Возвращаем код завершения
-    
+    // Возвращаем код завершения    
     return msg.wParam;
 
 }
@@ -223,7 +222,7 @@ void CPLC::Sleep (DWORD dwMilliseconds ) {
 
 
 /**
- * Получить дискриптор активного окна
+ * Получить дескриптор активного окна
  */
 inline HWND CPLC::GetActiveWindow() {
 

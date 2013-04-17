@@ -9,6 +9,7 @@
 #include "Configuration.h"
 #include "MessagesQueue.h"
 
+
 MSG EmptyMsg = {
     NULL, // hwnd
     NULL, // message
@@ -17,6 +18,7 @@ MSG EmptyMsg = {
     0     // time
 };
 
+
 CMessagesQueue::CMessagesQueue(){
 
     m_Head = 0;
@@ -24,6 +26,7 @@ CMessagesQueue::CMessagesQueue(){
     m_LenBuffer = MESSAGE_QUEUE_LENGTH;
 
 }
+
 
 void CMessagesQueue::get(LPMSG lpMsg, HWND hWnd, UINT wMsgFilterMin, UINT wMsgFilterMax){
 
@@ -59,12 +62,14 @@ void CMessagesQueue::put(LPMSG lpMsg){
     // Иначе сообщение не попадает в очередь сообщений и пропадает
 }
 
+
 // Хвост начинается с головы
 bool CMessagesQueue::empty(){
 
 	return ( m_Head == m_Tail );
 
 }
+
 
 // !space() - нет места, т.е. заполнена
 bool CMessagesQueue::filled(){
