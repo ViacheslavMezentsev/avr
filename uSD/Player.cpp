@@ -151,6 +151,7 @@ DWORD CPlayer::LoadHead() {
 }
 
 
+// Проигрывание звукового файла.
 FRESULT CPlayer::Play ( const char * fn ) {
 	
     BYTE sw;
@@ -235,7 +236,7 @@ void CPlayer::FormActivate() {
 
     #endif
      
-    // Присоеденяем к пути имя выбранного файла.
+    // Присоединяем к пути имя выбранного файла.
     strcat( CommandString, CFileManager::pCurrentPanel->Path );
     
     if ( strcmp( CommandString, szROOT ) != 0 ) strcat( CommandString, szROOT );
@@ -310,7 +311,7 @@ void CPlayer::FormActivate() {
     // Монтирование FAT32.
     res = CFAT::Mount( & fs );
 
-    // Присоеденяем к пути имя выбранного файла.
+    // Присоединяем к пути имя выбранного файла.
     strcpy( CommandString, CFileManager::pCurrentPanel->Path );
     
     if ( strcmp( CommandString, szROOT ) != 0 ) strcat( CommandString, szROOT );
@@ -320,7 +321,7 @@ void CPlayer::FormActivate() {
     // Если монтирование было успешным.
     if ( res == FR_OK ) Play( CommandString );
 
-    // Отмонтируем FatFs
+    // Размонтируем FatFs.
     res = CFAT::Mount( NULL );
 
     // Очищаем буфер.
