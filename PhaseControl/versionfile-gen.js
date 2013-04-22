@@ -81,6 +81,9 @@ public:\r\n\
     inline static uint16_t GetRevision() { return " + Revision + "; }\r\n\
     inline static uint16_t GetBuild() { return " + Build + "; }\r\n\
 \r\n\
+    inline static FCHAR_PTR GetVersionString() {\r\n\
+        return SPSTR( \"" + Major + "." + Minor + "." + Revision + "." + Build + "\" );\r\n\
+    }\r\n\
     inline static FCHAR_PTR GetBuildDateString() {\r\n\
         return SPSTR( \"" + d.toLocaleDateString() + "\" );\r\n\
     }\r\n\

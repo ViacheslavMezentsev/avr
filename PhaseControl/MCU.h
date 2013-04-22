@@ -27,25 +27,26 @@ class CMCU {
 
 public:
 
+	inline static void OnExternalInterruptRequest0();
+	inline static void OnExternalInterruptRequest1();
+	inline static void OnTimerCounter1CaptureEvent();
+	inline static void OnTimerCounter1CompareMatchA();
+	inline static void OnTimerCounter1Overflow();
+	inline static void OnTimerCounter0Overflow();
+    inline static void OnUSARTRxComplete( uint8_t );
+	inline static void OnUSARTDataRegisterEmpty();
+	inline static void OnUSARTTxComplete();	
+    inline static void OnAnalogComparator();
+    inline static void OnPinChangeInterrupt();
+    inline static void OnTimerCounter1CompareMatchB();
+    inline static void OnTimerCounter0CompareMatchA();
+    inline static void OnTimerCounter0CompareMatchB();
+    inline static void OnUSIStartCondition();
+    inline static void OnUSIOverflow();
+	inline static void OnEEPROMReady();
+    inline static void OnWatchdogTimerOverflow();
+
 	static void Initialization();
-	static void OnExternalInterruptRequest0();
-	static void OnExternalInterruptRequest1();
-	static void OnTimerCounter1CaptureEvent();
-	static void OnTimerCounter1CompareMatchA();
-	static void OnTimerCounter1Overflow();
-	static void OnTimerCounter0Overflow();
-    static void OnUSARTRxComplete( uint8_t );
-	static void OnUSARTDataRegisterEmpty();
-	static void OnUSARTTxComplete();	
-    static void OnAnalogComparator();
-    static void OnPinChangeInterrupt();
-    static void OnTimerCounter1CompareMatchB();
-    static void OnTimerCounter0CompareMatchA();
-    static void OnTimerCounter0CompareMatchB();
-    static void OnUSIStartCondition();
-    static void OnUSIOverflow();
-	static void OnEEPROMReady();
-    static void OnWatchdogTimerOverflow();
     static HRESULT MainThreadProcedure();
 
 private:
