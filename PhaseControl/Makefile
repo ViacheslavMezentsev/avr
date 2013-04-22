@@ -82,7 +82,7 @@ OBJDIR = obj
 
 
 # List C++ source files here. (C dependencies are automatically generated.)
-CPPSRC = ISRList.cpp MCU.cpp Console.cpp MainUnit.cpp
+CPPSRC = MCU.cpp Console.cpp MainUnit.cpp
 
 
 # List Assembler source files here.
