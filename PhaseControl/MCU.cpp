@@ -81,7 +81,7 @@ HRESULT CMCU::MainThreadProcedure(){
     // Выводим версию программы и дату сборки.
     CConsole::MoveTo( 1, 24 );
     CConsole::WriteString( CVersion::GetVersionString() );
-    
+
     CConsole::PutChar( ' ' );
     CConsole::PutChar( '(' );
     CConsole::WriteString( CVersion::GetBuildDateString(), CConsole::cp1251 );
@@ -983,8 +983,6 @@ void CMCU::OnTimerCounter1Overflow(){
  */
 void CMCU::OnTimerCounter0Overflow(){
 
-    uint8_t tmp;
-
     Counter10ms++;
 
     // Восстанавливаем счётчик
@@ -993,6 +991,9 @@ void CMCU::OnTimerCounter0Overflow(){
     if ( Counter10ms == 10 ) {
 
         Counter10ms = 0;
+
+        // Формирование события.
+        // ...
 
     }
 
@@ -1078,11 +1079,13 @@ void CMCU::OnAnalogComparator(){
 
                 SamplePoint = 0;
 
-                HalfPeriod = ( PointValues[2] - PointValues[0] ) / 2U;
+                uint16_t temp = PointValues[0];
+
+                HalfPeriod = ( PointValues[2] - temp ) / 2U;
 
                 // Вычисляем параметры для рабочего режима.
                 // Время, оставшееся до ближайшего пересечения нуля.
-                uint16_t temp = ( HalfPeriod +  ( PointValues[1] - PointValues[0] ) ) / 2U;
+                temp = ( HalfPeriod +  ( PointValues[1] - temp ) ) / 2U;
 
                 // Перенастраиваем таймер/счётчик 1.
                 TCCR1B = 0x00;
