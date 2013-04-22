@@ -24,13 +24,13 @@
 #include "MCU.h"
 #include "MainUnit.h"
 
-// Точка входа в основную программу
+// Точка входа в основную программу.
 int main() {
 
-    // Инициализация микроконтроллера
+    // Инициализация микроконтроллера.
     CMCU::Initialization();
 
-    // Запуск основного потока
+    // Запуск основного потока.
     HRESULT hResult = CMCU::MainThreadProcedure();
 
     return 0;

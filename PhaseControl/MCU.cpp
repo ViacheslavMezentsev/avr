@@ -14,11 +14,6 @@
 
 // -=[ Пользовательские типы ]=-
 
-struct divmod10_t {
-
-    uint32_t quot;
-    uint8_t rem;
-};
 
 // Перечисление видов работы компаратора.
 enum EnACMode { acmFirstMeasurement = 0, acmWorkMode };
@@ -35,20 +30,33 @@ extern FIFO( 16 ) uart_rx_fifo;
 
 // -=[ Переменные в ОЗУ ]=-
 
-EnACMode ACMode = acmFirstMeasurement; 
+// Текущий режим работы аналогового компаратора.
+EnACMode ACMode = acmFirstMeasurement;
+
+// Состояния КА для формирования импульса управления симистором.
 EnPCMode PCMode = pcmDisabled;
 
+// Номер отсчёта измерения.
 uint8_t SamplePoint = 0;
+
+// Вычисляемое значение половины периода сетевого напряжения в отсчётах счётчика
+// таймера.
 uint16_t HalfPeriod = 0;
 
 // Длительность импульса запуска симистора, мкс.
+// Очень короткие импульсы могут не захватываться триггерами простых
+// цифровых осциллографов, поэтому реализована возможность регулировки их
+// длительности в целях отладки.
 uint16_t PulseWidth = 1000U;
+
+// Программный счётчик для формирования событий через определённый временной
+// интервал.
 uint16_t Counter10ms = 0;
 
+// Массив для хранения значений измеренных временных интервалов для отсчётов
+// сетевого напряжения. Эти значения используются в алгоритме определения
+// перечечения нуля.
 volatile uint16_t PointValues[3] = { 0U, 0U, 0U };
-
-char Version[ 16 ]; // Версия программы
-char buffer[ 16 ];
 
 
 /***********************
@@ -57,60 +65,12 @@ char buffer[ 16 ];
 ************************/
 
 
-divmod10_t divmodu10( uint32_t n ) {
-
-    divmod10_t res;
-
-    // умножаем на 0.8
-    res.quot = n >> 1;
-    res.quot += res.quot >> 1;
-    res.quot += res.quot >> 4;
-    res.quot += res.quot >> 8;
-    res.quot += res.quot >> 16;
-    uint32_t qq = res.quot;
-
-    // делим на 8
-    res.quot >>= 3;
-
-    // вычисляем остаток
-    res.rem = uint8_t( n - ( ( res.quot << 1 ) + ( qq & ~7ul ) ) );
-
-    // корректируем остаток и частное
-    if ( res.rem > 9 ) {
-
-        res.rem -= 10;
-        res.quot++;
-    }
-
-    return res;
-
-}
-
-
-char * utoa_fast_div( uint32_t value, char * buffer ) {
-
-    buffer += 11;
-    * --buffer = 0;
-
-    do {
-
-        divmod10_t res = divmodu10( value );
-        * --buffer = res.rem + '0';
-        value = res.quot;
-
-    } while ( value != 0 );
-
-    return buffer;
-
-}
-
-
 /**
- * Главный (основной) поток программы
+ * Главный (основной) поток программы.
  */
 HRESULT CMCU::MainThreadProcedure(){
 
-    // Разрешаем прерывания
+    // Разрешаем прерывания.
     __enable_interrupt();
 
     CConsole::CursorOff();
@@ -118,15 +78,14 @@ HRESULT CMCU::MainThreadProcedure(){
 
     CConsole::ClearScreen();
 
-    // Выводим приглашение.
-    //CConsole::MoveTo( 1, 25 );
-    //CConsole::WriteString( SPSTR( "Версия: " ), CConsole::cp1251 );
-    //CConsole::WriteString( Version );
-
-    //CConsole::PutChar( ' ' );
-    //CConsole::PutChar( '(' );
-    //CConsole::WriteString( CVersion::GetBuildDateString(), CConsole::cp1251 );
-    //CConsole::PutChar( ')' );
+    // Выводим версию программы и дату сборки.
+    CConsole::MoveTo( 1, 24 );
+    CConsole::WriteString( CVersion::GetVersionString() );
+    
+    CConsole::PutChar( ' ' );
+    CConsole::PutChar( '(' );
+    CConsole::WriteString( CVersion::GetBuildDateString(), CConsole::cp1251 );
+    CConsole::PutChar( ')' );
 
     CConsole::MoveTo( 1, 25 );
     CConsole::WriteString( SPSTR( "Двигатель: Выключен" ), CConsole::cp1251 );
@@ -136,7 +95,7 @@ HRESULT CMCU::MainThreadProcedure(){
 
     } while ( true );
 
-    // Все проверки прошли успешно, объект в рабочем состоянии
+    // Все проверки прошли успешно, объект в рабочем состоянии.
     return NO_ERROR;
 
 }
@@ -148,28 +107,13 @@ HRESULT CMCU::MainThreadProcedure(){
 void CMCU::Initialization(){
 
     // Инициализация после сброса.
-    
+
     // Запрещаем все прерывания.
     __disable_interrupt();
 
-    // Вычисляем строку с номером версии программы.
-    char szDot[] = ".";
-
-    // Вычисление строки с версией программы
-    //strcat( Version, utoa_fast_div( CVersion::GetMajor(), buffer ) );
-    //strcat( Version, szDot );
-
-    //strcat( Version, utoa_fast_div( CVersion::GetMinor(), buffer ) );
-    //strcat( Version, szDot );
-
-    //strcat( Version, utoa_fast_div( CVersion::GetRevision(), buffer ) );
-    //strcat( Version, szDot );
-
-    //strcat( Version, utoa_fast_div( CVersion::GetBuild(), buffer ) );
-
     // Устанавливаем начальный режим работы аналогового компаратора.
     ACMode = acmFirstMeasurement;
-    
+
     PCMode = pcmDisabled;
 
     // Текущая измеряемая точка.
@@ -214,7 +158,7 @@ void CMCU::Initialization(){
 
 
 /**
- * Настройка управляющих регистров контроллера
+ * Настройка управляющих регистров контроллера.
  */
 void CMCU::ControlRegistersInit(){
 
@@ -251,7 +195,7 @@ void CMCU::ControlRegistersInit(){
     //           |||||||+- 0, rw, OCIE0A: - Timer/Counter0 Output Compare Match A Interrupt Enable
     //           ||||||+-- 1, rw, TOIE0:  - Timer/Counter0 Overflow Interrupt Enable
     //           |||||+--- 2, rw, OCIE0B: - OCIE0B: Timer/Counter0 Output Compare Match B Interrupt Enable
-    //           ||||+---- 3, rw, ICIE1:  - Timer/Counter1, Input Capture Interrupt Enable 
+    //           ||||+---- 3, rw, ICIE1:  - Timer/Counter1, Input Capture Interrupt Enable
     //           |||+----- 4, r: 0
     //           ||+------ 5, rw, OCIE1B: - Timer/Counter1, Output Compare B Match Interrupt Enable
     //           |+------- 6, rw, OCIE1A: - Timer/Counter1, Output Compare A Match Interrupt Enable
@@ -294,29 +238,29 @@ void CMCU::PortsInit(){
     //  mailto:unihomelab@ya.ru
     //  skype: viacheslavmezentsev
 
-//                 [ATtiny2313]                    
+//                 [ATtiny2313]
 //
-//                                            
-//                                            
-//                            PDIP/SOIC                    
-//                        +--------------+              
-//       (~RESET/dW) PA2 -|  1        20 |- VCC  
-//             (RXD) PD0 -|  2        19 |- PB7 (UCSK/SCL/PCINT7)  
-//             (TXD) PD1 -|  3        18 |- PB6 (MISO/DO/PCINT6)  
-//           (XTAL2) PA1 -|  4        17 |- PB5 (MOSI/DI/SDA/PCINT5)  
-//           (XTAL1) PA0 -|  5        16 |- PB4 (OC1B/PCINT4)  
-//  (CKOUT/XCK/INT0) PD2 -|  6        15 |- PB3 (OC1A/PCINT3)  
-//            (INT1) PD3 -|  7        14 |- PB2 (OC0A/PCINT2)  
-//              (T0) PD4 -|  8        13 |- PB1 (AIN1/PCINT1)  
-//         (OC0B/T1) PD5 -|  9        12 |- PB0 (AIN0/PCINT0)        
-//                   GND -| 10        11 |- PD6 (ICP)         
-//                        +--------------+              
-//                                            
-//                                            
-//                                            
-//                                            
-//                                            
-//                                            
+//
+//
+//                            PDIP/SOIC
+//                        +--------------+
+//       (~RESET/dW) PA2 -|  1        20 |- VCC
+//             (RXD) PD0 -|  2        19 |- PB7 (UCSK/SCL/PCINT7)
+//             (TXD) PD1 -|  3        18 |- PB6 (MISO/DO/PCINT6)
+//           (XTAL2) PA1 -|  4        17 |- PB5 (MOSI/DI/SDA/PCINT5)
+//           (XTAL1) PA0 -|  5        16 |- PB4 (OC1B/PCINT4)
+//  (CKOUT/XCK/INT0) PD2 -|  6        15 |- PB3 (OC1A/PCINT3)
+//            (INT1) PD3 -|  7        14 |- PB2 (OC0A/PCINT2)
+//              (T0) PD4 -|  8        13 |- PB1 (AIN1/PCINT1)
+//         (OC0B/T1) PD5 -|  9        12 |- PB0 (AIN0/PCINT0)
+//                   GND -| 10        11 |- PD6 (ICP)
+//                        +--------------+
+//
+//
+//
+//
+//
+//
 
 
     // Table. Port Pin Configurations
@@ -334,9 +278,9 @@ void CMCU::PortsInit(){
     // резисторы отключаются от всех выводов микроконтроллера.
 
     //sbi( MCUCR, PUD );
-    cbi( MCUCR, PUD );
+    cbi( MCUCR, PUD );  // Начальное значение бита.
 
-    // Настройка портов: A, B, D. Начальная инициализация уровней
+    // Настройка портов: A, B, D. Начальная инициализация уровней.
 
     // Port A Data Direction Register
     // [ Регистр направления порта A ][ATtiny2313]
@@ -414,7 +358,7 @@ void CMCU::PortsInit(){
     //          76543210
     //          |||||||+- 0, rw, DDD0: (RXD)            - RXD
     //          ||||||+-- 1, rw, DDD1: (TXD)            - TXD
-    //          |||||+--- 2, rw, DDD2: (INT0/XCK/CKOUT) - 
+    //          |||||+--- 2, rw, DDD2: (INT0/XCK/CKOUT) -
     //          ||||+---- 3, rw, DDD3: (INT1)           -
     //          |||+----- 4, rw, DDD4: (T0)             -
     //          ||+------ 5, rw, DDD5: (OC0B/T1)        -
@@ -431,7 +375,7 @@ void CMCU::PortsInit(){
     //           76543210
     //           |||||||+- 0, rw, PORTD0: (RXD)            - RXD
     //           ||||||+-- 1, rw, PORTD1: (TXD)            - TXD
-    //           |||||+--- 2, rw, PORTD2: (INT0/XCK/CKOUT) - 
+    //           |||||+--- 2, rw, PORTD2: (INT0/XCK/CKOUT) -
     //           ||||+---- 3, rw, PORTD3: (INT1)           -
     //           |||+----- 4, rw, PORTD4: (T0)             -
     //           ||+------ 5, rw, PORTD5: (OC0B/T1)        -
@@ -500,7 +444,7 @@ void CMCU::Timer0Init(){
     //            ||+------ 5, rw, COM0B1: _|
     //            |+------- 6, rw, COM0A0: -+ - Режим работы канала сравнения A
     //            +-------- 7, rw, COM0A1: _|
-    // Примечание: 
+    // Примечание:
 
 
 }
@@ -532,7 +476,7 @@ void CMCU::Timer1Init(){
     //            ||||||||
     //            76543210
     //            |||||||+- 0, rw, CS10:  -+ - Управление тактовым сигналом
-    //            ||||||+-- 1, rw, CS11:   | 
+    //            ||||||+-- 1, rw, CS11:   |
     //            |||||+--- 2, rw, CS12:  _|
     //            ||||+---- 3, rw, WGM12: -+ - Режим работы таймера/счетчика
     //            |||+----- 4, rw, WGM13: _|
@@ -571,7 +515,7 @@ void CMCU::Timer1Init(){
     //            ||+------ 5, rw, COM1B1: _|
     //            |+------- 6, rw, COM1A0: -+ - Режим работы канала сравнения A
     //            +-------- 7, rw, COM1A1: _|
-    // Примечание: 
+    // Примечание:
 
 
     // Timer/Counter1 Control Register C
@@ -588,7 +532,7 @@ void CMCU::Timer1Init(){
     //            ||+------ 5, r: 0
     //            |+------- 6, rw, FOC1B: - Force Output Compare for Channel B
     //            +-------- 7, rw, FOC1A: - Force Output Compare for Channel A
-    // Примечание: 
+    // Примечание:
 
 }
 
@@ -628,7 +572,7 @@ void CMCU::USIInit(){
     //          |||||+--- 2, r:            - reserved (will always read as zero)
     //          ||||+---- 3, r, TWS3:   -+ - TWI Status
     //          |||+----- 4, r, TWS4:    |
-    //          ||+------ 5, r, TWS5:    | 
+    //          ||+------ 5, r, TWS5:    |
     //          |+------- 6, r, TWS6:    |
     //          +-------- 7, r, TWS7:   _|
     // Примечание:
@@ -734,7 +678,7 @@ void CMCU::AnalogComparatorInit(){
     // Примечание:
 
     // When changing the ACD bit, the Analog Comparator Interrupt must be
-    // disabled by clearing the ACIE bit in ACSR. Otherwise an interrupt can 
+    // disabled by clearing the ACIE bit in ACSR. Otherwise an interrupt can
     // occur when the bit is changed.
 
 
@@ -817,7 +761,7 @@ void CMCU::ExternalInterruptsInit(){
 
     // Запрещаем внешние прерывания INT0 и INT1.
     cbi( GIMSK, INT0 );
-    cbi( GIMSK, INT1 );   
+    cbi( GIMSK, INT1 );
 
     // Настройка прерываний INT0 и INT1
     // MCU Control Register
@@ -925,7 +869,7 @@ void CMCU::PinChangeInterruptsInit(){
     //           |+------- 6, rw, PCINT6: (PB6)  |
     //           +-------- 7, rw, PCINT7: (PB7) _|
     // Примечание:
-        
+
 
     // External Interrupt Flag Register
     // [ Регистр флагов внешних прерываний ][ATtiny2313]
@@ -1098,8 +1042,8 @@ void CMCU::OnAnalogComparator(){
 
         // Режим первого измерения.
         case acmFirstMeasurement: {
-            
-            // При первом срабатывании компаратора проверяем положение точки.            
+
+            // При первом срабатывании компаратора проверяем положение точки.
             if ( SamplePoint == 0 ) {
 
                 // Если обнаружена вторая точка, то пропускаем её.
@@ -1160,8 +1104,11 @@ void CMCU::OnAnalogComparator(){
                 // Разрешаем прерывание по сравнению.
                 sbi( TIMSK, OCIE1A );
 
-                // Переходим в рабочий режим.
+                // Переводим компаратор в рабочий режим.
                 ACMode = acmWorkMode;
+
+                // Устанавливаем начальное значение для формирователя импульса
+                // управления симистором.
                 PCMode = pcmDisabled;
 
             }
@@ -1171,6 +1118,11 @@ void CMCU::OnAnalogComparator(){
         }
 
         case acmWorkMode: {
+
+            // Доделать: Корректировка положения точки пересечения нуля в каждом
+            // периоде источника.
+
+            //...
 
             break;
         }
@@ -1242,3 +1194,432 @@ void CMCU::OnEEPROMReady(){
 void CMCU::OnWatchdogTimerOverflow(){
 
 }
+
+
+// -=[ Процедуры обработки прерываний ] [ATtiny2313]=-
+
+/**
+* Внимание: При входе в обработчик прерывания флаг IE в SREG
+* сбрасывается для запрещения вложенных прерываний.
+*
+* Для сохранения и восстановления SREG можно использовать
+* следующие конструкции:
+*
+* // Сохраняем SREG
+* uint8_t tmp = __save_interrupt();
+*
+* // ...
+*
+* // Восстанавливаем SREG
+* __restore_interrupt( tmp );
+*/
+
+
+/**
+ * External Interrupt Request 0
+ */
+#ifdef External_Interrupt_Request_0
+
+    #ifdef __GNUC__
+
+        ISR( INT0_vect ) {
+
+    #elif defined( __ICCAVR__ )
+
+        #pragma vector = INT0_vect
+        __interrupt void ExternalInterruptRequest0() {
+
+    #endif
+
+        CMCU::OnExternalInterruptRequest0();
+
+    } // External Interrupt Request 0
+
+#endif
+
+
+/**
+ * External Interrupt Request 1
+ */
+#ifdef External_Interrupt_Request_1
+
+    #ifdef __GNUC__
+
+        ISR( INT1_vect ) {
+
+    #elif defined( __ICCAVR__ )
+
+        #pragma vector = INT1_vect
+        __interrupt void ExternalInterruptRequest1() {
+
+    #endif
+
+        CMCU::OnExternalInterruptRequest1();
+
+    } // External Interrupt Request 1
+
+#endif
+
+
+/**
+ *  Timer/Counter1 Capture Event
+ */
+#ifdef Timer_Counter1_Capture_Event
+
+    #ifdef __GNUC__
+
+        ISR( TIMER1_CAPT_vect ) {
+
+    #elif defined( __ICCAVR__ )
+
+        #pragma vector = TIMER1_CAPT_vect
+        __interrupt void TimerCounter1CaptureEvent() {
+
+    #endif
+
+        CMCU::OnTimerCounter1CaptureEvent();
+
+    } // Timer/Counter1 Capture Event
+
+#endif
+
+
+/**
+ *  Timer/Counter1 Compare Match A
+ */
+#ifdef Timer_Counter1_Compare_Match_A
+
+    #ifdef __GNUC__
+
+        ISR( TIMER1_COMPA_vect ) {
+
+    #elif defined( __ICCAVR__ )
+
+        #pragma vector = TIMER1_COMPA_vect
+        __interrupt void TimerCounter1CompareMatchA() {
+
+    #endif
+
+        CMCU::OnTimerCounter1CompareMatchA();
+
+    } // Timer/Counter1 Compare Match A
+
+#endif
+
+
+/**
+ *  Timer/Counter1 Overflow
+ */
+#ifdef Timer_Counter1_Overflow
+
+    #ifdef __GNUC__
+
+        ISR( TIMER1_OVF_vect ) {
+
+    #elif defined( __ICCAVR__ )
+
+        #pragma vector = TIMER1_OVF1_vect
+        __interrupt void TimerCounter1Overflow() {
+
+    #endif
+
+        CMCU::OnTimerCounter1Overflow();
+
+    } // Timer/Counter1 Overflow
+
+#endif
+
+
+/**
+ *  Timer/Counter0 Overflow
+ */
+#ifdef Timer_Counter0_Overflow
+
+    #ifdef __GNUC__
+
+        ISR( TIMER0_OVF_vect ) {
+
+    #elif defined( __ICCAVR__ )
+
+        #pragma vector = TIMER0_OVF0_vect
+        __interrupt void TimerCounter0Overflow() {
+
+    #endif
+
+        CMCU::OnTimerCounter0Overflow();
+
+    } // Timer/Counter0 Overflow
+
+#endif
+
+
+/**
+ *  USART, Rx Complete
+ */
+#ifdef USART_Rx_Complete
+
+    #ifdef __GNUC__
+
+        ISR( USART_RX_vect ) {
+
+    #elif defined( __ICCAVR__ )
+
+        #pragma vector = USART0_RX_vect
+        __interrupt void USARTRxComplete() {
+
+    #endif
+
+        CMCU::OnUSARTRxComplete( UDR );
+
+    } // USART, Rx Complete
+
+#endif
+
+
+/**
+ *  USART Data Register Empty
+ */
+#ifdef USART_Data_Register_Empty
+
+    #ifdef __GNUC__
+
+        ISR( USART_UDRE_vect ) {
+
+    #elif defined( __ICCAVR__ )
+
+        #pragma vector = USART0_UDRE_vect
+        __interrupt void USARTDataRegisterEmpty() {
+
+    #endif
+
+        CMCU::OnUSARTDataRegisterEmpty();
+
+    } // USART Data Register Empty
+
+#endif
+
+
+/**
+ *  USART, Tx Complete
+ */
+#ifdef USART_Tx_Complete
+
+    #ifdef __GNUC__
+
+        ISR( USART_TXC_vect ) {
+
+    #elif defined( __ICCAVR__ )
+
+        #pragma vector = USART0_TX_vect
+        __interrupt void USARTTxComplete() {
+
+    #endif
+
+        CMCU::OnUSARTTxComplete();
+
+    } // USART, Tx Complete
+
+#endif
+
+
+/**
+ *  Analog Comparator
+ */
+#ifdef Analog_Comparator
+
+    #ifdef __GNUC__
+
+        ISR( ANA_COMP_vect ) {
+
+    #elif defined( __ICCAVR__ )
+
+        #pragma vector = ANA_COMP_vect
+        __interrupt void AnalogComparator() {
+
+    #endif
+
+        CMCU::OnAnalogComparator();
+
+    } // Analog Comparator
+
+#endif
+
+
+/**
+ *  Pin Change Interrupt
+ */
+#ifdef Pin_Change_Interrupt
+
+    #ifdef __GNUC__
+
+        ISR( PCINT_vect ) {
+
+    #elif defined( __ICCAVR__ )
+
+        #pragma vector = PCIN1_vect
+        __interrupt void PinChangeInterrupt() {
+
+    #endif
+
+        CMCU::OnPinChangeInterrupt();
+
+    } // Pin Change Interrupt
+
+#endif
+
+
+/**
+ *  Timer/Counter1 Compare Match B
+ */
+#ifdef Timer_Counter1_Compare_Match_B
+
+    #ifdef __GNUC__
+
+        ISR( TIMER1_COMPB_vect ) {
+
+    #elif defined( __ICCAVR__ )
+
+        #pragma vector = TIMER1_COMPB_vect
+        __interrupt void TimerCounter1CompareMatchB() {
+
+    #endif
+
+        CMCU::OnTimerCounter1CompareMatchB();
+
+    } // Timer/Counter1 Compare Match B
+
+#endif
+
+
+/**
+ *  Timer/Counter0 Compare Match A
+ */
+#ifdef Timer_Counter0_Compare_Match_A
+
+    #ifdef __GNUC__
+
+        ISR( TIMER0_COMPA_vect ) {
+
+    #elif defined( __ICCAVR__ )
+
+        #pragma vector = TIMER0_COMPA_vect
+        __interrupt void TimerCounter0CompareMatchA() {
+
+    #endif
+
+        CMCU::OnTimerCounter0CompareMatchA();
+
+    } // Timer/Counter0 Compare Match A
+
+#endif
+
+
+/**
+ *  Timer/Counter0 Compare Match B
+ */
+#ifdef Timer_Counter0_Compare_Match_B
+
+    #ifdef __GNUC__
+
+        ISR( TIMER0_COMPB_vect ) {
+
+    #elif defined( __ICCAVR__ )
+
+        #pragma vector = TIMER0_COMPB_vect
+        __interrupt void TimerCounter0CompareMatchB() {
+
+    #endif
+
+        CMCU::OnTimerCounter0CompareMatchB();
+
+    } // Timer/Counter0 Compare Match B
+
+#endif
+
+
+/**
+ *  USI Start Condition
+ */
+#ifdef USI_Start_Condition
+
+    #ifdef __GNUC__
+
+        ISR( USI_START_vect ) {
+
+    #elif defined( __ICCAVR__ )
+
+        #pragma vector = USI_STRT_vect
+        __interrupt void USIStartCondition() {
+
+    #endif
+
+        CMCU::OnUSIStartCondition();
+
+    } // USI Start Condition
+#endif
+
+
+/**
+ *  USI Overflow
+ */
+#ifdef USI_Overflow
+
+    #ifdef __GNUC__
+
+        ISR( USI_OVERFLOW_vect ) {
+
+    #elif defined( __ICCAVR__ )
+
+        #pragma vector = USI_OVF_vect
+        __interrupt void USIOverflow() {
+
+    #endif
+
+        CMCU::OnUSIOverflow();
+
+    } // USI Overflow
+#endif
+
+
+/**
+ *  EEPROM Ready
+ */
+#ifdef EEPROM_Ready
+
+    #ifdef __GNUC__
+
+        ISR( EE_RDY_vect ) {
+
+    #elif defined( __ICCAVR__ )
+
+        #pragma vector = EE_RDY_vect
+        __interrupt void EEPROMReady() {
+
+    #endif
+
+        CMCU::OnEEPROMReady();
+
+    } // EEPROM Ready
+#endif
+
+
+/**
+ *  Watchdog Timer Overflow
+ */
+#ifdef Watchdog_Timer_Overflow
+
+    #ifdef __GNUC__
+
+        ISR( WDT_OVERFLOW_vect ) {
+
+    #elif defined( __ICCAVR__ )
+
+        #pragma vector = WDT_vect
+        __interrupt void WatchdogTimerOverflow() {
+
+    #endif
+
+        CMCU::OnWatchdogTimerOverflow();
+
+    } // Watchdog Timer Overflow
+#endif

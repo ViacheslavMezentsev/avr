@@ -9,7 +9,7 @@
 #include "Configuration.h"
 #include "Version.h"
 
-// Modbus
+// Заголовочные файлы модуля freemodbus.
 #include "mb.h"
 #include "mbport.h"
 
