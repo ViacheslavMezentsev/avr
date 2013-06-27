@@ -96,6 +96,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\fifo.h"
+				>
+			</File>
+			<File
 				RelativePath=".\LCD.h"
 				>
 			</File>

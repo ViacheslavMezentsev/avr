@@ -1079,11 +1079,11 @@ void CMCU::OnAnalogComparator(){
 
                 SamplePoint = 0;
 
+                // Вычисляем параметры для рабочего режима.
                 uint16_t temp = PointValues[0];
 
                 HalfPeriod = ( PointValues[2] - temp ) / 2U;
-
-                // Вычисляем параметры для рабочего режима.
+                
                 // Время, оставшееся до ближайшего пересечения нуля.
                 temp = ( HalfPeriod +  ( PointValues[1] - temp ) ) / 2U;
 
