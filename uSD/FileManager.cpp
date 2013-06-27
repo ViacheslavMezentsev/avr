@@ -89,11 +89,11 @@ void CFileManager::Initialization() {
     RightPanel.ItemIndex = 0;
     RightPanel.ItemsCount = 0;
 
-    // Иницициализируем начальный путь для каждой панели.
+    // Инициализируем начальный путь для каждой панели.
     strcpy( LeftPanel.Path, szROOT );
     strcpy( RightPanel.Path, szROOT );
 
-    // Очищаем командрую строку.
+    // Очищаем командную строку.
     CommandString[0] = 0;
 
 }
@@ -108,7 +108,7 @@ void CFileManager::DrawMainMenu() {
     CConsole::SetColor( clBlack, clWhite );    
 
     CConsole::WriteString( SPSTR( "Файловый менеджер, ATmega16 @ 16 МГц, версия сборки: " ), CConsole::cp1251 );
-    CConsole::WriteString( Version );
+    CConsole::WriteString( CVersion::GetVersionString() );
 
 #ifdef __GNUC__
     CConsole::WriteString( SPSTR( " (gnu)" ) );
@@ -209,7 +209,7 @@ void CFileManager::HightlightPanel( CPanel & Panel ) {
         CConsole::SetColor( clLightGray, clBlue );
         CConsole::MoveTo( Panel.Left + 1, Panel.ItemIndex + Panel.Top + 2 );
 
-        // Обображаем данные элемента для выделенной строки.
+        // Отображаем данные элемента для выделенной строки.
         // Если объект - папка.
         if ( Panel.FileInfo.fattrib & AM_DIR ) {
 
@@ -568,7 +568,7 @@ void CFileManager::FormKeyDown( uint16_t Key ) {
             // Если объект - папка
             if ( pCurrentPanel->FileInfo.fattrib & AM_DIR ) {
 
-                // Присоеденяем к пути имя выбранного файла.
+                // Присоединяем к пути имя выбранного файла.
                 if ( strcmp( pCurrentPanel->Path, szROOT ) != 0 ) strcat( pCurrentPanel->Path, szROOT );
 
                 strcat( pCurrentPanel->Path, pCurrentPanel->FileInfo.fname );

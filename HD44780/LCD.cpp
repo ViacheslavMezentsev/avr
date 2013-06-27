@@ -55,7 +55,7 @@
 // Идентификаторы пользовательских символов
 // Примечание: Перед использованием нужно загрузить символы в ОЗУ ЖКИ при помощи 
 // метода LoadCustomChar(), второй параметр которого и есть идентификатор символа 
-// (по сути это номер элемента в массиве LcdCustomChar[])
+// (по сути это номер символа в массиве LcdCustomChar[])
 #define LCDCHAR_PROGRESS05          0       // 0/5 full progress block
 #define LCDCHAR_PROGRESS15          1       // 1/5 full progress block
 #define LCDCHAR_PROGRESS25          2       // 2/5 full progress block
@@ -78,7 +78,7 @@
 #define SCROLL_LEFT  1
 
 
-// Пользоватеский набор символов
+// Пользовательский набор символов
 #ifdef __ICCAVR__
     __flash uint8_t LcdCustomChar[136] = {
 #elif defined __GNUC__

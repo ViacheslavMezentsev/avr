@@ -35,8 +35,6 @@ extern MSG EmptyMsg;
 
 
 // -=[ Переменные в ОЗУ ]=-
-
-char Version[ 16 ]; // Версия программы
 char buffer[ 16 ];
 
 // Дескриптор активного окна
@@ -124,20 +122,6 @@ void CPLC::Initialization(){
     // Инициализация после сброса
     // запрещаем все прерывания
     __disable_interrupt();
-
-    char szDot[] = ".";
-
-    // Вычисление строки с версией программы
-    strcat( Version, utoa_fast_div( CVersion::GetMajor(), buffer ) );
-    strcat( Version, szDot );
-
-    strcat( Version, utoa_fast_div( CVersion::GetMinor(), buffer ) );
-    strcat( Version, szDot );
-
-    strcat( Version, utoa_fast_div( CVersion::GetRevision(), buffer ) );
-    strcat( Version, szDot );
-
-    strcat( Version, utoa_fast_div( CVersion::GetBuild(), buffer ) );
 
     // Инициализируем указатель текущей очереди
     pMsgsQueue = & MessagesQueue;
