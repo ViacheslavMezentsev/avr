@@ -171,6 +171,9 @@
 // Описание типов, аналогичных в Windows
 #include "windows.h"
 
+// Работа с кольцевым буфером.
+#include "fifo.h"
+
 #define TOGGLE(x,y) ((x) ^= (1<<(y)))
 #define CHECKBIT(x,y) ((x) & (1<<(y)))
 

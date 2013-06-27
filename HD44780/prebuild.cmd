@@ -1,3 +1,4 @@
 @echo off
-rm %1Version.h
-cscript //NoLogo %1versionfile-gen.js %1Version %1version.txt
+rem See: for /?
+rm "%~dp0"Version.h
+cscript //NoLogo "%~dp0"versionfile-gen.js "%~dp0"Version "%~dp0"version.txt
