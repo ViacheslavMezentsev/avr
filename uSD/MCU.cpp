@@ -1059,7 +1059,7 @@ void CMCU::OnTimerCounter2Overflow(){
 
                         // Удаляем символ из буфера.
                         FIFO_POP( uart_rx_fifo );
-                        
+
                         // Создаём событие нажатия на клавишу.
                         CPLC::DoKeyDown( VK_DOWN, 0x42 );
 
@@ -1067,7 +1067,7 @@ void CMCU::OnTimerCounter2Overflow(){
 
                         // Удаляем символ из буфера.
                         FIFO_POP( uart_rx_fifo );
-                        
+
                         // Создаём событие нажатия на клавишу.
                         CPLC::DoKeyDown( VK_HOME, 0x48 );
 
@@ -1075,7 +1075,7 @@ void CMCU::OnTimerCounter2Overflow(){
 
                         // Удаляем символ из буфера.
                         FIFO_POP( uart_rx_fifo );
-                        
+
                         // Создаём событие нажатия на клавишу.
                         CPLC::DoKeyDown( VK_END, 0x4B );
 
@@ -1117,7 +1117,7 @@ void CMCU::OnTimerCounter2Overflow(){
 
 
             // CP866.
-            } else if ( ( ( tmp > 0x19 ) && ( tmp < 0x7F ) ) 
+            } else if ( ( ( tmp > 0x19 ) && ( tmp < 0x7F ) )
                 || ( ( tmp > 0x7F ) && ( tmp < 0xB0 ) )
                 || ( ( tmp > 0xBF ) && ( tmp < 0xF2 ) ) ) {
 
