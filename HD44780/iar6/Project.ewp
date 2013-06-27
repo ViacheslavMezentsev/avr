@@ -711,8 +711,8 @@
       <name>BUILDACTION</name>
       <archiveVersion>1</archiveVersion>
       <data>
-        <prebuild>$PROJ_DIR$\..\prebuild.cmd $PROJ_DIR$\..\</prebuild>
-        <postbuild>$PROJ_DIR$\..\postbuild.cmd $PROJ_DIR$\..\</postbuild>
+        <prebuild>$PROJ_DIR$\..\prebuild.cmd</prebuild>
+        <postbuild>$PROJ_DIR$\..\postbuild.cmd</postbuild>
       </data>
     </settings>
     <settings>
@@ -1003,6 +1003,11 @@
     </settings>
     <settings>
       <name>BILINK</name>
+      <archiveVersion>0</archiveVersion>
+      <data/>
+    </settings>
+    <settings>
+      <name>Coder</name>
       <archiveVersion>0</archiveVersion>
       <data/>
     </settings>
@@ -2000,6 +2005,11 @@
     </settings>
     <settings>
       <name>BILINK</name>
+      <archiveVersion>0</archiveVersion>
+      <data/>
+    </settings>
+    <settings>
+      <name>Coder</name>
       <archiveVersion>0</archiveVersion>
       <data/>
     </settings>
