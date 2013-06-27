@@ -309,7 +309,7 @@ public:
 		LCD_DRIVER_USER = 2
 	};	   
 
-	static void Initialization(EnLCDDriverType DriverType);
+	static void Initialization(EnLCDDriverType DriverType = LCD_DRIVER_NONE);
 	static void SetCols(uint8_t Cols);
 	static void SetRows(uint8_t Rows);
     static void Clear();
