@@ -14,6 +14,7 @@
 
 #elif defined( __ICCAVR__ )
 
+    // ƒл€ отладки в Proteus нужно установить частоту 4ћ√ц.
     #define F_CPU 4000000UL
 
 #endif
@@ -126,7 +127,7 @@
 //#define External_Interrupt_Request_1
 //#define External_Interrupt_Request_2
 
-#define Timer_Counter0_Overflow
+//#define Timer_Counter0_Overflow
 //#define Timer_Counter0_Compare_Match
 
 //#define Timer_Counter1_Overflow
@@ -138,13 +139,13 @@
 //#define Timer_Counter2_Overflow
 //#define Timer_Counter2_Compare_Match
 
-#define USART_Rx_Complete
+//#define USART_Rx_Complete
 //#define USART_Tx_Complete
 //#define USART_Data_Register_Empty
 
 //#define SPI_Serial_Transfer_Complete
 
-#define ADC_Conversion_Complete
+//#define ADC_Conversion_Complete
 
 //#define EEPROM_Ready
 
@@ -153,5 +154,6 @@
 //#define TWI_Serial_Interface
 
 //#define Store_Program_Memory_Read
+
 
 #endif // _CONFIGURATION_H_

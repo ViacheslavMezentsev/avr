@@ -20,15 +20,15 @@
 // Описание заставки
 FLASHSTR_DECLARE( char, frmSplashString,
 #ifdef __GNUC__
-"                 HD44780 Demo GCC\n"
+"                 HD44780 Демо GCC\n"
 #elif defined __ICCAVR__
-"                 HD44780 Demo IAR\n"
+"                 HD44780 Демо IAR\n"
 #endif
-"                 Author: uni     " );
+"                 Автор: uni     " );
 
 // Статическая информация на экране
 FLASHSTR_DECLARE( char, frmString,
-"Ver:            \n"
+"Вер:            \n"
 "                " );
 
 
@@ -42,14 +42,14 @@ FLASHSTR_DECLARE( char, frmString,
 
 
 /**
- * Главный (основной) поток программы
+ * Главный (основной) поток программы.
  */
 HRESULT CMCU::MainThreadProcedure(){
 
-    // Вывод заставки
+    // Вывод заставки.
 	CLCD::WriteString( frmSplashString, 0, 0 );
 	
-    // Анимация заставки
+    // Анимация заставки.
 	uint8_t cnt = 16;
 	
 	do {
@@ -63,12 +63,15 @@ HRESULT CMCU::MainThreadProcedure(){
 
     CLCD::Clear();
     CLCD::Home();
+
+    // Вывод статического текста. 
     CLCD::WriteString( frmString, 0, 0 );
 
-    // Вывод версии
-    CLCD::WriteString( CVersion::GetBuildDateString(), 0, 5 );
+    // Вывод версии и даты сборки.
+    CLCD::WriteString( CVersion::GetVersionString(), 0, 5 );
+    CLCD::WriteString( CVersion::GetBuildDateString(), 1, 0 );
 
-    // Разрешаем прерывания
+    // Разрешаем прерывания.
     __enable_interrupt();
 
     do {
@@ -76,7 +79,7 @@ HRESULT CMCU::MainThreadProcedure(){
 
     } while ( true );
 
-    // Все проверки прошли успешно, объект в рабочем состоянии
+    // Все проверки прошли успешно, объект в рабочем состоянии.
     return NO_ERROR;
 
 }
@@ -91,10 +94,10 @@ void CMCU::Initialization(){
     PortsInit();
 
     // Настройка АЦП [ATmega16]
-    ADCInit();
+    //ADCInit();
 
     // Настройка таймера/счётчика 0 [ATmega16]
-    Timer0Init();
+    //Timer0Init();
 
     // Настройка таймера/счётчика 1 [ATmega16]
     //Timer1Init();
@@ -106,7 +109,7 @@ void CMCU::Initialization(){
     //InternalWDTInit();
 
     // Настройка внутреннего USART [ATmega16]
-    USARTInit();
+    //USARTInit();
 
     // Настройка последовательного интерфейса TWI [ATmega16]
     //TWIInit();
