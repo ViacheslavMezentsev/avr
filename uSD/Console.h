@@ -154,6 +154,7 @@ public:
     static void PutChar( uint8_t ch, EnCodePage CodePage = cp866 );
     static void WriteString( FCHAR_PTR Value, EnCodePage CodePage = cp866, uint8_t Length = 0 );
     static void WriteString( const char * Value, EnCodePage CodePage = cp866, uint8_t Length = 0 );
+    static void Beep( uint16_t Frequency = 800U, uint8_t Duration = 1 );
     static void ClearScreen( EnClearMode Mode = cmAll );
     static void ClearLine( EnClearMode Mode = cmFromCursorToEnd );
     static void ClearForward( uint8_t Count );
@@ -168,6 +169,6 @@ public:
     static void MoveTo( uint8_t Left, uint8_t Top );
     static void Move( EnMoveDirection Direction, uint8_t Delta );
     static void DrawFrame( uint8_t Left, uint8_t Top, uint8_t Width, uint8_t Height, 
-        EnColor Color, EnColor bgColor, char * Caption );
+        EnColor Color, EnColor bgColor, char * Caption = NULL );
 
 };

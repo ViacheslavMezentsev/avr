@@ -128,6 +128,12 @@ public:
 
     }
 
+    inline T * operator & () {
+
+        return ( T * ) _address;
+
+    }
+
 private:
 
     T * _address;

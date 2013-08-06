@@ -66,6 +66,10 @@
 			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}"
 			>
 			<File
+				RelativePath=".\CommandShell.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\Console.cpp"
 				>
 			</File>
@@ -86,6 +90,14 @@
 				>
 			</File>
 			<File
+				RelativePath=".\MessagesQueue.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\PLC.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\SystemTime.cpp"
 				>
 			</File>
@@ -95,6 +107,10 @@
 			Filter="h;hpp;hxx;hm;inl;inc;xsd"
 			UniqueIdentifier="{93995380-89BD-4b04-88EB-625FBE52EBFB}"
 			>
+			<File
+				RelativePath=".\CommandShell.h"
+				>
+			</File>
 			<File
 				RelativePath=".\Configuration.h"
 				>
@@ -125,6 +141,14 @@
 			</File>
 			<File
 				RelativePath=".\MCU.h"
+				>
+			</File>
+			<File
+				RelativePath=".\MessagesQueue.h"
+				>
+			</File>
+			<File
+				RelativePath=".\PLC.h"
 				>
 			</File>
 			<File

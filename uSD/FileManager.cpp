@@ -4,13 +4,14 @@
 #include "Console.h"
 #include "FAT.h"
 #include "PLC.h"
+#include "CommandShell.h"
 #include "FileManager.h"
 
 
 // -=[ Внешние ссылки ]=-
 
-extern char Version[ 16 ];
 extern char buffer[ 16 ];
+extern char CommandString[ 128 ];
 extern char * utoa_fast_div( uint32_t value, char * buffer );
 
 
@@ -32,8 +33,6 @@ CPanel RightPanel;
 
 CPanel * CFileManager::pCurrentPanel = & LeftPanel;
 
-char CommandString[ 128 ];
-
 char szROOT[2] = "/";
 
 
@@ -42,7 +41,8 @@ char szROOT[2] = "/";
 *  ~~~~~~~~~~~~~~~~~~~
 ************************/
 
-
+// Функция поиска вхождения подстроки из флеш отсутствует в стандартной
+// библиотеке IAR.
 #if defined( __ICCAVR__ )
 
 char * strstr_P( const char * s1, PGM_P s2 ){
@@ -100,7 +100,7 @@ void CFileManager::Initialization() {
 
 
 /**
- * Отрисовка заголовка окна
+ * Отрисовка заголовка окна.
  */
 void CFileManager::DrawMainMenu() {
 
@@ -116,49 +116,54 @@ void CFileManager::DrawMainMenu() {
     CConsole::WriteString( SPSTR( " (iar)" ) );
 #endif
 
-    CConsole::ClearLine( CConsole::cmFromCursorToEnd );
+    CConsole::ClearLine();
 
 }
 
 
 void CFileManager::WriteDateTime( CPanel & Panel, FILINFO & fno ) {
 
-    // Вывод даты
+    // Вывод даты.
     FDate.Value = fno.fdate;
 
-    // День
-    CConsole::PutChar( FDate.fdate.Day / 10 + '0' );
-    CConsole::PutChar( FDate.fdate.Day % 10 + '0' );
-    CConsole::PutChar( '.' );
+    // День.
+    buffer[0] = FDate.fdate.Day / 10 + '0';
+    buffer[1] = FDate.fdate.Day % 10 + '0';
+    buffer[2] = '.';
 
-    // Месяц
-    CConsole::PutChar( FDate.fdate.Month / 10 + '0' );
-    CConsole::PutChar( FDate.fdate.Month % 10 + '0' );
-    CConsole::PutChar( '.' );
+    // Месяц.
+    buffer[3] = FDate.fdate.Month / 10 + '0';
+    buffer[4] = FDate.fdate.Month % 10 + '0';
+    buffer[5] = '.';
 
-    // Год
+    // Год.
     uint16_t tmp = 1980U + FDate.fdate.Year;
 
     tmp %= 1000U;
     tmp %= 100;
 
-    CConsole::PutChar( ( uint8_t ) ( tmp / 10 ) + '0' );
-    CConsole::PutChar( ( uint8_t ) ( tmp % 10 ) + '0' );
+    buffer[6] = ( uint8_t ) ( tmp / 10 ) + '0';
+    buffer[7] = ( uint8_t ) ( tmp % 10 ) + '0';
 
-    CConsole::Move( mdForward, 1 );
+    buffer[8] = '\0';
 
-    // Вывод времени
+    CConsole::WriteString( buffer );
+
+    // Вывод времени.
     FTime.Value = fno.ftime;
 
-    // Часы
-    CConsole::PutChar( FTime.ftime.Hour / 10 + '0' );
-    CConsole::PutChar( FTime.ftime.Hour % 10 + '0' );
+    // Часы.
+    buffer[0] = FTime.ftime.Hour / 10 + '0';
+    buffer[1] = FTime.ftime.Hour % 10 + '0';
+    buffer[2] = ':';
 
-    CConsole::PutChar( ':' );
+    // Минуты.
+    buffer[3] = FTime.ftime.Minute / 10 + '0';
+    buffer[4] = FTime.ftime.Minute % 10 + '0';
+    buffer[5] = '\0';
 
-    // Минуты
-    CConsole::PutChar( FTime.ftime.Minute / 10 + '0' );
-    CConsole::PutChar( FTime.ftime.Minute % 10 + '0' );
+    CConsole::Move( mdForward, 1 );
+    CConsole::WriteString( buffer );
 
 }
 
@@ -171,9 +176,7 @@ void CFileManager::HightlightPanel( CPanel & Panel ) {
     CConsole::SetColor( clLightGray, clBlue );
 
     // Отображаем путь в заголовке панели.
-    uint8_t len = Panel.Width - strlen( Panel.Path );
-
-    len /= 2;
+    uint8_t len = ( Panel.Width - strlen( Panel.Path ) ) / 2;
 
     CConsole::MoveTo( Panel.Left + len, Panel.Top );
 
@@ -199,10 +202,11 @@ void CFileManager::HightlightPanel( CPanel & Panel ) {
 
         // Отображаем разделители для выделенной строки.
         CConsole::MoveTo( Panel.Left + 13, Panel.ItemIndex + Panel.Top + 2 );
-
         CConsole::PutChar( ACS_VLINE );
+
         CConsole::Move( mdForward, 10 );
         CConsole::PutChar( ACS_VLINE );
+
         CConsole::Move( mdForward, 8 );
         CConsole::PutChar( ACS_VLINE );
 
@@ -215,12 +219,13 @@ void CFileManager::HightlightPanel( CPanel & Panel ) {
 
             ( & Panel == pCurrentPanel ) ? CConsole::SetColor( clBlack, clWhite ) : CConsole::SetForegroundColor( clLightGreen );
 
-            // Имя
+            // Имя.
             CConsole::WriteString( Panel.FileInfo.fname );
 
             len = 12 - strlen( Panel.FileInfo.fname );
 
-            while ( len-- ) CConsole::PutChar( ' ' );
+            CConsole::ClearForward( len );
+            CConsole::Move( mdForward, len );
 
             CConsole::MoveTo( Panel.Left + 14, Panel.ItemIndex + Panel.Top + 2 );
 
@@ -231,18 +236,20 @@ void CFileManager::HightlightPanel( CPanel & Panel ) {
 
             ( & Panel == pCurrentPanel ) ? CConsole::SetColor( clBlack, clWhite ) : CConsole::SetForegroundColor( clLightGray );
 
-            // Имя
+            // Имя.
             CConsole::WriteString( Panel.FileInfo.fname );
 
             len = 12 - strlen( Panel.FileInfo.fname );
 
-            while ( len-- ) CConsole::PutChar( ' ' );
+            CConsole::ClearForward( len );
+            CConsole::Move( mdForward, len );
 
             CConsole::MoveTo( Panel.Left + 14, Panel.ItemIndex + Panel.Top + 2 );
 
             len = 9 - strlen( utoa_fast_div( Panel.FileInfo.fsize, buffer ) );
 
-            do CConsole::PutChar( ' ' ); while ( len-- );
+            CConsole::ClearForward( ++len );
+            CConsole::Move( mdForward, len );
 
             CConsole::WriteString( utoa_fast_div( Panel.FileInfo.fsize, buffer ) );
 
@@ -276,52 +283,43 @@ void CFileManager::DrawPanel( CPanel & Panel ) {
 
     CConsole::WriteString( SPSTR( "Дата   Время" ), CConsole::cp1251 );
 
-    CConsole::SetForegroundColor( clLightGray );
+    CConsole::SetForegroundColor( clLightGray );    
 
     // Отображаем разделительные линии таблицы.
     for ( uint8_t i = Panel.Top + 1; i < Panel.Top + Panel.Height + 1; i++ ) {
 
         CConsole::MoveTo( Panel.Left + 13, i );
-
         CConsole::PutChar( ACS_VLINE );
 
         CConsole::Move( mdForward, 10 );
-
         CConsole::PutChar( ACS_VLINE );
 
         CConsole::Move( mdForward, 8 );
-
         CConsole::PutChar( ACS_VLINE );
 
     }
 
     // Добавляем стыкующие элементы.
     CConsole::MoveTo( Panel.Left + 13, 2 );
-
     CConsole::PutChar( 0xD1 );
 
     CConsole::Move( mdForward, 10 );
-
     CConsole::PutChar( 0xD1 );
 
     CConsole::Move( mdForward, 8 );
-
     CConsole::PutChar( 0xD1 );
 
     CConsole::Move( mdDown, 21 );
     CConsole::Move( mdBackward, 1 );
-
     CConsole::PutChar( 0xCF );
 
     CConsole::Move( mdBackward, 10 );
-
     CConsole::PutChar( 0xCF );
 
     CConsole::Move( mdBackward, 12 );
-
     CConsole::PutChar( 0xCF );
 
-    // Монтирование
+    // Монтирование.
     res = CFAT::Mount( & fs );
 
     // Устанавливаем признак отсутствия данных об элементе.
@@ -329,7 +327,7 @@ void CFileManager::DrawPanel( CPanel & Panel ) {
 
     uint8_t len;
 
-    // Открываем директорию (папку)
+    // Открываем директорию (папку).
     res = CFAT::OpenDir( & dir, Panel.Path );
 
     if ( res == FR_OK ) {
@@ -351,40 +349,43 @@ void CFileManager::DrawPanel( CPanel & Panel ) {
                 Panel.FileInfo = fno;
             }
 
-            // Если объект - папка
+            // Если объект - папка.
             if ( fno.fattrib & AM_DIR ) {
 
                 CConsole::SetForegroundColor( clLightGreen );
 
-                // Имя
+                // Имя.
                 CConsole::WriteString( fno.fname );
 
                 len = 12 - strlen( fno.fname );
 
-                while ( len-- ) CConsole::PutChar( ' ' );
+                CConsole::ClearForward( len );
+                CConsole::Move( mdForward, len );
 
                 CConsole::MoveTo( Panel.Left + 14, i );
 
                 CConsole::WriteString( SPSTR( "  [Папка] " ), CConsole::cp1251 );
 
-            // Если объект - файл
+            // Если объект - файл.
             } else {
 
                 CConsole::SetForegroundColor( clLightGray );
 
-                // Имя
+                // Имя.
                 CConsole::WriteString( fno.fname );
 
                 len = 12 - strlen( fno.fname );
 
-                while ( len-- ) CConsole::PutChar( ' ' );
+                CConsole::ClearForward( len );
+                CConsole::Move( mdForward, len );
 
                 CConsole::MoveTo( Panel.Left + 14, i );
 
                 len = 9 - strlen( utoa_fast_div( fno.fsize, buffer ) );
 
-                do CConsole::PutChar( ' ' ); while ( len-- );
+                CConsole::ClearForward( ++len );
 
+                CConsole::Move( mdForward, len );
                 CConsole::WriteString( utoa_fast_div( fno.fsize, buffer ) );
 
             }
@@ -402,7 +403,7 @@ void CFileManager::DrawPanel( CPanel & Panel ) {
     // Подсвечиваем выбранный элемент таблицы.
     HightlightPanel( Panel );
 
-    // Отмонтируем
+    // Отмонтируем.
     res = CFAT::Mount( NULL );
 
 }
@@ -410,7 +411,7 @@ void CFileManager::DrawPanel( CPanel & Panel ) {
 
 void CFileManager::DrawCommandLine( CPanel & Panel ) {
 
-    // Выводим приглашение
+    // Выводим приглашение.
     CConsole::SetColor( clLightGreen, clBlack );
     CConsole::MoveTo( 1, 24 );
 
@@ -434,33 +435,43 @@ void CFileManager::DrawCommandLine( CPanel & Panel ) {
  */
 void CFileManager::DrawFunctionKeys( CKeys & Keys ) {
 
+    CConsole::SetTextAttributes( atOff );
     CConsole::MoveTo( 1, 25 );
 
     // Перебираем функциональные клавиши.
-    for ( uint8_t i = 0; i < 10; i++ ) {
+    for ( uint8_t i = 0; i < Keys.Count(); i++ ) {
 
         if ( Keys[i] != 0 ) {
 
+            // Назначенная комбинация клавиш.
             CConsole::SetColor( clRed, clWhite );
 
-            // Разделитель
-            CConsole::PutChar( ' ' );
+            uint8_t ch, n = 0;
 
-            CConsole::WriteString( SPSTR( "ESC" ) );
-            //CConsole::WriteString( utoa_fast_div( i, buf ) );
+            ch = Keys[i][ n++ ];
 
-            // Разделитель
-            CConsole::PutChar( ' ' );
+            while ( ch != '\0' ) {                                 
 
-            CConsole::SetForegroundColor( clBlack );
-            CConsole::WriteString( Keys[i], CConsole::cp1251 );
+                // После разделителя меняем цвет для описания действия.
+                if ( ch == '|' ) { 
+
+                    CConsole::SetForegroundColor( clBlack );
+
+                } else {
+
+                    CConsole::PutChar( ch, CConsole::cp1251 );
+                }
+
+                ch = Keys[i][ n++ ];
+
+            }
 
         }
 
     }
 
     // Заполняем пустое пространство до конца строки.
-    CConsole::ClearLine( CConsole::cmFromCursorToEnd );
+    CConsole::ClearLine();
 
 }
 
@@ -521,6 +532,8 @@ LRESULT CFileManager::WindowProc( HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lP
 
 void CFileManager::FormActivate() {
 
+    Initialization();
+
     CConsole::CursorOff();
     CConsole::SetColor( clLightGray, clBlack );
     
@@ -548,7 +561,11 @@ void CFileManager::FormKeyDown( uint16_t Key ) {
 
     switch ( Key ) {
 
-        case VK_ESCAPE: { break; }
+        case VK_ESCAPE: { 
+            
+            CPLC::SetActiveWindow( HWND_COMMAND_SHELL );
+            break;
+        }
 
         case VK_RETURN: {
 
@@ -565,7 +582,7 @@ void CFileManager::FormKeyDown( uint16_t Key ) {
                 break;
             }
 
-            // Если объект - папка
+            // Если объект - папка.
             if ( pCurrentPanel->FileInfo.fattrib & AM_DIR ) {
 
                 // Присоединяем к пути имя выбранного файла.
@@ -651,6 +668,10 @@ void CFileManager::FormKeyDown( uint16_t Key ) {
             break;
 
         }
+
+        case VK_LEFT: { break; }
+        
+        case VK_RIGHT: { break; }
 
         case VK_UP: {
 

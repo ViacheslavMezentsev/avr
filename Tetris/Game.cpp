@@ -1,15 +1,20 @@
 #include "Defines.h"
 #include "Configuration.h"
+#include "SystemTime.h"
+#include "Version.h"
 #include "Console.h"
+#include "PLC.h"
 #include "Figures.h"
 #include "Game.h"
 
 
+// -=[ Пользовательские типы ]=-
+
+
 // -=[ Внешние ссылки ]=-
 
-extern char Version[ 16 ];
+extern SYSTEMTIME Time;
 extern char buffer[ 16 ];
-extern char * utoa_fast_div( uint32_t value, char * buffer );
 
 
 // -=[ Постоянные во флеш-памяти ]=-
@@ -55,16 +60,19 @@ char * CopyFigureToRAM( char * dest, FCHAR_PTR src ) {
 }
 
 
+/**
+ * Конструктор.
+ */
 CGame::CGame() {
 
-    F_Level = 0;
-    F_State = gsStopped;
+    level = 0;
+    state = gsStopped;
 
 }
 
 
 /**
- * Инициализация игры
+ * Инициализация игры.
  */
 void CGame::Initialization() {
 
@@ -77,31 +85,21 @@ void CGame::Initialization() {
     FigureType = ftJ;
 
     // Очищаем память стакана.
-    for ( uint16_t i = 0; i < ( GLASS_WIDTH / 2 ) * GLASS_HEIGHT; i++ ) Glass[i] = 0;
-    
-    // Прячем курсор.
-    CConsole::CursorOff();
-
-    // Очистка экрана.
-    CConsole::SetTextAttributes( atOff );    
-    CConsole::SetBackgroundColor( clBlue );
-    CConsole::ClearScreen();
+    for ( uint16_t i = 0; i < ( GLASS_WIDTH / 2 ) * GLASS_HEIGHT; i++ ) Glass[i] = 0;    
 
 }
 
 
 /**
- * Отрисовка заголовка окна
+ * Отрисовка заголовка окна.
  */
 void CGame::DrawTitle() {
 
-        CConsole::SetTextAttributes( atOff );        
-        CConsole::MoveTo( 1, 1 );
+    CConsole::MoveTo( 1, 1 );   
+    CConsole::SetColor( clBlack, clWhite );
 
-        CConsole::SetForegroundColor( clBlack );
-        CConsole::SetBackgroundColor( clWhite );
-        CConsole::WriteString( SPSTR( "Pinboard II, Тетрис, ATmega16 @ 16 МГц, версия сборки: " ), CConsole::cp1251 );
-        CConsole::WriteString( Version );
+    CConsole::WriteString( SPSTR( "Pinboard II, Тетрис, ATmega16 @ 16 МГц, версия сборки: " ), CConsole::cp1251 );
+    CConsole::WriteString( CVersion::GetVersionString() );
 
 #ifdef __GNUC__
         CConsole::WriteString( SPSTR( " (gnu)" ) );
@@ -109,23 +107,20 @@ void CGame::DrawTitle() {
         CConsole::WriteString( SPSTR( " (iar)" ) );
 #endif
 
-        CConsole::ClearEndOfLine();
+    CConsole::ClearLine();
 
 }
 
 
 /**
- * Отрисовка окна с рамкой
+ * Отрисовка окна с рамкой.
  */
 void CGame::DrawFrame( uint8_t Left, uint8_t Top, uint8_t Width, uint8_t Height, 
         EnColor Color, EnColor bgColor ) {
 
-    CConsole::SetTextAttributes( atOff );    
-    CConsole::SetForegroundColor( Color );
-    CConsole::SetBackgroundColor( bgColor );
-
     CConsole::MoveTo( Left, Top );
-
+    CConsole::SetColor( Color, bgColor );
+    
     CConsole::PutChar( ACS_DBL_ULCORNER );
 
     CConsole::PutChar( ACS_DBL_HLINE );
@@ -146,35 +141,29 @@ void CGame::DrawFrame( uint8_t Left, uint8_t Top, uint8_t Width, uint8_t Height,
     CConsole::PutChar( ACS_DBL_URCORNER );
 
     // Тень.
-    CConsole::SetTextAttributes( atOff );
-    CConsole::SetForegroundColor( clBlack );
-    CConsole::SetBackgroundColor( clBlue );
+    CConsole::SetColor( clBlack, clBlue );
     CConsole::PutChar( 0xDC );
 
-    CConsole::SetForegroundColor( Color );
-    CConsole::SetBackgroundColor( bgColor );
+    CConsole::SetColor( Color, bgColor );
 
     for ( uint8_t i = 0; i < Height; i++ ) {
 
+        // Левая граница.
         CConsole::MoveTo( Left, Top + i + 1 );
         CConsole::PutChar( ACS_DBL_VLINE );
+        
+        // Заполняем до конца правой границы.
+        CConsole::ClearForward( Width + 2 );
 
-        CConsole::PutChar( ' ' );
-
-        for ( uint8_t j = 0; j < Width; j++ ) CConsole::PutChar( ' ' );
-
-        CConsole::PutChar( ' ' );
-
+        // Правая граница.
+        CConsole::Move( mdForward, Width + 2 );
         CConsole::PutChar( ACS_DBL_VLINE );
 
         // Тень.
-        CConsole::SetTextAttributes( atOff );
-        CConsole::SetForegroundColor( clBlack );
-        CConsole::SetBackgroundColor( clBlue );
+        CConsole::SetColor( clBlack, clBlue );
         CConsole::PutChar( 0xDB );
 
-        CConsole::SetForegroundColor( Color );
-        CConsole::SetBackgroundColor( bgColor );
+        CConsole::SetColor( Color, bgColor );
     }
 
     CConsole::MoveTo( Left, Top + Height + 1 );
@@ -186,16 +175,11 @@ void CGame::DrawFrame( uint8_t Left, uint8_t Top, uint8_t Width, uint8_t Height,
     CConsole::PutChar( ACS_DBL_LRCORNER );
     
     // Тень.
-    CConsole::SetTextAttributes( atOff );
-    CConsole::SetForegroundColor( clBlack );
-    CConsole::SetBackgroundColor( clBlue );
+    CConsole::SetColor( clBlack, clBlue );
     CConsole::PutChar( 0xDB );
 
-    CConsole::MoveTo( Left + 1, Top + Height + 2 );
-    
-    CConsole::SetTextAttributes( atOff );
-    CConsole::SetForegroundColor( clBlack );
-    CConsole::SetBackgroundColor( clBlue );
+    CConsole::MoveTo( Left + 1, Top + Height + 2 );    
+    CConsole::SetColor( clBlack, clBlue );
 
     for ( uint8_t i = 0; i < Width + 4; i++ ) CConsole::PutChar( 0xDF );
 
@@ -203,14 +187,12 @@ void CGame::DrawFrame( uint8_t Left, uint8_t Top, uint8_t Width, uint8_t Height,
 
 
 /**
- * Отрисовка стакана
+ * Отрисовка стакана.
  */
 void CGame::DrawGlass( uint8_t Left, uint8_t Top, uint8_t Width, uint8_t Height, 
         EnColor Color, EnColor bgColor ) {
 
-    CConsole::SetTextAttributes( atOff );
-    CConsole::SetBackgroundColor( bgColor );
-    CConsole::SetForegroundColor( Color );
+    CConsole::SetColor( Color, bgColor );
 
     CConsole::MoveTo( Left, Top );
 
@@ -222,16 +204,16 @@ void CGame::DrawGlass( uint8_t Left, uint8_t Top, uint8_t Width, uint8_t Height,
 
     for ( uint8_t i = 0; i < Height; i++ ) {
 
+        // Левая граница.
         CConsole::MoveTo( Left, Top + i + 1 );
         CConsole::PutChar( ACS_VLINE );
-
+        
+        // Заполняем до конца правой границы.
         CConsole::SetBackgroundColor( clBlack );
-        CConsole::PutChar( ' ' );
+        CConsole::ClearForward( Width + 2 );
 
-        for ( uint8_t j = 0; j < Width; j++ ) CConsole::PutChar( ' ' );
-
-        CConsole::PutChar( ' ' );
-
+        // Правая граница.
+        CConsole::Move( mdForward, Width + 2 );        
         CConsole::SetBackgroundColor( bgColor );
         CConsole::PutChar( ACS_VLINE );
 
@@ -256,7 +238,7 @@ void CGame::DrawFigure(){
     uint16_t offset;
 
     // Заглушка: если игра не запущена, то ничего не делаем.
-    if ( F_State != gsRunning ) return;
+    if ( state != gsRunning ) return;
 
     // Проверка столкновения.
 
@@ -305,6 +287,7 @@ void CGame::DrawFigure(){
 
     y++;
 
+    // Обновляем фигуру.
     if ( y > 19 ) { 
        
         y = GLASS_OFFSET_TOP;
@@ -317,8 +300,7 @@ void CGame::DrawFigure(){
 
     }
 
-    CConsole::SetBackgroundColor( clBlack );
-    CConsole::SetForegroundColor( FigureColor );
+    CConsole::SetColor( FigureColor, clBlack );
 
     // Рисуем новое изображение.
     switch ( FigureType ) {
@@ -364,55 +346,226 @@ void CGame::DrawFigure(){
  */
 void CGame::DrawFunctionKeys( CKeys & Keys ) {
 
-    char buf[3];
-
     CConsole::SetTextAttributes( atOff );
     CConsole::MoveTo( 1, 25 );
 
     // Перебираем функциональные клавиши.
-    for ( uint8_t i = 0; i < 10; i++ ) {
+    for ( uint8_t i = 0; i < Keys.Count(); i++ ) {
 
         if ( Keys[i] != 0 ) {
             
-            CConsole::SetForegroundColor( clRed );
-            CConsole::SetBackgroundColor( clWhite );
+            // Назначенная комбинация клавиш.
+            CConsole::SetColor( clRed, clWhite );
             
-            // Разделитель
-            CConsole::PutChar( ' ' );
-            
-            CConsole::WriteString( utoa_fast_div( i, buf ) );
-            
-            // Разделитель
-            CConsole::PutChar( ' ' );
+            uint8_t ch, n = 0;
 
-            CConsole::SetForegroundColor( clBlack );
-            CConsole::WriteString( Keys[i], CConsole::cp1251 );
+            ch = Keys[i][ n++ ];
+
+            while ( ch != '\0' ) {                                 
+
+                // После разделителя меняем цвет для описания действия.
+                if ( ch == '|' ) { 
+                    
+                    CConsole::SetForegroundColor( clBlack );
+
+                } else {
+
+                    CConsole::PutChar( ch, CConsole::cp1251 );
+                }
+
+                ch = Keys[i][ n++ ];
+
+            }
 
         }
 
     }
 
     // Заполняем пустое пространство до конца строки.
-    CConsole::ClearEndOfLine();
+    CConsole::ClearLine();
 
 }
 
 
-/**
- * Цикл игры
- */
-void CGame::Run() {
+LRESULT CGame::WindowProc( HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam ) {
 
-    char * cmd;
+    switch ( uMsg ) {
 
-    F_State = gsRunning;
+        // Здесь можно сделать какой-нибудь эффект.
+        // Это событие делает окно активным.
+        case SW_SHOW: { break; }
 
-    do {
+        case WM_ACTIVATE: {
+
+            switch ( wParam ) {
+
+                case WA_ACTIVE: { FormActivate(); break; }
+
+                case WA_INACTIVE: { break; }
+
+            }
+
+            break;
+        }
+
+        case WM_KEYDOWN: { FormKeyDown( wParam ); break; }
+
+        case WM_KEYUP: { break; }
+
+        case WM_TIMER: {
+
+            switch ( wParam ) {
+
+                case ID_TIMER_10MS: { Form10msTimer(); break; }
+
+                case ID_TIMER_100MS: { Form100msTimer(); break; }
+
+                case ID_TIMER_500MS: { Form500msTimer(); break; }
+
+                case ID_TIMER_1S: { Form1secTimer(); break; }
+
+                case ID_TIMER_5S: { Form5secTimer(); break; }
+
+            }
+
+            break;
+
+        }
+
+        case WM_PAINT: { break; }
+
+    }
+
+    return 0;
+
+}
+
+
+void CGame::FormActivate() {
+
+    Initialization();
     
-        cmd = CConsole::ReadString( buffer );
+    CConsole::CursorOff();
 
-    } while ( ! ( ( cmd[0] == 'q' ) && ( cmd[1] == 0 ) ) );
+    // Очистка экрана.
+    CConsole::SetColor( clLightGray, clBlue );
+    CConsole::ClearScreen();
 
-    F_State = gsStopped;
+    DrawTitle();
+    DrawFunctionKeys( GameKeys );
+    DrawFrame( 13, 2, 52, 20, clLightGray, clWhite );
+
+    DrawGlass( GLASS_OFFSET_LEFT - 1, GLASS_OFFSET_TOP - 1,
+        GLASS_WIDTH + 2, GLASS_HEIGHT + 2, clLightGray, clWhite );
+
+    // Запускаем игру.
+    state = gsRunning;
+
+};
+
+
+void CGame::FormKeyDown( uint16_t Key ) {   
+
+    switch ( Key ) {
+
+        case VK_ESCAPE: { 
+            
+            // Возвращаемся в командную оболочку.
+            state = gsStopped; 
+            CPLC::SetActiveWindow( HWND_COMMAND_SHELL );
+
+            break; 
+        }
+
+        case VK_UP: { break; }
+
+        case VK_DOWN: {  break; }
+
+        case VK_HOME: { break; }
+
+        case VK_END: { break; }
+
+        case VK_TAB: { break; }
+
+        default: {
+
+            switch ( Key ) {
+
+                // Описание игры.
+                case '0': {
+
+                    break;
+                }
+
+                // Новая игра.
+                case '2': {
+
+                    state = gsStopped;
+                    CPLC::SetActiveWindow( HWND_GAME );
+                    break;
+                }
+
+            }
+
+        }
+
+    }
 
 }
+
+void CGame::Form10msTimer() {
+
+};
+
+
+void CGame::Form100msTimer() {
+
+};
+
+void CGame::Form500msTimer() {
+
+    // Отображаем время в заголовке.
+    CSystemTime::GetTimeAsSystemTime( & Time );
+
+    CConsole::SaveCursor();
+
+    CConsole::MoveTo( 73, 1 );
+    CConsole::SetColor( clBlack, clWhite );
+
+    buffer[0] = Time.wHour / 10 + '0';
+    buffer[1] = Time.wHour / 10 + '0';
+    buffer[2] = ':';
+    buffer[3] = Time.wMinute / 10 + '0';
+    buffer[4] = Time.wMinute % 10 + '0';
+    buffer[5] = ':';
+    buffer[6] = Time.wSecond / 10 + '0';
+    buffer[7] = Time.wSecond % 10 + '0';
+    buffer[8] = '\0';
+
+    CConsole::WriteString( buffer );
+
+    CConsole::RestoreCursor();
+
+};
+
+
+void CGame::Form1secTimer() {    
+
+    if ( Game.State == gsRunning ) {
+
+        // Отображаем фигуру в зависимости от уровня игры.
+        switch ( Game.Level ) {
+
+            case 0: { Game.DrawFigure(); break; }
+
+        }      
+
+    } // if
+
+};
+
+
+void CGame::Form5secTimer() {
+
+};
+

@@ -7,11 +7,13 @@ class CKeys {
    
 public:	
 
+    inline uint8_t Count() { return 1; }
+
     inline FCHAR_PTR operator []( uint8_t Key ) {
         
         switch ( Key ) {
 
-            case 0: return SPSTR( "Выход" );
+            case 0: return SPSTR( "Esc| Выход" );
             
             default: return 0;
 

@@ -53,7 +53,6 @@ uint8_t CConsole::GetChar() {
 
     uint8_t ret = 0;
 
-    // запрещаем прерывания
     __disable_interrupt();
 
     if ( !FIFO_IS_EMPTY( uart_rx_fifo ) ) {
@@ -65,7 +64,6 @@ uint8_t CConsole::GetChar() {
 
     }
 
-    // разрешаем прерывания
     __enable_interrupt();
 
     return ret;
@@ -134,6 +132,33 @@ void CConsole::WriteString( const char * s, EnCodePage CodePage, uint8_t Length 
 
 
 /**
+ * Вывод звука.
+ */
+void CConsole::Beep( uint16_t Frequency, uint8_t Duration  ) {
+
+    // Настройка параметров (если используется).
+    WriteString( ESC );
+
+    PutChar( ( Frequency / 100 ) + '0' );
+
+    Frequency %= 100;
+
+    PutChar( ( Frequency / 10 ) + '0' );
+    PutChar( ( Frequency % 10 ) + '0' );
+
+    PutChar( ';' );
+
+    PutChar( ( Duration / 10 ) + '0' );
+    PutChar( ( Duration % 10 ) + '0' );
+
+    PutChar( 'B' );
+
+    // Вывод звука (BELL).
+    PutChar( '\a' );
+}
+
+
+/**
  * Очистить экран.
  */
 void CConsole::ClearScreen( EnClearMode Mode ) {
@@ -192,6 +217,8 @@ void CConsole::ClearLine( EnClearMode Mode ) {
  */
 void CConsole::ClearForward( uint8_t Count ) {
 
+    if ( Count == 0 ) return;
+
     WriteString( ESC );
     PutChar( ( Count / 10 ) + '0' );
     PutChar( ( Count % 10 ) + '0' );
@@ -201,7 +228,7 @@ void CConsole::ClearForward( uint8_t Count ) {
 
 
 /**
- * Спрятать курсор.
+ * Показать курсор.
  */
 void CConsole::CursorOn() {
 
@@ -211,7 +238,7 @@ void CConsole::CursorOn() {
 
 
 /**
- * Показать курсор.
+ * Спрятать курсор.
  */
 void CConsole::CursorOff() {
 
@@ -241,12 +268,12 @@ void CConsole::RestoreCursor() {
 
 
 /**
- * 
+ * Установка цвета текста.
  */
 void CConsole::SetForegroundColor( EnColor Color ) {
 
     if ( Color & 0x8 ) {
-        
+
         WriteString( ESC );
         PutChar( '1' );
         PutChar( 'm' );
@@ -267,12 +294,12 @@ void CConsole::SetForegroundColor( EnColor Color ) {
 
 
 /**
- * 
+ * Установка цвета фона.
  */
 void CConsole::SetBackgroundColor( EnColor Color ) {
 
     if ( Color & 0x8 ) {
-        
+
         WriteString( ESC );
         PutChar( '5' );
         PutChar( 'm' );
@@ -293,11 +320,11 @@ void CConsole::SetBackgroundColor( EnColor Color ) {
 
 
 /**
- * 
+ *
  */
 void CConsole::SetColor( EnColor ForegroundColor, EnColor BackgroundColor ) {
 
-    SetTextAttributes( atOff );    
+    SetTextAttributes( atOff );
     SetForegroundColor( ForegroundColor );
     SetBackgroundColor( BackgroundColor );
 
@@ -337,7 +364,7 @@ void CConsole::MoveTo( uint8_t Left, uint8_t Top ) {
 
 
 /**
- * 
+ * Перемещение курсора.
  */
 void CConsole::Move( EnMoveDirection Direction, uint8_t Delta ) {
 
@@ -368,29 +395,49 @@ void CConsole::Move( EnMoveDirection Direction, uint8_t Delta ) {
 
 
 /**
- * Отрисовка окна с рамкой
+ * Отрисовка окна с рамкой.
  */
 void CConsole::DrawFrame( uint8_t Left, uint8_t Top, uint8_t Width, uint8_t Height,
         EnColor Color, EnColor bgColor, char * Caption ) {
 
     SetColor( Color, bgColor );
+
+    // Верхняя граница.
     MoveTo( Left, Top );
-
-    // Отображаем путь в заголовке панели.
-    uint8_t len = Width - strlen( Caption );
-
-    len /= 2;
-
     PutChar( ACS_DBL_ULCORNER );
 
-    for ( uint8_t i = 0; i < len; i++ ) PutChar( ACS_DBL_HLINE );
-    
-    Move( mdForward, Width - ( len << 1 ) );
-
-    for ( uint8_t i = 0; i < len; i++ ) PutChar( ACS_DBL_HLINE );
+    for ( uint8_t i = 0; i < Width; i++ ) PutChar( ACS_DBL_HLINE );
 
     PutChar( ACS_DBL_URCORNER );
 
+    uint8_t len = ( Width - strlen( Caption ) ) / 2;
+
+    // Отображаем заголовок, если он есть.
+    if ( Caption != NULL ) {
+
+        MoveTo( Left + len, Top );
+
+        PutChar( ' ' );
+        WriteString( Caption );
+        PutChar( ' ' );
+
+    }
+
+    // Вертикальные границы.
+    for ( uint8_t i = 0; i < Height; i++ ) {
+
+        MoveTo( Left, Top + i + 1 );
+
+        PutChar( ACS_DBL_VLINE );
+
+        ClearForward( Width );
+
+        Move( mdForward, Width );
+        PutChar( ACS_DBL_VLINE );
+
+    }
+
+    // Нижняя граница.
     MoveTo( Left, Top + Height + 1 );
 
     PutChar( ACS_DBL_LLCORNER );
@@ -398,24 +445,5 @@ void CConsole::DrawFrame( uint8_t Left, uint8_t Top, uint8_t Width, uint8_t Heig
     for ( uint8_t i = 0; i < Width; i++ ) PutChar( ACS_DBL_HLINE );
 
     PutChar( ACS_DBL_LRCORNER );
-
-    MoveTo( Left + len, Top );
-
-    PutChar( ' ' );
-
-    WriteString( Caption );
-
-    PutChar( ' ' );
-
-    for ( uint8_t i = 0; i < Height; i++ ) {
-
-        MoveTo( Left, Top + i + 1 );
-        PutChar( ACS_DBL_VLINE );
-
-        for ( uint8_t i = 0; i < Width; i++ ) PutChar( ' ' );
-
-        PutChar( ACS_DBL_VLINE );
-
-    }
 
 }

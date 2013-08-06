@@ -326,8 +326,9 @@ public:
     static void ShowProgressBar( uint8_t Progress, uint8_t MaxProgress, uint8_t Length, uint8_t Row, uint8_t Col );
 	static void PutChar(uint8_t Data);
     static void PutChar( uint8_t Data, uint8_t Row, uint8_t Col );
-	static void LoadCustomChar(FU08T_PTR pCustomCharArray, uint8_t romCharNum, uint8_t lcdCharNum);
+    static void LoadCustomChar(FU08T_PTR pCustomCharArray, uint8_t romCharNum, uint8_t lcdCharNum);
     static void LoadCustomChar(const uint8_t * pCustomCharArray, uint8_t romCharNum, uint8_t lcdCharNum);
+    static void LoadCustomChars();
     static void Draw( uint8_t Buffer[], uint8_t Row, uint8_t Col );
     static void WriteLine(uint8_t Line, FCHAR_PTR pString);
     static void WriteLine(uint8_t Line, char * pString);
@@ -353,7 +354,7 @@ private:	/**
 	inline static void WriteData(EnLCDDataType Type, uint8_t Data);
     inline static uint8_t ReadAddress();
     inline static uint8_t ReadData();
-	inline static void Scroll(uint8_t Direction);
+    inline static void Scroll(uint8_t Direction);
 	inline static void SetLCDDriver(EnLCDDriverType DriverType);
 	inline static bool IsBusy();
 	inline static void WriteStrobe(uint16_t usec);

@@ -1,5 +1,4 @@
-#ifndef _CONFIGURATION_H_
-#define _CONFIGURATION_H_
+#pragma once
 
 #include "Defines.h"
 
@@ -14,7 +13,7 @@
 
 #elif defined( __ICCAVR__ )
 
-    #define F_CPU 16000000UL
+    #define F_CPU 4000000UL
 
 #endif
 
@@ -24,12 +23,14 @@
     //#define __DEBUG__
 #endif
 
-
 #define REG_INPUT_START 1000
 #define REG_INPUT_NREGS 4
 
 // —корость работы внутреннего USART
-//#define BAUD 9600
+#define BAUD 9600UL
+//#define BAUD 19200UL
+//#define BAUD 38400UL
+//#define BAUD 57600UL
 
 
 /**
@@ -44,7 +45,6 @@
  * избежать конфликта при определении одного вектора прерывани€
  * одновременно в нескольких местах проекта.
  */
-
 
 //#define External_Interrupt_Request_0
 //#define External_Interrupt_Request_1
@@ -78,4 +78,3 @@
 
 //#define Store_Program_Memory_Read
 
-#endif // _CONFIGURATION_H_

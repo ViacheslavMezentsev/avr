@@ -29,7 +29,6 @@
 
 
 // -=[ Внешние ссылки ]=-
-extern char Version[16];
 extern SYSTEMTIME Time;
 
 
@@ -198,8 +197,8 @@ uint8_t runmenu( uint8_t x, uint8_t y, const char * menu[], uint8_t defaultitem 
     while ( true ) {
 
         CConsole::CursorOff();
-        CConsole::SetTextAttr( GREEN << 4 | WHITE );
-        CConsole::GotoXY( x, y );
+        CConsole::SetColor( clWhite, clGreen );
+        CConsole::MoveTo( x, y );
         CConsole::PutChar( ACS_ULCORNER );
 
         for ( i = 0; i < width + 2; i++ ) CConsole::PutChar( ACS_HLINE );
@@ -208,12 +207,12 @@ uint8_t runmenu( uint8_t x, uint8_t y, const char * menu[], uint8_t defaultitem 
 
         for ( i = 0; i < nitems; i++ ) {
 
-            CConsole::GotoXY( x, y + i + 1 );
+            CConsole::MoveTo( x, y + i + 1 );
 
             CConsole::PutChar( ACS_VLINE );	
             CConsole::PutChar( ' ' );
 
-            if ( i == itemno ) CConsole::SetTextAttr( YELLOW );
+            if ( i == itemno ) CConsole::SetBackgroundColor( clYellow );
 
             s = 0;
 
@@ -232,13 +231,13 @@ uint8_t runmenu( uint8_t x, uint8_t y, const char * menu[], uint8_t defaultitem 
 
             }
 
-            CConsole::SetTextAttr( GREEN << 4 | WHITE );
+            CConsole::SetColor( clWhite, clGreen );
             CConsole::PutChar( ' ' );
             CConsole::PutChar( ACS_VLINE );
 
         }
 
-        CConsole::GotoXY( x, y + nitems + 1 );
+        CConsole::MoveTo( x, y + nitems + 1 );
         CConsole::PutChar( ACS_LLCORNER );
 
         for ( i = 0; i < width + 2; i++ ) { CConsole::PutChar( ACS_HLINE ); }
@@ -346,12 +345,12 @@ void drawfkeys( const char * fkeys[] ) {
 
     const char * s;
 
-    CConsole::GotoXY( 1, 25 );
+    CConsole::MoveTo( 1, 25 );
 
     for ( uint8_t i = 0; i < 10; i++ ) {
 
-        CConsole::SetTextColor( WHITE );
-        CConsole::SetTextBackground( BLACK );
+        CConsole::SetTextAttributes( atOff );
+        CConsole::SetBackgroundColor( clBlack );
 
         if ( i > 0 && i < 9 ) CConsole::PutChar( ' ' );
 
@@ -365,8 +364,7 @@ void drawfkeys( const char * fkeys[] ) {
             CConsole::PutChar( ( i % 10 ) + '1' );
         }
 
-        CConsole::SetTextColor( WHITE );
-        CConsole::SetTextBackground( GREEN );
+        CConsole::SetColor( clWhite, clGreen );
 
         s = fkeys[i] ? fkeys[i] : 0;
 
@@ -388,10 +386,10 @@ void drawfkeys( const char * fkeys[] ) {
 }
 
 
-void drawframe( uint8_t x, uint8_t y, uint8_t width, uint8_t height, uint8_t color ) {
+void DrawFrame( uint8_t x, uint8_t y, uint8_t width, uint8_t height, EnColor color ) {
 
-    CConsole::SetTextAttr( color );
-    CConsole::GotoXY( x, y );
+    CConsole::SetForegroundColor( color );
+    CConsole::MoveTo( x, y );
 
     CConsole::PutChar( ACS_ULCORNER );
 
@@ -401,7 +399,7 @@ void drawframe( uint8_t x, uint8_t y, uint8_t width, uint8_t height, uint8_t col
 
     for ( uint8_t i = 0; i < height; i++ ) {
 
-        CConsole::GotoXY( x, y + i + 1 );
+        CConsole::MoveTo( x, y + i + 1 );
         CConsole::PutChar( ACS_VLINE );
         CConsole::PutChar( ' ' );
 
@@ -413,7 +411,7 @@ void drawframe( uint8_t x, uint8_t y, uint8_t width, uint8_t height, uint8_t col
 
     }
 
-    CConsole::GotoXY( x, y + height + 1 );
+    CConsole::MoveTo( x, y + height + 1 );
 
     CConsole::PutChar( ACS_LLCORNER );
 
@@ -424,7 +422,7 @@ void drawframe( uint8_t x, uint8_t y, uint8_t width, uint8_t height, uint8_t col
 }
 
 
-void drawmem( const unsigned char * mem ) {
+void DrawMem( const unsigned char * mem ) {
 
     const unsigned char * mptr;
     uint8_t i, j;
@@ -433,11 +431,9 @@ void drawmem( const unsigned char * mem ) {
 
         mptr = & mem[ i * 16 ];
 
-        CConsole::GotoXY( 1, i + 2 );
+        CConsole::MoveTo( 1, i + 2 );
 
-        CConsole::SetTextColor( YELLOW );
-
-        CConsole::SetTextBackground( BLUE );
+        CConsole::SetColor( clYellow, clBlue );
 
         j = 8;
 
@@ -450,7 +446,7 @@ void drawmem( const unsigned char * mem ) {
 
         CConsole::WriteString( ":  " );
 
-        CConsole::SetTextColor( WHITE );
+        CConsole::SetForegroundColor( clWhite );
 
         for ( j = 0; j < 16; j++ ) {
 
@@ -488,7 +484,7 @@ void drawmem( const unsigned char * mem ) {
 
         }
 
-        CConsole::ClearEndOfLine();
+        CConsole::ClearLine( CConsole::cmFromCursorToEnd );
 
     }
 
@@ -502,13 +498,12 @@ void MemViewer( void * start ) {
     uint16_t key;
     const unsigned char * mem;
 
-    CConsole::SetTextAttr( LIGHTGRAY | BLUE << 4 );
+    CConsole::SetColor( clLightGray, clBlue );
     CConsole::ClearScreen();
 
-    CConsole::SetTextColor( WHITE );
-    CConsole::SetTextBackground( GREEN );
+    CConsole::SetColor( clWhite, clGreen );
     CConsole::WriteString( szViewMemory, CConsole::cp1251 );
-    CConsole::ClearEndOfLine();
+    CConsole::ClearLine( CConsole::cmFromCursorToEnd );
 
     CConsole::CursorOff();
     drawfkeys( memview_fkeys );
@@ -517,7 +512,7 @@ void MemViewer( void * start ) {
 
     for (;;) {
 
-        drawmem( mem );
+        DrawMem( mem );
 
         do _delay_ms( 10 ); while ( !( key = CConsole::GetChar() ) );
 
@@ -589,7 +584,7 @@ void DebugDemo() {
 
     uint8_t key;
 
-    CConsole::SetTextAttr( LIGHTGRAY );
+    CConsole::SetForegroundColor( clLightGray );
     CConsole::ClearScreen();
 
     CConsole::WriteString( szDebugMode, CConsole::cp1251 );
@@ -625,13 +620,13 @@ void Command() {
 
     char * cmd;
 
-    CConsole::SetTextAttr( LIGHTGRAY );
+    CConsole::SetForegroundColor( clLightGray );
     CConsole::ClearScreen();
 
-    CConsole::GotoXY( 1, 25 );
+    CConsole::MoveTo( 1, 25 );
 
     CConsole::WriteString( szInterpreterName, CConsole::cp1251 );
-    CConsole::WriteString( Version );
+    CConsole::WriteString( CVersion::GetVersionString() );
     CConsole::WriteString( "\r\n" );
 
     CConsole::WriteString( szBuildDate, CConsole::cp1251 );
@@ -642,11 +637,11 @@ void Command() {
     while ( true ) {
 
         // Выводим приглашение
-        CConsole::SetTextAttr( GREEN );
+        CConsole::SetForegroundColor( clGreen );
         CConsole::WriteString( szCommandPrompt );
 
         // Считываем ввод пользователя
-        CConsole::SetTextAttr( LIGHTGRAY );
+        CConsole::SetForegroundColor( clLightGray );
         cmd = CConsole::ReadString( buff );
 
         // Если пустая команда, то переходим на следующую строку
@@ -657,19 +652,19 @@ void Command() {
         // Выводим справку
         } else if ( ( cmd[0] == 'h' ) && ( cmd[1] == 0 ) ) {
 
-            CConsole::SetTextAttr( WHITE );
+            CConsole::SetForegroundColor( clWhite );
             CConsole::WriteString( szAvailableCommands, CConsole::cp1251 );
 
-            CConsole::SetTextAttr( LIGHTRED );
+            CConsole::SetForegroundColor( clLightRed );
             CConsole::PutChar( 'h' );
 
-            CConsole::SetTextAttr( WHITE );
+            CConsole::SetForegroundColor( clWhite );
             CConsole::WriteString( szHelpDescription, CConsole::cp1251 );
 
-            CConsole::SetTextAttr( LIGHTRED );
+            CConsole::SetForegroundColor( clLightRed );
             CConsole::PutChar( 'q' );
 
-            CConsole::SetTextAttr( WHITE );
+            CConsole::SetForegroundColor( clWhite );
             CConsole::WriteString( szQuitDescription, CConsole::cp1251 );
 
         // Выходим из интерпретатора
@@ -680,13 +675,13 @@ void Command() {
         // Выводим сообщение о неподдерживаемой команде
         } else {
 
-            CConsole::SetTextAttr( WHITE );
+            CConsole::SetForegroundColor( clWhite );
             CConsole::WriteString( szCommandIsNotSupported, CConsole::cp1251 );
 
-            CConsole::SetTextAttr( LIGHTRED );
+            CConsole::SetForegroundColor( clLightRed );
             CConsole::WriteString( "h" );
 
-            CConsole::SetTextAttr( WHITE );
+            CConsole::SetForegroundColor( clWhite );
             CConsole::WriteString( szForHelp, CConsole::cp1251 );
 
         }
@@ -701,9 +696,9 @@ void SpeedTest() {
     FLASHSTR_DECLARE( char, szTestPrompt, "TEST50=>" );
     FLASHSTR_DECLARE( char, szTestStr, "\x08\x08\x08\x08\x08\x08\x08\x08\x08\x08" );
 
-    CConsole::GotoXY( 1, 1 );
+    CConsole::MoveTo( 1, 1 );
 
-    CConsole::SetTextAttr( GREEN << 4 | YELLOW );
+    CConsole::SetColor( clYellow, clGreen );
 
     for ( uint16_t i = 0; i < 50000; i++ ) {
 
@@ -772,7 +767,7 @@ void SubmenuTest() {
 
 void AsciiArt() {
 
-    CConsole::SetTextAttr( LIGHTGRAY );
+    CConsole::SetForegroundColor( clLightGray );
     CConsole::ClearScreen();
     CConsole::WriteString( ascii_art_str );
 
@@ -792,23 +787,23 @@ void TestCGetS() {
     uint8_t i;
 
     //draw input dialog (frame)
-    drawframe( 10, 10, 40, 9, WHITE  | RED << 4 );
-    CConsole::GotoXY( 12, 12 );
+    CConsole::DrawFrame( 10, 10, 40, 9, clWhite, clRed, NULL );
+    CConsole::MoveTo( 12, 12 );
     CConsole::WriteString( szEnterYourName, CConsole::cp1251 );
 
-    CConsole::GotoXY( 12, 14 );
-    CConsole::SetTextAttr( WHITE  | BLACK << 4 );
+    CConsole::MoveTo( 12, 14 );
+    CConsole::SetColor( clWhite, clBlack );
 
     for ( i = 0; i < 40; i++ ) CConsole::PutChar( ' ' );
 
     //read data
-    CConsole::GotoXY( 12,14 );
+    CConsole::MoveTo( 12,14 );
 
     out = CConsole::ReadString( buff );
 
     // write read data
-    CConsole::GotoXY( 12, 16 );
-    CConsole::SetTextAttr( WHITE | RED << 4 );
+    CConsole::MoveTo( 12, 16 );
+    CConsole::SetColor( clWhite, clRed );
 
     if ( strlen( out ) == 0 ) {
 
@@ -818,15 +813,15 @@ void TestCGetS() {
 
         CConsole::WriteString( szYourName, CConsole::cp1251 );
 
-        CConsole::GotoXY( 12, 17 );
+        CConsole::MoveTo( 12, 17 );
         CConsole::WriteString( out );
 
     }
 
     CConsole::CursorOff();
 
-    CConsole::GotoXY( 23, 19 );
-    CConsole::SetTextAttr( WHITE | RED << 4 );
+    CConsole::MoveTo( 23, 19 );
+    CConsole::SetColor( clWhite, clRed );
     CConsole::WriteString( szPressEscForExit, CConsole::cp1251 );
 
     // wait for ESC press
@@ -843,28 +838,27 @@ void DateTime() {
 
     uint8_t width = 34;
 
-    CConsole::SetTextAttr( LIGHTGRAY | BLUE << 4 );
+    CConsole::SetColor( clLightGray, clBlue );
     CConsole::ClearScreen();
 
-    CConsole::SetTextColor( WHITE );
-    CConsole::SetTextBackground( GREEN );
+    CConsole::SetColor( clWhite, clGreen );
     CConsole::WriteString( szDateTime, CConsole::cp1251 );
-    CConsole::ClearEndOfLine();
+    CConsole::ClearLine( CConsole::cmFromCursorToEnd );
 
     while ( true ) {
 
         CSystemTime::GetTimeAsSystemTime( & Time );
 
         CConsole::CursorOff();
-        CConsole::SetTextAttr( GREEN << 4 | WHITE );
-        CConsole::GotoXY( 4, 4 );
+        CConsole::SetColor( clWhite, clGreen );
+        CConsole::MoveTo( 4, 4 );
         CConsole::PutChar( ACS_ULCORNER );
 
         for ( uint8_t i = 0; i < width + 2; i++ ) CConsole::PutChar( ACS_HLINE );
 
         CConsole::PutChar( ACS_URCORNER );
 
-        CConsole::GotoXY( 4, 5 );
+        CConsole::MoveTo( 4, 5 );
         CConsole::PutChar( ACS_VLINE );	
         CConsole::PutChar( ' ' );
         CConsole::WriteString( szDate, CConsole::cp1251 );
@@ -892,7 +886,7 @@ void DateTime() {
         CConsole::PutChar( ' ' );
         CConsole::PutChar( ACS_VLINE );	
 
-        CConsole::GotoXY( 4, 6 );
+        CConsole::MoveTo( 4, 6 );
         CConsole::PutChar( ACS_VLINE );	
         CConsole::PutChar( ' ' );
         CConsole::WriteString( szTime, CConsole::cp1251 );
@@ -909,7 +903,7 @@ void DateTime() {
         CConsole::PutChar( ' ' );
         CConsole::PutChar( ACS_VLINE );
 
-        CConsole::GotoXY( 4, 7 );
+        CConsole::MoveTo( 4, 7 );
         CConsole::PutChar( ACS_LLCORNER );
 
         for ( uint8_t i = 0; i < width + 2; i++ ) { CConsole::PutChar( ACS_HLINE ); }
@@ -925,14 +919,14 @@ void DateTime() {
 
 void ShowTable() {
 
-    drawframe( 10, 5, 34, 15, DARKGRAY );
+    CConsole::DrawFrame( 10, 5, 34, 15, clWhite, clBlue, NULL );
 	
     do _delay_ms( 10 ); while ( CConsole::GetChar() != KB_ESC );
 
 }
 
 
-void UIMain() {
+void FormMain() {
 
     FLASHSTR_DECLARE( char, szTitle, "Pinboard II, MicroVGA, ATmega16 @ 16 МГц, версия сборки: " );
     FLASHSTR_DECLARE( char, szAuthor, "Автор сборки: Мезенцев В. Н. (unihomelab@ya.ru)" );
@@ -945,13 +939,12 @@ void UIMain() {
 
     do {
 
-        CConsole::SetTextBackground( BLUE );
+        CConsole::SetBackgroundColor( clBlue );
         CConsole::ClearScreen();
 
-        CConsole::SetTextColor( WHITE );
-        CConsole::SetTextBackground( GREEN );
+        CConsole::SetColor( clWhite, clGreen );        
         CConsole::WriteString( szTitle, CConsole::cp1251 );
-        CConsole::WriteString( Version );
+        CConsole::WriteString( CVersion::GetVersionString() );
 
 #ifdef __GNUC__
         CConsole::WriteString( szGCC );
@@ -959,19 +952,18 @@ void UIMain() {
         CConsole::WriteString( szIAR );
 #endif
 
-        CConsole::ClearEndOfLine();
+        CConsole::ClearLine( CConsole::cmFromCursorToEnd );
 	
-        CConsole::SetTextColor( DARKGRAY );
-        CConsole::SetTextBackground( BLUE );
-        CConsole::GotoXY( 1, 24 );
+        CConsole::SetColor( clDarkGray, clBlue );
+        CConsole::MoveTo( 1, 24 );
         CConsole::WriteString( szAuthor, CConsole::cp1251 );
-        CConsole::GotoXY( 1, 25 );
+        CConsole::MoveTo( 1, 25 );
         CConsole::WriteString( szProjectURL, CConsole::cp1251 );
 
         // draw "logo"
         for ( i = 0; i < 13; i++ ) {
 
-            CConsole::GotoXY( 46, 11 + i );
+            CConsole::MoveTo( 46, 11 + i );
 	
             for ( j = 0; j < 32; j++ ) {
 	

@@ -21,18 +21,19 @@
 
 #include "Defines.h"
 #include "Configuration.h"
-#include "MCU.h"
+#include "PLC.h"
 
 
-// Точка входа в основную программу
+// Точка входа в основную программу.
 int main() {
 
-    // Инициализация микроконтроллера
-    CMCU::Initialization();
+    // Настройка внутренних узлов платы.
+    CPLC::Initialization();
 
-    // Запуск основного потока
-    HRESULT hResult = CMCU::MainThreadProcedure();
+    // Запуск операционной системы.
+    CPLC::Run();
 
     return 0;
 
 }
+

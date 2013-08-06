@@ -63,7 +63,7 @@
         </option>
         <option>
           <name>SCCStackSize</name>
-          <state>0x30</state>
+          <state>0x40</state>
         </option>
         <option>
           <name>SCExtCStack</name>
@@ -71,7 +71,7 @@
         </option>
         <option>
           <name>SCRStackSize</name>
-          <state>20</state>
+          <state>32</state>
         </option>
         <option>
           <name>SCExtRStack</name>
@@ -711,8 +711,8 @@
       <name>BUILDACTION</name>
       <archiveVersion>1</archiveVersion>
       <data>
-        <prebuild>$PROJ_DIR$\..\prebuild.cmd $PROJ_DIR$\..\</prebuild>
-        <postbuild>$PROJ_DIR$\..\postbuild.cmd $PROJ_DIR$\..\</postbuild>
+        <prebuild>$PROJ_DIR$\..\prebuild.cmd</prebuild>
+        <postbuild>$PROJ_DIR$\..\postbuild.cmd</postbuild>
       </data>
     </settings>
     <settings>
@@ -1003,6 +1003,11 @@
     </settings>
     <settings>
       <name>BILINK</name>
+      <archiveVersion>0</archiveVersion>
+      <data/>
+    </settings>
+    <settings>
+      <name>Coder</name>
       <archiveVersion>0</archiveVersion>
       <data/>
     </settings>
@@ -2003,7 +2008,15 @@
       <archiveVersion>0</archiveVersion>
       <data/>
     </settings>
+    <settings>
+      <name>Coder</name>
+      <archiveVersion>0</archiveVersion>
+      <data/>
+    </settings>
   </configuration>
+  <file>
+    <name>$PROJ_DIR$\..\CommandShell.cpp</name>
+  </file>
   <file>
     <name>$PROJ_DIR$\..\Console.cpp</name>
   </file>
@@ -2018,6 +2031,12 @@
   </file>
   <file>
     <name>$PROJ_DIR$\..\MCU.cpp</name>
+  </file>
+  <file>
+    <name>$PROJ_DIR$\..\MessagesQueue.cpp</name>
+  </file>
+  <file>
+    <name>$PROJ_DIR$\..\PLC.cpp</name>
   </file>
   <file>
     <name>$PROJ_DIR$\..\SystemTime.cpp</name>

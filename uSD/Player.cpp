@@ -337,7 +337,7 @@ void CPlayer::FormKeyDown( uint16_t Key ) {
         case VK_ESCAPE: { 
                
             CommandString[0] = 0;
-            CPLC::SetActiveWindow( HWND_MAIN_SCREEN );
+            CPLC::SetActiveWindow( HWND_FILE_MANAGER );
             break; 
         }
 

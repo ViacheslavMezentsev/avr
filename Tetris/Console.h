@@ -1,5 +1,4 @@
-#ifndef _CONSOLE_H_
-#define _CONSOLE_H_
+#pragma once
 
 /**
  * Класс CConsole
@@ -12,11 +11,12 @@
  * 
  * Почта: mailto:unihomelab@ya.ru
  * 
+ * http://citforum.ru/operating_systems/freebsd/ansi.shtml
+ * http://subscribe.ru/archive/comp.soft.prog.shellandawk/200301/27191228.html
+ *
  */
 
-#define BLINK 128
-
-//defines max coordinates for checking overflow
+// Максимальные размеры окна.
 #define MAX_X 80
 #define MAX_Y 25
 
@@ -57,6 +57,29 @@
 #define ACS_BLOCK	(acs_map['0'])	/* solid square block */
 
 
+// Text attributes
+enum EnAttributes {
+
+    atOff               = 0,    // Reset all attributes
+    atIntensityBold     = 1,
+    atIntensityFaint    = 2,    // (not widely supported)
+    atItalicOn          = 3,    // (not widely supported)
+    atUnderlineSingle   = 4,    // (not widely supported)
+    atBlinkSlow         = 5,
+    atBlinkRapid        = 6,
+    atImageNegative     = 7,
+    atConceal           = 8,    // (not widely supported)
+
+    atUnderlineDouble   = 21,   //
+    atIntensityNormal   = 22,   // not bold and not faint
+    atUnderlineNone     = 24,   //
+    atBlinkOff          = 25,   //
+    atImagePositive     = 27,   //
+    atReveal            = 28    // conceal off
+
+};
+
+
 enum EnMoveDirection {
 
     // Cursor Up: Moves the cursor up by the specified number of lines without
@@ -82,33 +105,10 @@ enum EnMoveDirection {
 };
 
 
-// Text attributes
-enum EnAttributes {
-
-    atOff               = 0,    // Reset all attributes
-    atIntensityBold     = 1,
-    atIntensityFaint    = 2,    // (not widely supported)
-    atItalicOn          = 3,    // (not widely supported)
-    atUnderlineSingle   = 4,    // (not widely supported)
-    atBlinkSlow         = 5,
-    atBlinkRapid        = 6,
-    atImageNegative     = 7,
-    atConceal           = 8,    // (not widely supported)
-
-    atUnderlineDouble   = 21,   //
-    atIntensityNormal   = 22,   // not bold and not faint
-    atUnderlineNone     = 24,   //
-    atBlinkOff          = 25,   //
-    atImagePositive     = 27,   //
-    atReveal            = 28    // conceal off
-
-};
-
-
-//  Цвета
+//  Цвета.
 enum EnColor {
 
-/* dark colors */
+    // Тёмные.
     clBlack = 0,
     clRed, 
     clGreen, 
@@ -118,7 +118,7 @@ enum EnColor {
     clCyan,
     clWhite,
 
-/* light colors */
+    // Светлые.
     clDarkGray,
     clLightRed,
     clLightGreen,
@@ -133,27 +133,41 @@ enum EnColor {
 
 class CConsole {
 
+private:
+
+
 public:
 
     enum EnCodePage { cp866 = 0, cp1251 };
 
+    enum EnClearMode {
+               
+        cmFromCursorToEnd = 0,
+        cmFromBeginToCursor,        
+        cmAll
+
+    };
+
+public:
+
     static uint8_t GetChar();
     static void PutChar( uint8_t ch, EnCodePage CodePage = cp866 );
-    static char * ReadString( char * s );
     static void WriteString( FCHAR_PTR Value, EnCodePage CodePage = cp866, uint8_t Length = 0 );
     static void WriteString( const char * Value, EnCodePage CodePage = cp866, uint8_t Length = 0 );
-    static void ClearScreen();
-    static void ClearEndOfLine();
+    static void ClearScreen( EnClearMode Mode = cmAll );
+    static void ClearLine( EnClearMode Mode = cmFromCursorToEnd );
+    static void ClearForward( uint8_t Count );
     static void CursorOn();
     static void CursorOff();
     static void SaveCursor();
     static void RestoreCursor();
     static void SetForegroundColor( EnColor Color );
     static void SetBackgroundColor( EnColor Color );
+    static void SetColor( EnColor ForegroundColor, EnColor BackgroundColor );
     static void SetTextAttributes( EnAttributes Attributes );
     static void MoveTo( uint8_t Left, uint8_t Top );
     static void Move( EnMoveDirection Direction, uint8_t Delta );
+    static void DrawFrame( uint8_t Left, uint8_t Top, uint8_t Width, uint8_t Height, 
+        EnColor Color, EnColor bgColor, char * Caption = NULL );
 
 };
-
-#endif // _CONSOLE_H_
