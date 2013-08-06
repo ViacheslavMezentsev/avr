@@ -14,7 +14,7 @@
 
 #elif defined( __ICCAVR__ )
 
-    #define F_CPU 16000000UL
+    #define F_CPU 8000000UL
 
 #endif
 
@@ -25,7 +25,11 @@
 #endif
 
 // Скорость работы внутреннего USART
-#define BAUD 57600UL
+//#define BAUD 9600UL
+//#define BAUD 19200UL
+#define BAUD 38400UL
+//#define BAUD 57600UL
+//#define BAUD 115200UL
 
 
 /**

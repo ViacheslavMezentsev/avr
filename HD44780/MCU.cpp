@@ -46,6 +46,9 @@ FLASHSTR_DECLARE( char, frmString,
  */
 HRESULT CMCU::MainThreadProcedure(){
 
+    // Загружаем пользовательский набор символов.
+    CLCD::LoadCustomChars();
+
     // Вывод заставки.
 	CLCD::WriteString( frmSplashString, 0, 0 );
 	
@@ -65,11 +68,20 @@ HRESULT CMCU::MainThreadProcedure(){
     CLCD::Home();
 
     // Вывод статического текста. 
-    CLCD::WriteString( frmString, 0, 0 );
+    CLCD::WriteString( frmString );
 
     // Вывод версии и даты сборки.
     CLCD::WriteString( CVersion::GetVersionString(), 0, 5 );
     CLCD::WriteString( CVersion::GetBuildDateString(), 1, 0 );
+
+    CLCD::PutChar( 0, 1, 0 );
+    CLCD::PutChar( 1 );
+    CLCD::PutChar( 2 );
+    CLCD::PutChar( 3 );
+    CLCD::PutChar( 4 );
+    CLCD::PutChar( 5 );
+    CLCD::PutChar( 6 );
+    CLCD::PutChar( 7 );
 
     // Разрешаем прерывания.
     __enable_interrupt();
@@ -263,7 +275,7 @@ void CMCU::ADCInit(){
     //           ||+------ 5, rw, ADLAR:    - ADC Left Adjust Result
     //           |+------- 6, rw, REFS0: -+ - Reference Selection Bits
     //           +-------- 7, rw, REFS1: _|
-    // Примечание: AVCC
+    // Примечание: 
 
 
     // Digital Input Disable Register 0 – DIDR0

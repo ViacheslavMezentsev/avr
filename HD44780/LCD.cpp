@@ -149,7 +149,6 @@
          |  00  |  01  |  02  |  03  |  04  |  05  |  06  |  07  |  08  |  09  |  0A  |  0B  |  0C  |  0D  |  0E  |  0F  | */
 /* CGRAM:  (1)    (2)    (3)    (4)    (5)    (6)    (7)    (8)    (1)    (2)    (3)    (4)    (5)    (6)    (7)    (8)    */
 /* 0x00 */ 0x00 , 0x01 , 0x02 , 0x03 , 0x04 , 0x05 , 0x06 , 0x07 , 0x08 , 0x09 , 0x0A , 0x0B , 0x0C , 0x0D , 0x0E , 0x0F , //
-
 /* 0x10 */ 0x10 , 0x11 , 0x12 , 0x13 , 0x14 , 0x15 , 0x16 , 0x17 , 0x18 , 0x19 , 0x1A , 0x1B , 0x1C , 0x1D , 0x1E , 0x1F , //
 /* 0x20 */ 0x20 , 0x21 , 0x22 , 0x23 , 0x24 , 0x25 , 0x26 , 0x27 , 0x28 , 0x29 , 0x2A , 0x2B , 0x2C , 0x2D , 0x2E , 0x2F , //
 /* 0x30 */ 0x30 , 0x31 , 0x32 , 0x33 , 0x34 , 0x35 , 0x36 , 0x37 , 0x38 , 0x39 , 0x3A , 0x3B , 0x3C , 0x3D , 0x3E , 0x3F , //
@@ -481,27 +480,7 @@ void CLCD::Init_HD44780(){
 
     WriteData( TYPE_COMMAND, 0x0C ); // 1, D, C, B
 
-    Home(); // -> 0x02
-    
-    
-    // Установка нулевого адреса для записи символов пользователя.
-    // Внимание. В Proteus не работает функция IsBusy(), вызываемая
-    // из ReadAddress(). Поэтому часть кода ниже нужно отключать при
-    // отладке.
-    //Goto( 0, 0 );
-
-    // Загружаем восемь пользовательских символов
-    // Первый параметр: идентификатор массива
-    // Второй параметр: номер элемента в массиве
-    // Третий параметр: в какой пользовательский символ записываем данные
-    //LoadCustomChar( LcdCustomChar, LCDCHAR_PROGRESS05, 0 );
-    //LoadCustomChar( LcdCustomChar, LCDCHAR_PROGRESS15, 1 );
-    //LoadCustomChar( LcdCustomChar, LCDCHAR_PROGRESS25, 2 );
-    //LoadCustomChar( LcdCustomChar, LCDCHAR_PROGRESS35, 3 );
-    //LoadCustomChar( LcdCustomChar, LCDCHAR_PROGRESS45, 4 );
-    //LoadCustomChar( LcdCustomChar, LCDCHAR_PROGRESS55, 5 );
-    //LoadCustomChar( LcdCustomChar, LCDCHAR_REWINDARROW, 6 );
-    //LoadCustomChar( LcdCustomChar, LCDCHAR_STOPBLOCK, 7 );
+    Home(); // -> 0x02       
 
 }
 
@@ -660,8 +639,10 @@ void CLCD::WriteData(EnLCDDataType Type, uint8_t Data){
  */
 uint8_t CLCD::ReadAddress(){
          
-    // Ожидаем, пока дисплей занят обработкой предыдущей команды
-    while ( IsBusy() );
+    // Ожидаем, пока дисплей занят обработкой предыдущей команды.
+    uint8_t count = LCD_DELAYS_COMMAND_US / 10;
+
+    while ( IsBusy() && count ) { _delay_us( 10 ); count--; };
          
     #ifdef LCD_DATA_LENGTH_4BIT
              
@@ -700,7 +681,9 @@ uint8_t CLCD::ReadAddress(){
 uint8_t CLCD::ReadData(){
          
     // Ожидаем, пока дисплей занят обработкой предыдущей команды
-    while ( IsBusy() );
+    uint8_t count = LCD_DELAYS_COMMAND_US / 10;
+
+    while ( IsBusy() && count ) { _delay_us( 10 ); count--; };
          
     #ifdef LCD_DATA_LENGTH_4BIT
              
@@ -861,6 +844,30 @@ void CLCD::MoveCursorLeft( uint8_t Count ) {
 void CLCD::MoveCursorRight( uint8_t Count ) {
 
     // TODO: Написать код для управления курсором
+
+}
+
+
+/**
+ * Загрузить пользовательский набор символов.
+ */
+void CLCD::LoadCustomChars(){
+
+    // Установка нулевого адреса для записи символов пользователя.
+    Goto( 0, 0 );
+
+    // Загружаем восемь пользовательских символов
+    // Первый параметр: идентификатор массива
+    // Второй параметр: номер элемента в массиве
+    // Третий параметр: в какой пользовательский символ записываем данные   
+    LoadCustomChar( LcdCustomChar, LCDCHAR_PROGRESS05, 0 );
+    LoadCustomChar( LcdCustomChar, LCDCHAR_PROGRESS15, 1 );    
+    LoadCustomChar( LcdCustomChar, LCDCHAR_PROGRESS25, 2 );
+    LoadCustomChar( LcdCustomChar, LCDCHAR_PROGRESS35, 3 );
+    LoadCustomChar( LcdCustomChar, LCDCHAR_PROGRESS45, 4 );
+    LoadCustomChar( LcdCustomChar, LCDCHAR_PROGRESS55, 5 );
+    LoadCustomChar( LcdCustomChar, LCDCHAR_REWINDARROW, 6 );
+    LoadCustomChar( LcdCustomChar, LCDCHAR_STOPBLOCK, 7 );
 
 }
 

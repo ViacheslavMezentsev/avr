@@ -75,11 +75,13 @@ void CViewer::DrawTitle( char * Caption ) {
     CConsole::MoveTo( 1, 1 );
 
     CConsole::WriteString( Caption );
-    CConsole::ClearLine( CConsole::cmFromCursorToEnd );
+    CConsole::ClearLine();
 
+    // Кодовая страница.
     CConsole::MoveTo( 60, 1 );
     CConsole::WriteString( SPSTR( "CP1251" ) );
 
+    // Размер файла.
     CConsole::MoveTo( 70, 1 );
     CConsole::WriteString( utoa_fast_div(  CFileManager::pCurrentPanel->FileInfo.fsize, buffer ) );
 
@@ -91,7 +93,7 @@ void CViewer::DrawTitle( char * Caption ) {
  */
 void CViewer::FormActivate() {       
 
-    CConsole::CursorOff();                       
+    CConsole::CursorOff();    
 
     // Монтирование FAT32.
     res = CFAT::Mount( & fs );
@@ -99,7 +101,10 @@ void CViewer::FormActivate() {
     // Если монтирование было успешным.
     if ( res == FR_OK ) {		
 
-        // Присоеденяем к пути имя выбранного файла.
+        CConsole::SetColor( clLightGray, clBlue );
+        CConsole::ClearScreen( CConsole::cmAll );
+
+        // Присоединяем к пути имя выбранного файла.
         strcpy( CommandString, CFileManager::pCurrentPanel->Path );
         
         if ( strcmp( CommandString, szROOT ) != 0 ) strcat( CommandString, szROOT );
@@ -109,16 +114,8 @@ void CViewer::FormActivate() {
         // Отображаем название файла в заголовке окна.
         DrawTitle( CommandString );
 
-        // Заполняем фон.
-        CConsole::SetColor( clLightGray, clBlue );
-
-        for ( uint8_t i = 2; i < 25; i++ ) {
-
-            CConsole::MoveTo( 1, i );
-            CConsole::ClearLine( CConsole::cmFromCursorToEnd );
-        }
-
         CConsole::MoveTo( 1, 2 );
+        CConsole::SetColor( clLightGray, clBlue );
 
         uint8_t row = 0;
         WORD wSize = 0;
@@ -175,7 +172,7 @@ void CViewer::FormKeyDown( uint16_t Key ) {
         case VK_ESCAPE: { 
                
             CommandString[0] = 0;
-            CPLC::SetActiveWindow( HWND_MAIN_SCREEN );
+            CPLC::SetActiveWindow( HWND_FILE_MANAGER );
             break; 
         }
 

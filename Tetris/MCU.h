@@ -50,7 +50,6 @@ public:
 	static void OnAnalogComparator();
 	static void OnTWISerialInterface();
 	static void OnStoreProgramMemoryRead();
-    static void CommandShell();
 	static HRESULT MainThreadProcedure();
 
 private:

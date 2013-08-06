@@ -95,43 +95,43 @@ eMBErrorCode eMBRegDiscreteCB( UCHAR * pucRegBuffer, USHORT usAddress, USHORT us
 
 
 /**
- * Главный (основной) поток программы
+ * Главный (основной) поток программы.
  */
 HRESULT CMCU::MainThreadProcedure(){
 
     const UCHAR ucSlaveID[] = { 0xAA, 0xBB, 0xCC };
     eMBErrorCode eStatus;
 
-    // Настраиваем последовательный порт
-    eStatus = eMBInit( ::MB_RTU, 0x0A, 0, 9600, ::MB_PAR_NONE );
+    // Настраиваем последовательный порт.
+    eStatus = eMBInit( MB_RTU, 0x0A, 0, BAUD, MB_PAR_NONE );
 
     // Задание параметров для работы протокола
     eStatus = eMBSetSlaveID( 0x34, TRUE, ucSlaveID, 3 );
 
-    // Разрешаем прерывания
+    // Разрешаем прерывания.
     __enable_interrupt();
 
-    // Запускаем стек протокола modbus
+    // Запускаем стек протокола modbus.
     eStatus = eMBEnable();
 
-    // Сохраняем номер ревизии
+    // Сохраняем номер ревизии.
     usRegInputBuf[2] = ( USHORT ) CVersion::GetRevision();
 
-    // Сохраняем номер сборки
+    // Сохраняем номер сборки.
     usRegInputBuf[3] = ( USHORT ) CVersion::GetBuild();
 
     do {
 
         eMBPoll();
 
-        // Обновляем значения первых двух регистров
+        // Обновляем значения первых двух регистров.
         usRegInputBuf[0] = Value1;
         usRegInputBuf[1] = Value2;
 
 
     } while ( true );
 
-    // Все проверки прошли успешно, объект в рабочем состоянии
+    // Все проверки прошли успешно, объект в рабочем состоянии.
     return NO_ERROR;
 
 }
@@ -652,7 +652,7 @@ void CMCU::USARTInit(){
     // USART Control and Status Register C
     // [ Регистр управления UCSRC ][ATmega16]
     //           10000110 - Initial Value
-    UCSRC = BIN8(10000110); // BIN8() не зависит от уровня оптимизации
+    //UCSRC = BIN8(10000110); // BIN8() не зависит от уровня оптимизации
     //           ||||||||
     //           |||||||+- 0, rw, UCPOL:    - Clock Polarity
     //           ||||||+-- 1, rw, UCSZ0: -+ - Character Size

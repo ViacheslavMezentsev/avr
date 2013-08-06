@@ -13,13 +13,15 @@ class CKeys {
    
 public:	
 
+    inline uint8_t Count() { return 3; }
+
     inline FCHAR_PTR operator []( uint8_t Key ) {
         
         switch ( Key ) {
 
-            case 0: return SPSTR( "Помощь" );
-            case 2: return SPSTR( "Новая игра" );
-            case 9: return SPSTR( "Выход" );
+            case 0: return SPSTR( " 0 |Помощь" );
+            case 1: return SPSTR( " 2 |Новая игра" );
+            case 2: return SPSTR( " Esc |Выход" );
             
             default: return 0;
 
@@ -33,14 +35,22 @@ public:
 class CGame {
 
 private:
-    uint8_t F_Level;
-    EnGameState F_State;
+    uint8_t level;
+    EnGameState state;
 
-    uint8_t getLevel() { return F_Level; }
-    void setLevel( uint8_t Level ) { F_Level = Level; }
+    uint8_t getLevel() { return level; }
+    void setLevel( uint8_t Level ) { level = Level; }
 
-    EnGameState getState() { return F_State; }
-    void setState( EnGameState State ) { F_State = State; }
+    EnGameState getState() { return state; }
+    void setState( EnGameState State ) { state = State; }
+
+    inline void FormActivate();
+    inline void FormKeyDown( uint16_t Key );
+    inline void Form10msTimer();
+    inline void Form100msTimer();
+    inline void Form500msTimer();
+    inline void Form1secTimer();
+    inline void Form5secTimer();
 
 public:	    
 
@@ -67,6 +77,8 @@ public:
     void DrawFigure();  
     void DrawFunctionKeys( CKeys & Keys );
     void Run();
+
+    LRESULT WindowProc( HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam );
 
 };
 

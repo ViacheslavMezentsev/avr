@@ -30,9 +30,7 @@
     #include <avr/iom16.h>
 
     // Набор шаблонов для "типизации" указателей в AVR GCC
-    #ifdef __cplusplus
-        #include "SmartPtr.h"
-    #endif
+    #include "SmartPtr.h"
 
     #define nop() asm volatile ("nop")
     #define sleep() asm volatile ("sleep")
@@ -60,6 +58,10 @@
     #define FLASHSTR_DECLARE(type,name,init) \
         static PROGMEM type _##name[] = init; \
         FlashPtr<type> name(_##name);
+
+    #define SPSTR(s) (__extension__({ \
+        static char __c[] PROGMEM = (s); \
+        FlashPtr<char> _c(__c); _c; }))
 
 #elif defined( __ICCAVR__ )
 
@@ -122,16 +124,16 @@
 
     // - Other characteristics of objects: __root and __no_init.
 
-    #define FLASHSTR_DECLARE( type, name, init ) \
-        static __flash type name[] = init;
-
-    #define FLASHARR_DECLARE( type, name, size, init ) \
-        __flash type name[size] = init;
+    #define PROGMEM __flash
+    #define prog_char char __flash
+    #define PGM_P prog_char *
+    #define PSTR(x) ( PGM_P ) x
 
     #define FLASH_DECLARE(x) __flash x
 
     #define FCHAR_PTR char __flash *
     #define FUCHAR_PTR unsigned char __flash *
+    #define FCHAR_PTR2(name) char __flash * (name)
 
     #define FU08T_PTR uint8_t __flash *
     #define FS08T_PTR int8_t __flash *
@@ -142,10 +144,13 @@
     #define FU32T_PTR uint32_t __flash *
     #define FS32T_PTR int32_t __flash *
 
-    #define PROGMEM __flash
-    #define prog_char char __flash
-    #define PGM_P prog_char *
-    #define PSTR(x) ( PGM_P ) x
+    #define FLASHSTR_DECLARE( type, name, init ) \
+        static __flash type name[] = init;
+
+    #define FLASHARR_DECLARE( type, name, size, init ) \
+        __flash type name[size] = init;
+
+    #define SPSTR(s) ( FCHAR_PTR )(s)
 
 #endif
 
@@ -165,6 +170,9 @@
 
 // Описание типов, аналогичных в Windows
 #include "windows.h"
+
+// Работа с кольцевым буфером.
+#include "fifo.h"
 
 #define TOGGLE(x,y) ((x) ^= (1<<(y)))
 #define CHECKBIT(x,y) ((x) & (1<<(y)))

@@ -11,6 +11,7 @@
 #include "MessagesQueue.h"
 #include "Console.h"
 #include "MCU.h"
+#include "CommandShell.h"
 #include "FileManager.h"
 #include "Viewer.h"
 #include "Player.h"
@@ -57,7 +58,7 @@ CMessagesQueue MessagesQueue;
 // Указатель для работы с очередями сообщений при их переключении
 CMessagesQueue * pMsgsQueue;
 
-HWND CPLC::hwndMain = HWND_MAIN_SCREEN;
+HWND CPLC::hwndMain = HWND_COMMAND_SHELL;
 
 
 /***********************
@@ -115,63 +116,57 @@ char * utoa_fast_div( uint32_t value, char * buffer ) {
 
 
 /**
- * Начальная настройка всех узлов модуля
+ * Начальная настройка всех узлов модуля.
  */
 void CPLC::Initialization(){
 
-    // Инициализация после сброса
-    // запрещаем все прерывания
     __disable_interrupt();
 
-    // Инициализируем указатель текущей очереди
+    // Инициализируем указатель текущей очереди.
     pMsgsQueue = & MessagesQueue;
 
-    // Инициализация микроконтроллера
+    // Инициализация микроконтроллера.
     CMCU::Initialization();
-
-    // Инициализация файлового менеджера.
-    CFileManager::Initialization();
 
 }
 
 
 /**
- * Запуск модуля
+ * Запуск модуля.
  */
 void CPLC::Run(){
-
-    // разрешаем прерывания
+    
     __enable_interrupt();
 
-    // Запускаем основной поток интерфейса модуля
+    // Запускаем основной поток интерфейса модуля.
     WinMain();
 
 }
 
 
 /**
- * Аналог WinMain в Windows
+ * Аналог WinMain в Windows.
  */
 int CPLC::WinMain() {
 
-    // Посылаем событие SW_SHOW
+    // Посылаем событие SW_SHOW.
     ShowWindow( hwndMain, SW_SHOW );
 
-    // Посылаем событие WM_PAINT окну, чтобы оно себя перерисовало
+    // Посылаем событие WM_PAINT окну, чтобы оно себя перерисовало.
     UpdateWindow( hwndMain );
 
-    // Цикл обработки сообщений
+    // Цикл обработки сообщений.
     while ( GetMessage( & msg, ( HWND ) NULL, 0, 0 ) ) {
 
-        // Цепочка фильтров, преобразователей потока сообщений
+        // Цепочка фильтров, преобразователей потока сообщений.
         TranslateMessage( & msg );
 
-        // "Почтальон" раздаёт почту по окнам
+        // "Почтальон" раздаёт почту по окнам.
         DispatchMessage( & msg );
 
     }
 
-    // Возвращаем код завершения    
+    // Возвращаем код завершения.
     return msg.wParam;
 
 }
@@ -206,7 +201,7 @@ void CPLC::Sleep (DWORD dwMilliseconds ) {
 
 
 /**
- * Получить дескриптор активного окна
+ * Получить дескриптор активного окна.
  */
 inline HWND CPLC::GetActiveWindow() {
 
@@ -216,7 +211,7 @@ inline HWND CPLC::GetActiveWindow() {
 
 
 /**
- * Сделать окно активным
+ * Сделать окно активным.
  */
 HWND CPLC::SetActiveWindow( HWND hWnd ) {
 
@@ -234,7 +229,7 @@ HWND CPLC::SetActiveWindow( HWND hWnd ) {
 
 bool CPLC::GetMessage( LPMSG lpMsg, HWND hWnd, UINT wMsgFilterMin, UINT wMsgFilterMax ) {
 
-    // Достаём очередное сообщение из текущей очереди
+    // Достаём очередное сообщение из текущей очереди.
     pMsgsQueue->get( lpMsg, hWnd, wMsgFilterMin, wMsgFilterMax );
 
 	return true;
@@ -244,21 +239,29 @@ bool CPLC::GetMessage( LPMSG lpMsg, HWND hWnd, UINT wMsgFilterMin, UINT wMsgFilt
 
 LRESULT CPLC::DispatchMessage( const MSG * lpMsg ) {
 
-    if ( lpMsg->hwnd == HWND_MAIN_SCREEN ) {
+    if ( lpMsg->hwnd == HWND_COMMAND_SHELL ) {
+
+        return CCommandShell::WindowProc( lpMsg->hwnd, lpMsg->message, lpMsg->wParam, lpMsg->lParam );
+
+    
+    } else if ( lpMsg->hwnd == HWND_FILE_MANAGER ) {
 
 	    return CFileManager::WindowProc( lpMsg->hwnd, lpMsg->message, lpMsg->wParam, lpMsg->lParam );
 
+    
     } else if ( lpMsg->hwnd == HWND_VIEWER ) {
 
         return CViewer::WindowProc( lpMsg->hwnd, lpMsg->message, lpMsg->wParam, lpMsg->lParam );
 
+    
     } else if ( lpMsg->hwnd == HWND_PLAYER ) {
 
         return CPlayer::WindowProc( lpMsg->hwnd, lpMsg->message, lpMsg->wParam, lpMsg->lParam );
 
+    
     } else {
 
-        // Если сообщение ни кем не получено, всё равно обрабатываем его
+        // Если сообщение ни кем не получено, всё равно обрабатываем его.
 	    return DefWindowProc( lpMsg->hwnd, lpMsg->message, lpMsg->wParam, lpMsg->lParam );
     }
 
@@ -267,7 +270,7 @@ LRESULT CPLC::DispatchMessage( const MSG * lpMsg ) {
 
 bool CPLC::TranslateMessage( const MSG * lpMsg ) {
 
-    // Здесь можно отфильтровать сообщения
+    // Здесь можно отфильтровать сообщения.
 
 	return false;
 
@@ -330,7 +333,7 @@ void CPLC::DoKeyDown( uint8_t KeyCode, uint8_t KeyData ) {
 
 void CPLC::ProcessMessages() {
 
-    // Проверяем все сообщения и добавляем не пустое
+    // Проверяем все сообщения и добавляем не пустое.
     if ( UserInterfaceMessage.hwnd != 0 ) {
 
         pMsgsQueue->put( & UserInterfaceMessage );
@@ -364,7 +367,7 @@ void CPLC::ProcessMessages() {
 
 LRESULT CPLC::DefWindowProc( HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam ) {
 
-    // Всё, что не обработано в интерфейсе, попадает сюда
+    // Всё, что не обработано в интерфейсе, попадает сюда.
 
 	return  NULL;
 

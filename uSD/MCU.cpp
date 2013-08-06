@@ -44,14 +44,13 @@ uint16_t Counter5s = 0;
 
 
 /**
- * Главный (основной) поток программы
+ * Главный (основной) поток программы.
  */
 HRESULT CMCU::MainThreadProcedure(){
-
-    // Разрешаем прерывания
+    
     __enable_interrupt();
 
-    // Все проверки прошли успешно, объект в рабочем состоянии
+    // Все проверки прошли успешно, объект в рабочем состоянии.
     return NO_ERROR;
 
 }
@@ -483,7 +482,7 @@ void CMCU::SPIInit(){
     // SPI Control Register
     // [ Регистр управления SPI ][ATmega16]
     //          00000000 - Initial Value
-    SPCR = BIN8(0000000); // BIN8() не зависит от уровня оптимизации
+    //SPCR = BIN8(0000000); // BIN8() не зависит от уровня оптимизации
     //          ||||||||
     //          76543210
     //          |||||||+- 0, rw, SPR0: -+ - Скорость передачи
@@ -499,7 +498,7 @@ void CMCU::SPIInit(){
     // SPI Status Register
     // [ Регистр статуса SPI ][ATmega16]
     //          00000000 - Initial Value
-    SPSR = BIN8(00000000); // BIN8() не зависит от уровня оптимизации
+    //SPSR = BIN8(00000000); // BIN8() не зависит от уровня оптимизации
     //          ||||||||
     //          76543210
     //          |||||||+- 0, rw, SPI2X:    - Double SPI Speed Bit
@@ -521,12 +520,12 @@ void CMCU::SPIInit(){
 void CMCU::TWIInit(){
 
     // TWI Bit Rate Register
-    TWBR = 1; // TODO: Написать формулу для настройки скорости
+    //TWBR = 1; // TODO: Написать формулу для настройки скорости
 
     // TWI Control Register
     // [ Регистр управления TWI ][ATmega16]
     //          00000000 - Initial Value
-    TWCR = BIN8(00000000); // BIN8() не зависит от уровня оптимизации
+    //TWCR = BIN8(00000000); // BIN8() не зависит от уровня оптимизации
     //          ||||||||
     //          76543210
     //          |||||||+- 0, rw, TWIE:  - TWI Interrupt Enable
@@ -542,7 +541,7 @@ void CMCU::TWIInit(){
     // TWI Status Register
     // [ TWI статус регистр ][ATmega16]
     //          11111000 - Initial Value
-    TWSR = BIN8(11111000); // BIN8() не зависит от уровня оптимизации
+    //TWSR = BIN8(11111000); // BIN8() не зависит от уровня оптимизации
     //          ||||||||
     //          76543210
     //          |||||||+- 0, rw, TWPS0: -+ - TWI Prescaler Bits
@@ -557,7 +556,7 @@ void CMCU::TWIInit(){
 
     // TWI (Slave) Address Register
     // Иметь в виду, что регистр содержит бит TWGCE (TWI General Call Recognition Enable Bit)
-    TWAR = 0xFE;
+    //TWAR = 0xFE;
 
 }
 
@@ -621,31 +620,6 @@ void CMCU::USARTInit(){
     //           ||+------ 5, rw, UPM1:  _|
     //           |+------- 6, rw, UMSEL:    - USART Mode Select
     //           +-------- 7, rw: URSEL     - Register Select
-    // Примечание:
-
-    //UCSRC = 0 // ( 1 << UCSZ0 ) | ( 1 << UCSZ1 ) | ( 1 << URSEL )
-
-    //    // Clock Polarity, биты: |-------0|, начальное значение: [0], чтение/запись
-    //    //|  ( 1 << UCPOL )
-
-    //    // Character Size, биты: |-----21-|, начальное значение: [11], чтение/запись
-    //    | ( 1 << UCSZ0 )
-    //    | ( 1 << UCSZ1 )
-
-    //    // Stop Bit Select, биты: |----3---|, начальное значение: [0], чтение/запись
-    //    //| ( 1 << USBS  )
-
-    //    // Parity Mode, биты: |--54----|, начальное значение: [00], чтение/запись
-    //    //| ( 1 << UPM0  )
-    //    //| ( 1 << UPM1  )
-
-    //    // USART Mode Select, биты: |-6------|, начальное значение: [0], чтение/запись
-    //    //| ( 1 << UMSEL )
-
-    //    // Register Select, биты: |7-------|, начальное значение: [0], чтение/запись
-    //    | ( 1 << URSEL )
-
-    //; // UCSRC
     // Примечание:
 
 }
@@ -771,7 +745,7 @@ void CMCU::PortsInit(){
     // Port D Data Direction Register
     // [ Регистр направления порта D ][ATmega16]
     //          00000000 - Initial Value
-    DDRD = BIN8(00000010); // BIN8() не зависит от уровня оптимизации
+    DDRD = BIN8(00000000); // BIN8() не зависит от уровня оптимизации
     //          ||||||||
     //          76543210
     //          |||||||+- 0, rw, DDD0: (RXD)  - RXD
@@ -836,7 +810,7 @@ void CMCU::PortsInit(){
     // Port D Data Register
     // [ Регистр данных порта D ][ATmega16]
     //           00000000 - Initial Value
-    PORTD = BIN8(00000001); // BIN8() не зависит от уровня оптимизации
+    PORTD = BIN8(00000000); // BIN8() не зависит от уровня оптимизации
     //           ||||||||
     //           76543210
     //           |||||||+- 0, rw, PORTD0: (RXD)  - RXD
@@ -874,7 +848,7 @@ void CMCU::InternalWDTInit(){
     // Watchdog Timer ControlRegister
     // [ Регистр управления сторожевого таймера ][ATmega16]
     //           00000000 - Initial Value
-    WDTCR = BIN8(00000000); // BIN8() не зависит от уровня оптимизации
+    //WDTCR = BIN8(00000000); // BIN8() не зависит от уровня оптимизации
     //           ||||||||
     //           76543210
     //           |||||||+- 0, rw, WDP0: -+
@@ -1062,6 +1036,22 @@ void CMCU::OnTimerCounter2Overflow(){
 
                         // Создаём событие нажатия на клавишу.
                         CPLC::DoKeyDown( VK_DOWN, 0x42 );
+
+                    } else if ( tmp == 0x43 ) {
+
+                        // Удаляем символ из буфера.
+                        FIFO_POP( uart_rx_fifo );
+
+                        // Создаём событие нажатия на клавишу.
+                        CPLC::DoKeyDown( VK_LEFT, 0x43 );
+
+                    } else if ( tmp == 0x44 ) {
+
+                        // Удаляем символ из буфера.
+                        FIFO_POP( uart_rx_fifo );
+
+                        // Создаём событие нажатия на клавишу.
+                        CPLC::DoKeyDown( VK_RIGHT, 0x44 );
 
                     } else if ( tmp == 0x48 ) {
 

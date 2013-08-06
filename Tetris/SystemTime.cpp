@@ -71,7 +71,7 @@ SYSTEMTIME Time;
 
 
 // Обязательно инициализируем начальными значениями статические
-// поля класса
+// поля класса.
 
 uint32_t CSystemTime::Counter = 0;
 
@@ -98,10 +98,10 @@ uint32_t CSystemTime::DaysToMonth( uint16_t Year, uint8_t Month ) {
     
 uint32_t CSystemTime::DaysToYear( uint16_t Year ) {
 
-    // Убираем годы до начала отсчёта
+    // Убираем годы до начала отсчёта.
     uint32_t year = ( uint32_t ) Year - 1970UL;
 
-    // Определяем количество дней в годах
+    // Определяем количество дней в годах.
     return year * 365UL + ( year + 1UL ) / 4UL + ( year + 69UL ) / 100UL + ( year + 369UL ) / 400UL;
     
 }
@@ -212,16 +212,16 @@ void CSystemTime::GetTimeAsSystemTime( PSYSTEMTIME pSystemTime ) {
     // Переводим количество миллисекунд в количество дней с 1970 г.
     uiDate = Counter / SECONDS_PER_DAY;
 
-    // День недели, считая от нуля
+    // День недели, считая от нуля.
     DayOfWeek = ( uint8_t ) ( ( uiDate + 3UL ) % 7UL );
 
-    // Грубо оцениваем год
+    // Грубо оцениваем год.
     Year = ( uint16_t ) ( uiDate / 365UL + 1970UL );
 
-    // Определяем количество дней в истекших годах
+    // Определяем количество дней в истекших годах.
     days_to_year = DaysToYear( Year );
 
-    // Делаем уточнение
+    // Делаем уточнение.
     if ( uiDate < days_to_year ) {
         
         Year =- 1;
@@ -229,16 +229,16 @@ void CSystemTime::GetTimeAsSystemTime( PSYSTEMTIME pSystemTime ) {
 
     }
 
-    // Определяем день года
+    // Определяем день года.
     uiDay = uiDate - days_to_year + 1;
 
-    // Грубо оценим месяц
+    // Грубо оценим месяц.
     Month = ( uint8_t ) min( uiDay / 29UL + 1UL, 12 ); 
 
-    // Определяем количество дней в истекших месяцах
+    // Определяем количество дней в истекших месяцах.
     days_to_month = DaysToMonth( Year, Month );
 
-    // Делаем уточнение
+    // Делаем уточнение.
     if ( uiDay <= days_to_month ) {
         
         Month =- 1;
@@ -246,10 +246,10 @@ void CSystemTime::GetTimeAsSystemTime( PSYSTEMTIME pSystemTime ) {
 
     }
 
-    // Опредеяем день
+    // Определяем день.
     Day = ( uint8_t ) ( uiDay - days_to_month );
 
-    // Вычисляем эквивалент неполного дня в секундах
+    // Вычисляем эквивалент неполного дня в секундах.
     mSeconds = 0;
 
     uiTime = Counter % SECONDS_PER_DAY;
@@ -276,17 +276,17 @@ void CSystemTime::GetTimeAsSystemTime( PSYSTEMTIME pSystemTime ) {
 
 void CSystemTime::SetTime( PSYSTEMTIME pSystemTime ) {
 
-    // Преобразуем дату в uint32_t
+    // Преобразуем дату в uint32_t.
     uint32_t sec = 0;
 
-    // Преобразуем дату
+    // Преобразуем дату.
     sec += DaysToYear( pSystemTime->wYear ) + DaysToMonth( pSystemTime->wYear, pSystemTime->wMonth ) + pSystemTime->wDay - 1;
     sec *= SECONDS_PER_DAY;
 
-    // Преобразуем время
+    // Преобразуем время.
     sec += ( ( uint32_t ) pSystemTime->wHour * 60UL + ( uint32_t ) pSystemTime->wMinute ) * 60UL + ( uint32_t ) pSystemTime->wSecond;
 
-    // Записываем результат
+    // Записываем результат.
     Counter = sec;
 
 }

@@ -62,7 +62,8 @@ MCU = atmega16
 #         F_CPU = 16000000
 #         F_CPU = 18432000
 #         F_CPU = 20000000
-F_CPU = 16000000
+# Для отладки в Proteus нужно установить частоту 4МГц.
+F_CPU = 8000000
 
 
 # Output format. (can be srec, ihex, binary)
@@ -82,7 +83,8 @@ OBJDIR = obj
 
 
 # List C++ source files here. (C dependencies are automatically generated.)
-CPPSRC = ISRList.cpp SystemTime.cpp Console.cpp MCU.cpp Game.cpp MainUnit.cpp
+CPPSRC = ISRList.cpp SystemTime.cpp MessagesQueue.cpp Console.cpp MCU.cpp 
+CPPSRC += PLC.cpp CommandShell.cpp Game.cpp MainUnit.cpp
 
 
 # List Assembler source files here.
@@ -188,7 +190,7 @@ CPPFLAGS += -Wundef
 CPPFLAGS += -Wa,-adhlns=$(<:%.cpp=$(OBJDIR)/%.lst)
 CPPFLAGS += $(patsubst %,-I%,$(EXTRAINCDIRS))
 #CPPFLAGS += $(CSTANDARD)
-# Внимание. Те функции которые не вызываются, не включаются в исходный бинарник
+# Внимание. Те функции, которые не вызываются, не включаются в объектный файл.
 CPPFLAGS += -ffunction-sections
 CPPFLAGS += -fdata-sections
 
@@ -263,7 +265,7 @@ LDFLAGS += $(EXTMEMOPTS)
 LDFLAGS += $(patsubst %,-L%,$(EXTRALIBDIRS))
 LDFLAGS += $(PRINTF_LIB) $(SCANF_LIB) $(MATH_LIB)
 #LDFLAGS += -T linker_script.x
-# Внимание. Те функции которые не вызываются, не включаются в исходный бинарник
+# Внимание. Те функции, которые не вызываются, не включаются в объектный файл.
 LDFLAGS += -Wl,-gc-sections
 
 

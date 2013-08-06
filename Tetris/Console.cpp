@@ -52,20 +52,18 @@ FIFO( 16 ) uart_rx_fifo;
 uint8_t CConsole::GetChar() {
 
     uint8_t ret = 0;
-
-    // запрещаем прерывания
+    
     __disable_interrupt();
 
     if ( !FIFO_IS_EMPTY( uart_rx_fifo ) ) {
 
-        // если в буфере есть данные, то извлекаем их
+        // Если в буфере есть данные, то извлекаем их.
         ret = FIFO_FRONT( uart_rx_fifo );
 
         FIFO_POP( uart_rx_fifo );
 
     }
-
-    // разрешаем прерывания
+    
     __enable_interrupt();
 
     return ret;
@@ -75,7 +73,7 @@ uint8_t CConsole::GetChar() {
 
 void CConsole::PutChar( uint8_t ch, EnCodePage CodePage ) {
 
-    // ждем окончания передачи предыдущего байта
+    // Ждём окончания передачи предыдущего байта.
     while ( !( UCSRA & ( 1 << UDRE ) ) );
 
 	// send character
@@ -99,52 +97,6 @@ void CConsole::PutChar( uint8_t ch, EnCodePage CodePage ) {
     while ( !( UCSRA & ( 1 << TXC ) ) );
 
 	UCSRA &= ~( ( 1 << TXC ) || ( 1 << UDRE ) );
-
-}
-
-
-char * CConsole::ReadString( char * s ) {
-
-    uint8_t len = 0;
-    uint8_t ch;
-    char * p = s;
-
-    while ( true ) {
-
-        do _delay_ms( 10 ); while ( !( ch = GetChar() ) );
-
-        // enter hit, end of input
-        if ( ( ch == KB_ENTER ) || ( ch == 0x0D ) ) break;
-
-        if ( ch == KB_BACK ) {
-
-            if ( len > 0 ) {
-
-                p[ len-- ] = 0;
-
-                // delete char and go back (if some chars left)
-                PutChar( KB_BACK );
-                PutChar( ' ' );
-                PutChar( KB_BACK );
-
-            }
-
-            continue;
-
-        }
-
-        if ( ( ( ch > 0xAF ) && ( ch < 0xE0 ) ) || ( ch < ' ' ) || ( ch > 0xF3 ) ) continue;
-
-        // print back to screen
-        PutChar( ch );
-
-        p[ len++ ] = ch;
-
-    }
-
-    p[ len ] = 0;
-
-    return s;
 
 }
 
@@ -179,20 +131,78 @@ void CConsole::WriteString( const char * s, EnCodePage CodePage, uint8_t Length 
 }
 
 
-void CConsole::ClearScreen() {
+/**
+ * Очистить экран.
+ */
+void CConsole::ClearScreen( EnClearMode Mode ) {
 
-    WriteString( SPSTR( "\033[2J" ) );
+    WriteString( ESC );
+
+    switch ( Mode ) {
+
+        // Очистить от курсора до конца экрана.
+        case cmFromCursorToEnd: { PutChar( '0' ); break; }
+
+        // Очистить от начала экрана до курсора.
+        case cmFromBeginToCursor: { PutChar( '1' ); break; }
+
+        // Очистить весь экран.
+        case cmAll: { PutChar( '2' ); break; }
+
+        default: PutChar( '2' );
+
+    }
+
+    PutChar( 'J' );
 
 }
 
 
-void CConsole::ClearEndOfLine() {
+/**
+ * Очистка строки.
+ */
+void CConsole::ClearLine( EnClearMode Mode ) {
 
-    WriteString( SPSTR( "\033[K" ) );
+    WriteString( ESC );
+
+    switch ( Mode ) {
+
+        // Очистить от курсора до конца строки.
+        case cmFromCursorToEnd: { PutChar( '0' ); break; }
+
+        // Очистить от начала строки до курсора.
+        case cmFromBeginToCursor: { PutChar( '1' ); break; }
+
+        // Очистить всю строку.
+        case cmAll: { PutChar( '2' ); break; }
+
+        default: PutChar( '0' );
+
+    }
+
+    PutChar( 'K' );
 
 }
 
 
+/**
+ * Очистить n знаков от позиции курсора.
+ */
+void CConsole::ClearForward( uint8_t Count ) {
+
+    if ( Count == 0 ) return;
+
+    WriteString( ESC );
+    PutChar( ( Count / 10 ) + '0' );
+    PutChar( ( Count % 10 ) + '0' );
+    PutChar( 'X' );
+
+}
+
+
+/**
+ * Показать курсор.
+ */
 void CConsole::CursorOn() {
 
     WriteString( SPSTR( "\033[?25h" ) );
@@ -200,6 +210,9 @@ void CConsole::CursorOn() {
 }
 
 
+/**
+ * Спрятать курсор.
+ */
 void CConsole::CursorOff() {
 
     WriteString( SPSTR( "\033[?25l" ) );
@@ -207,6 +220,9 @@ void CConsole::CursorOff() {
 }
 
 
+/**
+ * Запомнить положение курсора.
+ */
 void CConsole::SaveCursor() {
 
     WriteString( SPSTR( "\033[s" ) );
@@ -214,6 +230,9 @@ void CConsole::SaveCursor() {
 }
 
 
+/**
+ * Восстановить запомненное положение курсора.
+ */
 void CConsole::RestoreCursor() {
 
     WriteString( SPSTR( "\033[u" ) );
@@ -221,10 +240,13 @@ void CConsole::RestoreCursor() {
 }
 
 
+/**
+ *
+ */
 void CConsole::SetForegroundColor( EnColor Color ) {
 
     if ( Color & 0x8 ) {
-        
+
         WriteString( ESC );
         PutChar( '1' );
         PutChar( 'm' );
@@ -244,10 +266,13 @@ void CConsole::SetForegroundColor( EnColor Color ) {
 }
 
 
+/**
+ *
+ */
 void CConsole::SetBackgroundColor( EnColor Color ) {
 
     if ( Color & 0x8 ) {
-        
+
         WriteString( ESC );
         PutChar( '5' );
         PutChar( 'm' );
@@ -267,6 +292,21 @@ void CConsole::SetBackgroundColor( EnColor Color ) {
 }
 
 
+/**
+ *
+ */
+void CConsole::SetColor( EnColor ForegroundColor, EnColor BackgroundColor ) {
+
+    SetTextAttributes( atOff );
+    SetForegroundColor( ForegroundColor );
+    SetBackgroundColor( BackgroundColor );
+
+}
+
+
+/**
+ * Изменение атрибутов.
+ */
 void CConsole::SetTextAttributes( EnAttributes Attributes ) {
 
     WriteString( ESC );
@@ -276,6 +316,9 @@ void CConsole::SetTextAttributes( EnAttributes Attributes ) {
 }
 
 
+/**
+ * Переместить в позицию Left и строку Top.
+ */
 void CConsole::MoveTo( uint8_t Left, uint8_t Top ) {
 
     if ( Left == 0 || Top == 0 ) return;
@@ -293,6 +336,9 @@ void CConsole::MoveTo( uint8_t Left, uint8_t Top ) {
 }
 
 
+/**
+ *
+ */
 void CConsole::Move( EnMoveDirection Direction, uint8_t Delta ) {
 
     WriteString( ESC );
@@ -302,16 +348,77 @@ void CConsole::Move( EnMoveDirection Direction, uint8_t Delta ) {
 
     switch ( Direction ) {
 
+        // Вверх на n строк.
         case mdUp: { PutChar( 'A' ); break; }
 
+        // Вниз на n строк.
         case mdDown: { PutChar( 'B' ); break; }
 
+        // Вправо на n позиций.
         case mdForward: { PutChar( 'C' ); break; }
 
+        // Влево на n позиций.
         case mdBackward: { PutChar( 'D' ); break; }
 
         default: PutChar( 'C' );
 
     }
+
+}
+
+
+/**
+ * Отрисовка окна с рамкой
+ */
+void CConsole::DrawFrame( uint8_t Left, uint8_t Top, uint8_t Width, uint8_t Height,
+        EnColor Color, EnColor bgColor, char * Caption ) {
+
+    SetColor( Color, bgColor );
+    MoveTo( Left, Top );
+
+    PutChar( ACS_DBL_ULCORNER );
+
+    // Верхняя граница.
+    if ( Caption != NULL ) {
+
+        uint8_t len = Width - strlen( Caption );
+
+        len /= 2;
+
+        for ( uint8_t i = 0; i < len; i++ ) PutChar( ACS_DBL_HLINE );
+
+        PutChar( ' ' );
+
+        WriteString( Caption );
+
+        PutChar( ' ' );
+
+    } else {
+
+        PutChar( ACS_DBL_URCORNER );
+    }
+
+    PutChar( ACS_DBL_URCORNER );
+
+    // Вертикальные границы.
+    for ( uint8_t i = 0; i < Height; i++ ) {
+
+        MoveTo( Left, Top + i + 1 );
+        PutChar( ACS_DBL_VLINE );
+
+        for ( uint8_t i = 0; i < Width; i++ ) PutChar( ' ' );
+
+        PutChar( ACS_DBL_VLINE );
+
+    }
+
+    // Нижняя граница.
+    MoveTo( Left, Top + Height + 1 );
+
+    PutChar( ACS_DBL_LLCORNER );
+
+    for ( uint8_t i = 0; i < Width; i++ ) PutChar( ACS_DBL_HLINE );
+
+    PutChar( ACS_DBL_LRCORNER );
 
 }

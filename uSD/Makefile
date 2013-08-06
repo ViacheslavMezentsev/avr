@@ -62,8 +62,8 @@ MCU = atmega16
 #         F_CPU = 16000000
 #         F_CPU = 18432000
 #         F_CPU = 20000000
-# ƒл€ отладки в Proteus нужно установить частоту 4ћ√ц.
-F_CPU = 16000000
+# ƒл€ отладки в Proteus нужно установить частоту 4 (8) ћ√ц.
+F_CPU = 8000000
 
 
 # Output format. (can be srec, ihex, binary)
@@ -83,9 +83,9 @@ OBJDIR = obj
 
 
 # List C++ source files here. (C dependencies are automatically generated.)
-CPPSRC = MMC.cpp FAT.cpp MessagesQueue.cpp Viewer.cpp FileManager.cpp
-CPPSRC += ISRList.cpp MCU.cpp Console.cpp PLC.cpp Player.cpp MainUnit.cpp
-
+CPPSRC = MMC.cpp FAT.cpp MessagesQueue.cpp Viewer.cpp CommandShell.cpp 
+CPPSRC += FileManager.cpp ISRList.cpp MCU.cpp Console.cpp PLC.cpp Player.cpp 
+CPPSRC += MainUnit.cpp
 
 # List Assembler source files here.
 #     Make them always end in a capital .S.  Files ending in a lowercase .s

@@ -2015,6 +2015,9 @@
     </settings>
   </configuration>
   <file>
+    <name>$PROJ_DIR$\..\CommandShell.cpp</name>
+  </file>
+  <file>
     <name>$PROJ_DIR$\..\Console.cpp</name>
   </file>
   <file>

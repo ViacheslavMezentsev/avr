@@ -16,13 +16,11 @@
 #include "MCU.h"
 
 
-struct divmod10_t {
+// -=[ Пользовательские типы ]=-
 
-    uint32_t quot;
-    uint8_t rem;
-};
 
 // -=[ Внешние ссылки ]=-
+
 PR_BEGIN_EXTERN_C
     extern FIFO( 16 ) uart_rx_fifo;
 PR_END_EXTERN_C
@@ -33,9 +31,6 @@ PR_END_EXTERN_C
 // -=[ Переменные в ОЗУ ]=-
 
 uint16_t Counter1s = 0;
-
-// Версия программы
-char Version[16];
 char buffer[16];
 
 
@@ -45,74 +40,14 @@ char buffer[16];
 ************************/
 
 
-divmod10_t divmodu10( uint32_t n ) {
-
-    divmod10_t res;
-
-    // умножаем на 0.8
-    res.quot = n >> 1;
-    res.quot += res.quot >> 1;
-    res.quot += res.quot >> 4;
-    res.quot += res.quot >> 8;
-    res.quot += res.quot >> 16;
-    uint32_t qq = res.quot;
-
-    // делим на 8
-    res.quot >>= 3;
-
-    // вычисляем остаток
-    res.rem = uint8_t( n - ( ( res.quot << 1 ) + ( qq & ~7ul ) ) );
-
-    // корректируем остаток и частное
-    if ( res.rem > 9 ) {
-
-        res.rem -= 10;
-        res.quot++;
-    }
-
-    return res;
-
-}
-
-
-char * utoa_fast_div( uint32_t value, char * buffer ) {
-
-    buffer += 11;
-    * --buffer = 0;
-
-    do {
-
-        divmod10_t res = divmodu10( value );
-        * --buffer = res.rem + '0';
-        value = res.quot;
-    
-    } while ( value != 0 );
-
-    return buffer;
-
-}
-
-
 /**
  * Главный (основной) поток программы
  */
 HRESULT CMCU::MainThreadProcedure(){   
 
-    // Вычисление строки с версией программы
-    strcat( Version, utoa_fast_div( CVersion::GetMajor(), buffer ) );
-    strcat( Version, "." );
-
-    strcat( Version, utoa_fast_div( CVersion::GetMinor(), buffer ) );
-    strcat( Version, "." );
-
-    strcat( Version, utoa_fast_div( CVersion::GetRevision(), buffer ) );
-    strcat( Version, "." );
-
-    strcat( Version, utoa_fast_div( CVersion::GetBuild(), buffer ) );
-
     __enable_interrupt();
 
-    UIMain();
+    FormMain();
 
     // Все проверки прошли успешно, объект в рабочем состоянии
     return NO_ERROR;
@@ -276,7 +211,7 @@ void CMCU::ControlRegistersInit(){
 void CMCU::ADCInit(){
 
     // ADC Multiplexer Selection Register – ADMUX
-    // [ ADC Multiplexer Selection Register ]
+    // [ ADC Multiplexer Selection Register ][ATmega16]
     //           00000000 - Initial Value
     //ADMUX = BIN8(00000000); // BIN8() не зависит от уровня оптимизации
     //           ||||||||
@@ -292,7 +227,7 @@ void CMCU::ADCInit(){
 
 
     // Digital Input Disable Register 0 – DIDR0
-    // [ Digital Input Disable Register 0 ]
+    // [ Digital Input Disable Register 0 ][ATmega16]
     //           00000000 - Initial Value
     //DIDR0 = BIN8(00000000); // BIN8() не зависит от уровня оптимизации
     //           ||||||||
@@ -308,7 +243,7 @@ void CMCU::ADCInit(){
 
 
     // ADC Control and Status Register B – ADCSRB
-    // [ ADC Control and Status Register B ]
+    // [ ADC Control and Status Register B ][ATmega16]
     //            00000000 - Initial Value
     //ADCSRB = BIN8(00000000); // BIN8() не зависит от уровня оптимизации
     //            ||||||||
@@ -345,7 +280,7 @@ void CMCU::Timer0Init(){
     // +----+----+----+-----------------------------------------------------------------+
 
     // Timer/Counter 0 Control Register
-    // [ Регистр управления Таймером/Счётчиком 0 ]
+    // [ Регистр управления Таймером/Счётчиком 0 ][ATmega16]
     //           00000000 - Initial Value
     TCCR0 = BIN8(00000011); // BIN8() не зависит от уровня оптимизации
     //           ||||||||
@@ -601,6 +536,7 @@ void CMCU::USARTInit(){
     //           00100000 - Initial Value
     UCSRA = BIN8(00100000); // BIN8() не зависит от уровня оптимизации
     //           ||||||||
+    //           76543210
     //           |||||||+- 0, rw, MPCM: - Multi-processor Communication Mode
     //           ||||||+-- 1, rw, U2X:  - Double the USART Transmission Speed
     //           |||||+--- 2, r, PE:    - Parity Error
@@ -611,10 +547,11 @@ void CMCU::USARTInit(){
     //           +-------- 7, r, RXC:   - USART Receive Complete
     // Примечание:
 
+
     UCSRB = 0x00; // отключаем, пока настраиваем скорость
 
     // Определение BAUD см. в файле: "Configuration.h"
-    UBRRL = ( uint8_t ) ( F_CPU / ( 16UL * BAUD ) - 1UL ); // устанавливаем скорость
+    UBRRL = ( uint8_t ) ( F_CPU / ( 16UL * BAUD ) - 1UL );
     UBRRH = ( uint8_t ) ( ( F_CPU / ( 16UL * BAUD ) - 1UL ) >> 8 );
 
     // USART Control and Status Register B
@@ -622,6 +559,7 @@ void CMCU::USARTInit(){
     //           00000000 - Initial Value
     UCSRB = BIN8(10011000); // BIN8() не зависит от уровня оптимизации
     //           ||||||||
+    //           76543210
     //           |||||||+- 0, rw, TXB8:  - Transmit Data Bit 8
     //           ||||||+-- 1, r,  RXB8:  - Receive Data Bit 8
     //           |||||+--- 2, rw, UCSZ2: - Character Size
@@ -632,11 +570,13 @@ void CMCU::USARTInit(){
     //           +-------- 7, rw, RXCIE: - RX Complete Interrupt Enable
     // Примечание:
 
+
     // USART Control and Status Register C
     // [ Регистр управления UCSRC ][ATmega16]
     //           10000110 - Initial Value
     UCSRC = BIN8(10000110); // BIN8() не зависит от уровня оптимизации
     //           ||||||||
+    //           76543210
     //           |||||||+- 0, rw, UCPOL:    - Clock Polarity
     //           ||||||+-- 1, rw, UCSZ0: -+ - Character Size
     //           |||||+--- 2, rw, UCSZ1: _|
@@ -876,9 +816,6 @@ void CMCU::InternalWDTInit(){
     //           |+------- 6, r,  |- Reserved Bits
     //           +-------- 7, r, _|
     // Примечание:
-    // Включен сторожевой таймер. Далее в коде его необходимо сбрасывать
-    // через промежутки времени меньшие периода его генератора с учётом
-    // коэффициентов деления.
 
 }
 
@@ -1046,9 +983,9 @@ void CMCU::OnTimerCounter0Overflow(){
 
     if ( Counter1s == 1000 ) {
 
-        CSystemTime::SetTime( CSystemTime::GetTime() + 1 );
-
         Counter1s = 0;
+
+        CSystemTime::SetTime( CSystemTime::GetTime() + 1 );
 
     }
 

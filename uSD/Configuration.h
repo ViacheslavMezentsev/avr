@@ -13,7 +13,7 @@
 
 #elif defined( __ICCAVR__ )
 
-    #define F_CPU 16000000UL
+    #define F_CPU 8000000UL
 
 #endif
 
@@ -29,9 +29,10 @@
 #define ID_TIMER_1S     0x04
 #define ID_TIMER_5S     0x05
 
-#define HWND_MAIN_SCREEN 100
-#define HWND_VIEWER 101
-#define HWND_PLAYER 102
+#define HWND_COMMAND_SHELL 100
+#define HWND_FILE_MANAGER 101
+#define HWND_VIEWER 102
+#define HWND_PLAYER 103
 
 // Размер очереди сообщений в ОЗУ
 // Один элемент занимает в ОЗУ sizeof( MSG ) = 20 байт
@@ -40,8 +41,8 @@
 // Скорость работы внутреннего USART
 //#define BAUD 9600UL
 //#define BAUD 19200UL
-//#define BAUD 38400UL
-#define BAUD 57600UL
+#define BAUD 38400UL
+//#define BAUD 57600UL
 
 // Definitions for MMC/SDC connection
 #define SD_DI   5   // MOSI
