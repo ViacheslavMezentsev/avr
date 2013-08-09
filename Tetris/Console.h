@@ -154,6 +154,7 @@ public:
     static void PutChar( uint8_t ch, EnCodePage CodePage = cp866 );
     static void WriteString( FCHAR_PTR Value, EnCodePage CodePage = cp866, uint8_t Length = 0 );
     static void WriteString( const char * Value, EnCodePage CodePage = cp866, uint8_t Length = 0 );
+    static void Beep( uint16_t Frequency = 800U, uint8_t Duration = 1 );
     static void ClearScreen( EnClearMode Mode = cmAll );
     static void ClearLine( EnClearMode Mode = cmFromCursorToEnd );
     static void ClearForward( uint8_t Count );
