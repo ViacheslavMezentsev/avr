@@ -22,8 +22,8 @@ extern char buffer[ 16 ];
 
 // -=[ Переменные в ОЗУ ]=-
 
-uint8_t oldx, oldy;
-uint8_t x, y;
+volatile uint8_t oldx, oldy;
+volatile uint8_t x, y;
 
 EnColor FigureColor;
 EnFigureType FigureType;
@@ -79,10 +79,13 @@ void CGame::Initialization() {
     x = 23; 
     y = GLASS_OFFSET_TOP;
 
-    oldx = x; oldy = y;
+    oldx = x; 
+    oldy = y;
 
     FigureColor = clDarkGray;
     FigureType = ftJ;
+
+    CopyFigureToRAM( Block, FigureJ[0] );
 
     // Очищаем память стакана.
     for ( uint16_t i = 0; i < ( GLASS_WIDTH / 2 ) * GLASS_HEIGHT; i++ ) Glass[i] = 0;    
@@ -240,10 +243,12 @@ void CGame::DrawFigure(){
     // Заглушка: если игра не запущена, то ничего не делаем.
     if ( state != gsRunning ) return;
 
+    y++;
+
     // Проверка столкновения.
 
-    // Если обнаружено столкновение или дно стакана, то сохраняем фигуру
-    // в памяти и перерисовываем стакан.
+    // Если обнаружено столкновение или дно стакана, то переходим к
+    // следующей фигуре, оставляя текущую на экране.
     //for ( uint8_t i = 0; i < GLASS_HEIGHT; i++ ) {
     //    
     //    for ( uint8_t j = 0; j < GLASS_WIDTH; j++ ) {
@@ -252,23 +257,22 @@ void CGame::DrawFigure(){
 
     //}
 
-    // Сохраняем текущие координаты.
-    oldx = x; oldy = y;
-
     CConsole::SetTextAttributes( atOff );
     CConsole::SetBackgroundColor( clBlack );
 
-    // Удаляем старое изображение, перерисовывая участок стакана.
+    // Удаляем старое изображение.
     for ( uint8_t i = 0; i < 4; i++ ) {
         
         for ( uint8_t j = 0; j < 8; j++ ) {            
 
-            offset = ( y - GLASS_OFFSET_TOP + i ) * ( GLASS_WIDTH / 2 ) + ( x - GLASS_OFFSET_LEFT + j ) / 2;
+            if ( Block[ i * 8 + j ] != 'x' ) continue;
+
+            offset = ( oldy - GLASS_OFFSET_TOP + i ) * ( GLASS_WIDTH / 2 ) + ( oldx - GLASS_OFFSET_LEFT + j ) / 2;
 
             if ( offset >= ( GLASS_WIDTH / 2 ) * GLASS_HEIGHT ) continue;
 
             // Если нечётное, то берём младшую тетраду.
-            if ( ( x - GLASS_OFFSET_LEFT + j ) % 2 ) {
+            if ( ( oldx - GLASS_OFFSET_LEFT + j ) % 2 ) {
                 
                 CConsole::SetForegroundColor( ( EnColor ) ( Glass[ offset ] & 0x0F ) );
 
@@ -278,18 +282,17 @@ void CGame::DrawFigure(){
                 CConsole::SetForegroundColor( ( EnColor ) ( Glass[ offset ] >> 4 ) );
             }
 
-            CConsole::MoveTo( x + j, y + i );
+            CConsole::MoveTo( oldx + j, oldy + i );
             CConsole::PutChar( 0xDB );
 
         } // for
     
-    } // for
-
-    y++;
+    } // for    
 
     // Обновляем фигуру.
     if ( y > 19 ) { 
        
+        x = 23;
         y = GLASS_OFFSET_TOP;
 
         FigureType = ( EnFigureType ) ( ( uint8_t ) FigureType + 1 );
@@ -327,16 +330,18 @@ void CGame::DrawFigure(){
         
         for ( uint8_t j = 0; j < 8; j++ ) {
             
-            if ( Block[ i * 8 + j ] == 'x' ) {
+            if ( Block[ i * 8 + j ] != 'x' ) continue;
 
-                CConsole::MoveTo( x + j, y + i );
-                CConsole::PutChar( 0xDB );
-
-            } // if
+            CConsole::MoveTo( x + j, y + i );
+            CConsole::PutChar( 0xDB );
 
         } // for
     
     } // for
+
+    // Сохраняем текущие координаты.
+    oldy = y;
+    oldx = x;
 
 }
 
@@ -480,6 +485,18 @@ void CGame::FormKeyDown( uint16_t Key ) {
         case VK_UP: { break; }
 
         case VK_DOWN: {  break; }
+
+        case VK_LEFT: { 
+        
+            x++;
+            break; 
+        }
+
+        case VK_RIGHT: { 
+        
+            x--;
+            break; 
+        }
 
         case VK_HOME: { break; }
 

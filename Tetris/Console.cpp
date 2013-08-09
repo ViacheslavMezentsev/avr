@@ -132,6 +132,33 @@ void CConsole::WriteString( const char * s, EnCodePage CodePage, uint8_t Length 
 
 
 /**
+ * Вывод звука.
+ */
+void CConsole::Beep( uint16_t Frequency, uint8_t Duration  ) {
+
+    // Настройка параметров (если используется).
+    WriteString( ESC );
+
+    PutChar( ( Frequency / 100 ) + '0' );
+
+    Frequency %= 100;
+
+    PutChar( ( Frequency / 10 ) + '0' );
+    PutChar( ( Frequency % 10 ) + '0' );
+
+    PutChar( ';' );
+
+    PutChar( ( Duration / 10 ) + '0' );
+    PutChar( ( Duration % 10 ) + '0' );
+
+    PutChar( 'B' );
+
+    // Вывод звука (BELL).
+    PutChar( '\a' );
+}
+
+
+/**
  * Очистить экран.
  */
 void CConsole::ClearScreen( EnClearMode Mode ) {
