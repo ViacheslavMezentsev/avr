@@ -5,8 +5,7 @@ enum EnCommand {
     cmdNone = 0,
     cmdUnknown,
     cmdHelp,
-    cmdClearScreen,
-    cmdGame
+    cmdClearScreen
 
 };
 
@@ -24,8 +23,8 @@ class CCommandShell {
 
 private:  
 
-    inline static void Info();
-    inline static void Prompt();
+    static void Info();
+    static void Prompt();
 
 public:
 
