@@ -260,19 +260,24 @@ uint8_t CEFS::WriteFile( efs_file *file, uint8_t *buffer, uint8_t pointer, uint8
  * - Flags: 	*file 	-> File to delete
  *
  */
-void CEFS::DeleteFile(struct efs_file *file){
+void CEFS::DeleteFile( efs_file * file ) {
 	
-	do{
-		/* Update first_free_entry if lower */
-		if(file->entry < efs.first_free_entry) efs.first_free_entry=file->entry;
-		/* Mark entry as free & update cache */
-		eeprom_write_byte((uint8_t*)(file->entry*16), EFS_ENTRY_FREE);
-		efs.entries_cache[file->entry]=EFS_ENTRY_FREE;
-		/* Get next entry */
-		file->entry=eeprom_read_byte((uint8_t*)(file->entry*16+15));
-	}while(file->entry!=EFS_EOF);
+	do {
+
+		// Update first_free_entry if lower.
+		if ( file->entry < efs.first_free_entry ) efs.first_free_entry = file->entry;
+
+		// Mark entry as free & update cache.
+		eeprom_write_byte( ( uint8_t * ) ( file->entry * 16 ), EFS_ENTRY_FREE );
+		efs.entries_cache[ file->entry ] = EFS_ENTRY_FREE;
+
+		// Get next entry.
+		file->entry = eeprom_read_byte( ( uint8_t * ) ( file->entry * 16 + 15 ) );
+
+	} while ( file->entry != EFS_EOF );
 	
 }
+
 
 /* - Description: Creates a new file
  *
