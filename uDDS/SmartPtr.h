@@ -122,18 +122,15 @@ public:
 
     }
 
-    inline T& operator *() {
-               
-        Accessor::Write( ( uint8_t * )( _address ), * ( uint8_t * ) _address );
-
-        return * _address;
-
-    }
-
-
     inline const T operator []( int value ) {
             
         return * Self( _address + value );
+
+    }
+
+    inline T * operator & () {
+
+        return ( T * ) _address;
 
     }
 
@@ -156,12 +153,6 @@ class FlashPtr: public BasePtr<T, FlashPtr<T> > {
 
         }
 
-        static void Write( uint8_t * addr, uint8_t value ) {
-
-                return;
-
-        }
-
 };
 
 template<class T>
@@ -174,12 +165,6 @@ class EepromPtr: public BasePtr< T, EepromPtr<T> > {
         static uint8_t Read( const uint8_t *addr ) {
 
                 return eeprom_read_byte( addr );
-
-        }
-
-        static void Write( uint8_t * addr, uint8_t value ) {
-
-            eeprom_write_byte( addr, value );
 
         }
 

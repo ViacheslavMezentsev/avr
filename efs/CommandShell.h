@@ -6,7 +6,7 @@ enum EnCommand {
     cmdUnknown,
     cmdHelp,
     cmdClearScreen,
-    cmdGame
+    cmdMemoryViewer
 
 };
 

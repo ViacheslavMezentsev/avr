@@ -9,6 +9,7 @@
 #include "Configuration.h"
 #include "Version.h"
 #include "Console.h"
+#include "MemoryViewer.h"
 #include "CommandShell.h"
 #include "MCU.h"
 
@@ -34,6 +35,9 @@ PR_END_EXTERN_C
 volatile uint32_t TickCounter = 0;
 
 uint16_t Counter10ms = 0;
+
+// Дескриптор активного окна.
+HWND hwndActiveWindow = HWND_COMMAND_SHELL;
 
 
 /***********************
@@ -977,6 +981,17 @@ void CMCU::OnTimerCounter2CompareMatch(){
 }
 
 
+void FormKeyDown( uint16_t Key ) {
+
+    switch ( hwndActiveWindow ) {
+
+        case HWND_COMMAND_SHELL: { CCommandShell::FormKeyDown( Key ); break; }
+        case HWND_MEMORY_VIEWER: { CMemoryViewer::FormKeyDown( Key ); break; }
+    }
+
+}
+
+
 /**
  * Timer/Counter2 Overflow
  */
@@ -1009,7 +1024,7 @@ void CMCU::OnTimerCounter2Overflow(){
                 if ( FIFO_IS_EMPTY( uart_rx_fifo ) || ( tmp == VK_ESCAPE ) ) {
 
                     // Создаём событие нажатия на клавишу.
-                    CCommandShell::FormKeyDown( VK_ESCAPE );
+                    FormKeyDown( VK_ESCAPE );
 
                     // Принимаем расширенный код клавиши.
                 } else if ( tmp == '[' ) {
@@ -1035,7 +1050,7 @@ void CMCU::OnTimerCounter2Overflow(){
                 if ( FIFO_IS_EMPTY( uart_rx_fifo ) || ( FIFO_FRONT( uart_rx_fifo ) == VK_BACK ) ) {
 
                     // Создаём событие нажатия на клавишу.
-                    CCommandShell::FormKeyDown( VK_BACK );
+                    FormKeyDown( VK_BACK );
 
                 };
 
@@ -1045,7 +1060,7 @@ void CMCU::OnTimerCounter2Overflow(){
                 FIFO_POP( uart_rx_fifo );
 
                 // Создаём событие нажатия на клавишу.
-                CCommandShell::FormKeyDown( VK_RETURN );
+                FormKeyDown( VK_RETURN );
 
 
                 // CP866.
@@ -1054,7 +1069,7 @@ void CMCU::OnTimerCounter2Overflow(){
                 || ( ( tmp > 0xBF ) && ( tmp < 0xF2 ) ) ) {
 
                     // Создаём событие нажатия на клавишу.
-                    CCommandShell::FormKeyDown( tmp );
+                    FormKeyDown( tmp );
 
                     // Удаляем символ из буфера.
                     FIFO_POP( uart_rx_fifo );

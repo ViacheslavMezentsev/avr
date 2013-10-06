@@ -62,7 +62,7 @@ MCU = atmega16
 #         F_CPU = 16000000
 #         F_CPU = 18432000
 #         F_CPU = 20000000
-F_CPU = 4000000
+F_CPU = 8000000
 
 
 # Output format. (can be srec, ihex, binary)
@@ -82,7 +82,8 @@ OBJDIR = obj
 
 
 # List C++ source files here. (C dependencies are automatically generated.)
-CPPSRC = ISRList.cpp EFS.cpp Console.cpp CommandShell.cpp MCU.cpp MainUnit.cpp
+CPPSRC = ISRList.cpp EFS.cpp Console.cpp MemoryViewer.cpp CommandShell.cpp 
+CPPSRC += MCU.cpp MainUnit.cpp
 
 
 # List Assembler source files here.

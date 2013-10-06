@@ -63,6 +63,8 @@
         static char __c[] PROGMEM = (s); \
         FlashPtr<char> _c(__c); _c; }))
 
+    #define ECHAR_PTR EepromPtr< char >
+
 #elif defined( __ICCAVR__ )
 
     #pragma hdrstop

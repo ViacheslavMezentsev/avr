@@ -24,10 +24,13 @@
     //#define __DEBUG__
 #endif
 
+#define HWND_COMMAND_SHELL 100
+#define HWND_MEMORY_VIEWER 101
+
 // Скорость работы внутреннего USART
-#define BAUD 9600UL
+//#define BAUD 9600UL
 //#define BAUD 19200UL
-//#define BAUD 38400UL
+#define BAUD 38400UL
 //#define BAUD 57600UL
 
 
