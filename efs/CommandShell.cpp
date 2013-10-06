@@ -2,17 +2,20 @@
 #include "Configuration.h"
 #include "Version.h"
 #include "Console.h"
+#include "MemoryViewer.h"
 #include "CommandShell.h"
 
 
 // -=[ Внешние ссылки ]=-
 
+extern HWND hwndActiveWindow;
 
 // -=[ Постоянные во флеш-памяти ]=-
 
 FLASHSTR_DECLARE( char, szNewLine, "\r\n" );
 FLASHSTR_DECLARE( char, szcmdHelp, "help" );
 FLASHSTR_DECLARE( char, szcmdClearScreen, "cls" );
+FLASHSTR_DECLARE( char, szcmdMemoryViewer, "mem" );
 
 
 // -=[ Переменные в ОЗУ ]=-
@@ -65,6 +68,8 @@ EnCommand CCommands::operator[] ( char * Text ) {
     if ( strcmp_P( Text, ( PGM_P ) ( & szcmdHelp ) ) == 0 ) return cmdHelp;
 
     if ( strcmp_P( Text, ( PGM_P ) ( & szcmdClearScreen ) ) == 0 ) return cmdClearScreen;
+
+    if ( strcmp_P( Text, ( PGM_P ) ( & szcmdMemoryViewer ) ) == 0 ) return cmdMemoryViewer;
 
     return cmdUnknown;
 
@@ -167,7 +172,22 @@ void CCommandShell::FormKeyDown( uint16_t Key ) {
                     CConsole::SetForegroundColor( clWhite );
                     CConsole::WriteString( SPSTR( " - очистка экрана.\r\n" ), CConsole::cp1251 );
 
+                    CConsole::SetForegroundColor( clLightRed );
+                    CConsole::WriteString( szcmdMemoryViewer );
+
+                    CConsole::SetForegroundColor( clWhite );
+                    CConsole::WriteString( SPSTR( " - просмотр памяти.\r\n" ), CConsole::cp1251 );
+
                     Prompt();
+                    break;
+                }
+
+                case cmdMemoryViewer: {
+
+                    CMemoryViewer::FormActivate();
+
+                    hwndActiveWindow = HWND_MEMORY_VIEWER;
+                    
                     break;
                 }
 

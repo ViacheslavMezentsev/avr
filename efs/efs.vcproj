@@ -89,6 +89,10 @@
 				RelativePath=".\MCU.cpp"
 				>
 			</File>
+			<File
+				RelativePath=".\MemoryViewer.cpp"
+				>
+			</File>
 		</Filter>
 		<Filter
 			Name="Header Files"
@@ -125,6 +129,10 @@
 			</File>
 			<File
 				RelativePath=".\MCU.h"
+				>
+			</File>
+			<File
+				RelativePath=".\MemoryViewer.h"
 				>
 			</File>
 			<File

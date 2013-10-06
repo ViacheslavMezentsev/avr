@@ -23,6 +23,7 @@
 #include "Configuration.h"
 #include "EFS.h"
 #include "MCU.h"
+#include "MemoryViewer.h"
 #include "CommandShell.h"
 
 
@@ -32,7 +33,7 @@ int main() {
     // Инициализация микроконтроллера
     CMCU::Initialization();
     
-    // Инициализация драйвера SEEPROM.
+    // Инициализация драйвера EFS.
     CEFS::Initialization();
 
     // Инициализация командного интерпретатора.
