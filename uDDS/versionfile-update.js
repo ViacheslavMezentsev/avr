@@ -1,13 +1,13 @@
-/**
+/*********************************************
 * Изменение версии программы
 *
 * Автор: Мезенцев В. Н.
-* Почта: mailto:unihomelab@ya.ru
+* Почта: mailto:viacheslavmezentsev@gmail.com
 *
-**********************************/
+**********************************************/
 
 var fso, VersionFile, ForReading, TristateTrue, Text;
-var Major, Minor, Revision, Build;
+var Major, Minor, Build, Revision;
 
 // Создаём ссылку на массив параметров командной строки
 var objArgs = WScript.Arguments;
@@ -25,37 +25,50 @@ fso = WScript.CreateObject( "Scripting.FileSystemObject" );
 ForReading = 1; // Для чтения
 TristateFalse = 0; // Формат ASCII
 
-// Считываем номер версии из файла
+// Считываем номер версии из файла.
 VersionFile = fso.OpenTextFile( sVersionFile, ForReading, false, TristateFalse );
 
-Major = VersionFile.ReadLine();
-Minor = VersionFile.ReadLine();
-Revision = VersionFile.ReadLine();
-Build = VersionFile.ReadLine();
+try {
 
-VersionFile.Close();
+    var version = VersionFile.ReadLine().split( "." );
 
-// Изменяем версию
-Build++;
+    Major = version[0];
+    Minor = version[1];
+    Build = version[2];
+    Revision = version[3];
 
-if ( Build > 9999 ) {
+} catch(e) {
 
+} finally {
+
+    VersionFile.Close();
+}
+
+if ( ( Build != "*" ) && ( Revision != "*" ) ) {
+
+    // Изменяем версию
     Revision++;
-    Build = 0;
 
     if ( Revision > 9999 ) {
 
-        Minor++;
+        Build++;
         Revision = 0;
 
-        if ( Minor > 99 ) {
+        if ( Build > 9999 ) {
 
-            Major++;
-            Minor = 0;
+            Minor++;
+            Build = 0;
 
-            if ( Major > 9 ) {
+            if ( Minor > 99 ) {
 
-                Major = 0;
+                Major++;
+                Minor = 0;
+
+                if ( Major > 9 ) {
+
+                    Major = 0;
+
+                }
 
             }
 
@@ -63,14 +76,11 @@ if ( Build > 9999 ) {
 
     }
 
+    VersionFile = fso.CreateTextFile( sVersionFile, true );
+
+    // Выводим изменённые значения номера версии программы
+    VersionFile.WriteLine( Major + "." + Minor + "." + Build + "." + Revision );
+
+    VersionFile.Close();
+
 }
-
-VersionFile = fso.CreateTextFile( sVersionFile, true );
-
-// Выводим изменённые значения номера версии программы
-VersionFile.WriteLine( Major );
-VersionFile.WriteLine( Minor );
-VersionFile.WriteLine( Revision );
-VersionFile.WriteLine( Build );
-
-VersionFile.Close();
