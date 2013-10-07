@@ -66,6 +66,22 @@
 			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}"
 			>
 			<File
+				RelativePath=".\CommandShell.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\Console.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\DDS.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\EFS.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\ISRList.cpp"
 				>
 			</File>
@@ -84,11 +100,35 @@
 			UniqueIdentifier="{93995380-89BD-4b04-88EB-625FBE52EBFB}"
 			>
 			<File
+				RelativePath=".\CommandShell.h"
+				>
+			</File>
+			<File
 				RelativePath=".\Configuration.h"
 				>
 			</File>
 			<File
+				RelativePath=".\Console.h"
+				>
+			</File>
+			<File
+				RelativePath=".\DDS.h"
+				>
+			</File>
+			<File
 				RelativePath=".\Defines.h"
+				>
+			</File>
+			<File
+				RelativePath=".\EFS.h"
+				>
+			</File>
+			<File
+				RelativePath=".\fifo.h"
+				>
+			</File>
+			<File
+				RelativePath=".\KeyboardCodes.h"
 				>
 			</File>
 			<File
