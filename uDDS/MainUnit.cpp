@@ -21,17 +21,30 @@
 
 #include "Defines.h"
 #include "Configuration.h"
+#include "EFS.h"
 #include "MCU.h"
-#include "MainUnit.h"
+#include "DDS.h"
+#include "CommandShell.h"
 
 
-// Точка входа в основную программу
+// Точка входа в основную программу.
 int main() {
 
-    // Инициализация микроконтроллера
+    // Инициализация драйвера EFS.
+    CEFS::Initialization();
+
+    // Инициализация микроконтроллера.
     CMCU::Initialization();
 
-    // Запуск основного потока
+    // Инициализация модуля DDS.
+    CDDS::Initialization();
+
+    // Инициализация командного интерпретатора.
+    CCommandShell::Initialization();
+
+    CCommandShell::FormActivate();
+
+    // Запуск основного потока.
     HRESULT hResult = CMCU::MainThreadProcedure();
 
     return 0;

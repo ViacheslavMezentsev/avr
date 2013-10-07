@@ -66,6 +66,10 @@
         static PROGMEM type _##name[] = init; \
         FlashPtr<type> name(_##name);
 
+    #define SPSTR(s) (__extension__({ \
+        static char __c[] PROGMEM = (s); \
+        FlashPtr<char> _c(__c); _c; }))
+
     // Определения для работы с EEPROM
     #define EEPROM_DECLARE(x) EEMEM x
 
@@ -196,6 +200,9 @@
 
 // Описание типов, аналогичных в Windows
 #include "windows.h"
+
+// Работа с кольцевым буфером.
+#include "fifo.h"
 
 #define TOGGLE(x,y) ((x) ^= (1<<(y)))
 #define CHECKBIT(x,y) ((x) & (1<<(y)))

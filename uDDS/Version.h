@@ -1,7 +1,7 @@
 ///////////////////////////////////////////////////////////
 //  Version.h
 //  Implementation of the Class CVersion
-//  Created on:      24 но€бр€ 2012 г. 21:58:38
+//  Created on:      7 окт€бр€ 2013 г. 14:44:05
 //  Original author: ћезенцев ¬. Ќ.
 ///////////////////////////////////////////////////////////
 
@@ -11,20 +11,25 @@
 #include "Defines.h"
 
 /**
- * ќбраз дл€ работы с версией программы
+ * ќбраз дл€ работы с версией программы.
+ *
+ * ¬нимание. Ётот файл формируетс€ автоматически. Ћюбые внесЄнные
+ * здесь изменени€ пропадут перед компил€цией.
  */
 class CVersion {
 
 public:
 
-    inline static uint8_t GetMajor() { return 0; }
-    inline static uint8_t GetMinor() { return 0; }
-    inline static uint16_t GetRevision() { return 0; }
-    inline static uint16_t GetBuild() { return 45; }
+    inline static uint32_t GetMajor() { return 0; }
+    inline static uint32_t GetMinor() { return 0; }
+    inline static uint32_t GetBuild() { return 5028; }
+    inline static uint32_t GetRevision() { return 26522; }
 
+    inline static FCHAR_PTR GetVersionString() {
+        return SPSTR( "0.0.5028.26522" );
+    }
     inline static FCHAR_PTR GetBuildDateString() {
-        FLASHSTR_DECLARE( char, szBuildDateString, "24 но€бр€ 2012 г." );
-        return szBuildDateString;
+        return SPSTR( "7 окт€бр€ 2013 г." );
     }
 
 };

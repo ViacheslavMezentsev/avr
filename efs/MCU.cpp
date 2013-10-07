@@ -1002,7 +1002,7 @@ void CMCU::OnTimerCounter2Overflow(){
     Counter10ms++;
 
     // Восстанавливаем счётчик.
-    TCNT0 = 0xFF - F_CPU / 64000UL;
+    TCNT2 = 0xFF - F_CPU / 64000UL;
 
     if ( Counter10ms == 10 ) {
 

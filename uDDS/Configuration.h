@@ -14,7 +14,7 @@
 
 #elif defined( __ICCAVR__ )
 
-    #define F_CPU 16000000UL
+    #define F_CPU 8000000UL
 
 #endif
 
@@ -24,8 +24,25 @@
     //#define __DEBUG__
 #endif
 
+// 
+#define DDS_DDR_R2R         SET_DDR_NAME( A )   // -> DDRA
+#define DDS_PORT_NAME_R2R   SET_PORT_NAME( A )  // -> PORTA
+
+//Define Highs Speed (HS) signal output
+#define DDS_DDR_HS          SET_DDR_NAME( D )   // -> DDRD
+#define DDS_PORT_NAME_HS    SET_PORT_NAME( D )  // -> PORTD
+#define DDS_PIN_HS          SET_PORT_PIN_NUMBER( D, 5 ) // -> PD5
+
+#define HWND_COMMAND_SHELL 100
+#define HWND_DDS_MODULE 101
+
 // Скорость работы внутреннего USART
-//#define BAUD 9600
+//#define BAUD 9600UL
+//#define BAUD 19200UL
+#define BAUD 38400UL
+//#define BAUD 57600UL
+
+#define RESOLUTION 0.095367431640625
 
 
 /**
@@ -54,10 +71,10 @@
 //#define Timer_Counter1_Compare_Match_B
 //#define Timer_Counter1_Compare_Match_C
 
-//#define Timer_Counter2_Overflow
+#define Timer_Counter2_Overflow
 //#define Timer_Counter2_Compare_Match
 
-//#define USART_Rx_Complete
+#define USART_Rx_Complete
 //#define USART_Tx_Complete
 //#define USART_Data_Register_Empty
 

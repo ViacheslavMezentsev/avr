@@ -62,7 +62,7 @@ MCU = atmega16
 #         F_CPU = 16000000
 #         F_CPU = 18432000
 #         F_CPU = 20000000
-F_CPU = 4000000
+F_CPU = 16000000
 
 
 # Output format. (can be srec, ihex, binary)
@@ -82,7 +82,8 @@ OBJDIR = obj
 
 
 # List C++ source files here. (C dependencies are automatically generated.)
-CPPSRC = ISRList.cpp MCU.cpp MainUnit.cpp
+CPPSRC = ISRList.cpp EFS.cpp MCU.cpp Console.cpp CommandShell.cpp 
+CPPSRC += DDS.cpp MainUnit.cpp
 
 
 # List Assembler source files here.
@@ -189,8 +190,8 @@ CPPFLAGS += -Wa,-adhlns=$(<:%.cpp=$(OBJDIR)/%.lst)
 CPPFLAGS += $(patsubst %,-I%,$(EXTRAINCDIRS))
 #CPPFLAGS += $(CSTANDARD)
 # Внимание. Те функции которые не вызываются, не включаются в исходный бинарник
-#CPPFLAGS += -ffunction-sections
-#CPPFLAGS += -fdata-sections
+CPPFLAGS += -ffunction-sections
+CPPFLAGS += -fdata-sections
 
 #---------------- Assembler Options ----------------
 #  -Wa,...:   tell GCC to pass this to the assembler.
@@ -263,9 +264,17 @@ LDFLAGS += $(EXTMEMOPTS)
 LDFLAGS += $(patsubst %,-L%,$(EXTRALIBDIRS))
 LDFLAGS += $(PRINTF_LIB) $(SCANF_LIB) $(MATH_LIB)
 #LDFLAGS += -T linker_script.x
-# Внимание. Те функции которые не вызываются, не включаются в исходный бинарник
-#LDFLAGS += -Wl,-gc-sections
 
+# Внимание. Те функции которые не вызываются, не включаются в исходный бинарник
+LDFLAGS += -Wl,-gc-sections
+
+# Define sections where to store signal tables.
+LDFLAGS += -Wl,-section-start=.MySection1=0x3A00
+LDFLAGS += -Wl,-section-start=.MySection2=0x3B00
+LDFLAGS += -Wl,-section-start=.MySection3=0x3C00
+LDFLAGS += -Wl,-section-start=.MySection4=0x3D00
+LDFLAGS += -Wl,-section-start=.MySection5=0x3E00
+LDFLAGS += -Wl,-section-start=.MySection6=0x3F00 
 
 
 #---------------- Programming Options (avrdude) ----------------
