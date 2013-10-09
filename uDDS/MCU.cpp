@@ -54,34 +54,34 @@ HRESULT CMCU::MainThreadProcedure(){
     // Разрешаем прерывания
     __enable_interrupt();
     
-    Settings.Mode = sigSineWave;    
+    Settings.Mode = sigECGWave;    
     Settings.Flag = 1;
 
-    if ( Settings.Flag == 1 ) {
+    //if ( Settings.Flag == 1 ) {
 
-        cbi( SPCR, CPHA );
+    //    cbi( SPCR, CPHA );
 
-        CDDS::Run( ( PGM_P ) ( & Signals[ Settings.Mode ] ), 
-            ( uint8_t ) ( ( uint32_t ) Settings.Accumulator >> 16 ), 
-            ( uint8_t ) ( ( uint32_t ) Settings.Accumulator >> 8 ), 
-            ( uint8_t ) Settings.Accumulator
-            );
+    //    CDDS::Run( ( PGM_P ) ( & Signals[ Settings.Mode ] ), 
+    //        ( uint8_t ) ( ( uint32_t ) Settings.Accumulator >> 16 ), 
+    //        ( uint8_t ) ( ( uint32_t ) Settings.Accumulator >> 8 ), 
+    //        ( uint8_t ) Settings.Accumulator
+    //        );
 
-    }
+    //}
 
     do {
 
-        //if ( Settings.Flag == 1 ) {
+        if ( Settings.Flag == 1 ) {
 
-        //    cbi( SPCR, CPHA );
+            cbi( SPCR, CPHA );
 
-        //    CDDS::Run( ( PGM_P ) ( & Signals[ Settings.Mode ] ), 
-        //        ( uint8_t ) ( ( uint32_t ) Settings.Accumulator >> 16 ), 
-        //        ( uint8_t ) ( ( uint32_t ) Settings.Accumulator >> 8 ), 
-        //        ( uint8_t ) Settings.Accumulator
-        //        );
+            CDDS::Run( ( PGM_P ) ( & Signals[ Settings.Mode ] ), 
+                ( uint8_t ) ( ( uint32_t ) Settings.Accumulator >> 16 ), 
+                ( uint8_t ) ( ( uint32_t ) Settings.Accumulator >> 8 ), 
+                ( uint8_t ) Settings.Accumulator
+                );
 
-        //}
+        }
 
     } while ( true );
 
@@ -1079,7 +1079,7 @@ void CMCU::OnTimerCounter2Overflow(){
 
         Counter10ms = 0;
 
-        sbi( SPCR, CPHA );
+/*        sbi( SPCR, CPHA );
 
         switch ( Settings.Mode ) {
 
@@ -1090,7 +1090,7 @@ void CMCU::OnTimerCounter2Overflow(){
             case sigRewsawToothWave: Settings.Mode = sigECGWave; break;
             case sigECGWave: Settings.Mode = sigSineWave; break;
 
-        }        
+        } */       
 
     }
 

@@ -37,16 +37,17 @@
 #define EFS_FULL			0xff
 #define EFS_EOF				0xfe
 
-struct efs_file{
+struct efs_file {
 	uint8_t entry;
 	uint8_t size;
 	uint8_t format;
 	uint8_t first_data_entry;
 };
 
-/***********************/
-/* Класс CEFS */
-/***********************/
+
+/**
+* Класс CEFS
+************************/
 class CEFS {
 
 private:

@@ -184,9 +184,9 @@ void CCommandShell::FormKeyDown( uint16_t Key ) {
 
                 case cmdMemoryViewer: {
 
-                    CMemoryViewer::FormActivate();
-
                     hwndActiveWindow = HWND_MEMORY_VIEWER;
+
+                    CMemoryViewer::FormActivate();
                     
                     break;
                 }
@@ -222,7 +222,8 @@ void CCommandShell::FormKeyDown( uint16_t Key ) {
                 CConsole::PutChar( VK_BACK );
                 CConsole::ClearForward(1);
 
-                CommandString[ --tmp ] = 0;
+                CommandString[ tmp ] = 0;
+                tmp--;
 
             }
 
