@@ -30,6 +30,8 @@ char hexchars[ 17 ] = "0123456789ABCDEF";
 struct efs_file afile;
 CKeys Keys;
 
+uint16_t CMemoryViewer::_offset = 0;
+
 
 /***********************
 *  Р Е А Л И З А Ц И Я
@@ -42,6 +44,23 @@ void CMemoryViewer::Initialization() {
     // Очищаем командную строку.
     CommandString[0] = 0;
 
+}
+
+
+void CMemoryViewer::ScrollDown() {
+
+    _offset += 16U;
+    DrawMemory();
+}
+
+
+void CMemoryViewer::ScrollUp() {
+
+    _offset -= 16U;
+
+    if ( _offset > E2END ) _offset = 0;
+
+    DrawMemory();
 }
 
 
@@ -67,7 +86,9 @@ void CMemoryViewer::DrawMemory() {
 
     for ( i = 0; i < 23; i++ ) {
 
-        ECHAR_PTR mptr( ( char * ) ( i * 16 ) );
+        uint16_t addr = i * 16U + _offset;
+
+        ECHAR_PTR mptr( ( char * ) addr );
 
         CConsole::MoveTo( 1, i + 2 );
 
@@ -88,8 +109,20 @@ void CMemoryViewer::DrawMemory() {
 
         for ( j = 0; j < 16; j++ ) {
 
-            CConsole::PutChar( hexchars[ * mptr >> 4 ] );
-            CConsole::PutChar( hexchars[ * mptr & 0xF ] );
+            // Адрес текущего элемента.
+            addr = ( uint16_t ) & mptr;
+
+            if ( addr > E2END ) {
+
+                CConsole::PutChar( ' ' );
+                CConsole::PutChar( ' ' );
+
+            } else {
+
+                CConsole::PutChar( hexchars[ * mptr >> 4 ] );
+                CConsole::PutChar( hexchars[ * mptr & 0xF ] );
+            }
+
             mptr++;
             CConsole::PutChar( ' ' );
 
@@ -105,17 +138,30 @@ void CMemoryViewer::DrawMemory() {
         CConsole::PutChar( ACS_VLINE );
         CConsole::PutChar( ' ' );
 
-        ECHAR_PTR eepch( ( char * ) ( i * 16 ) );
+        addr = i * 16U + _offset;
+
+        ECHAR_PTR eepch( ( char * ) addr );
 
         for ( j = 0; j < 16; j++ ) {
 
-            if ( * eepch >= ' ' ) {
+            // Адрес текущего элемента.
+            addr = ( uint16_t ) & eepch;
 
-                CConsole::PutChar( * eepch, CConsole::cp1251 );
+            if ( addr > E2END ) {
+
+                CConsole::PutChar( ' ' );
 
             } else {
 
-                CConsole::PutChar( '.' );
+                if ( * eepch >= ' ' ) {
+
+                    CConsole::PutChar( * eepch, CConsole::cp1251 );
+
+                } else {
+
+                    CConsole::PutChar( '.' );
+                }
+
             }
 
             eepch++;
@@ -198,6 +244,18 @@ void CMemoryViewer::FormKeyDown( uint16_t Key ) {
 
             hwndActiveWindow = HWND_COMMAND_SHELL;
 
+            break;
+        }
+
+        case VK_UP: {
+
+            ScrollUp();
+            break;
+        }
+
+        case VK_DOWN: {
+
+            ScrollDown();
             break;
         }
 

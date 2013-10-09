@@ -34,7 +34,7 @@ public:
 class CMemoryViewer {
 
 private:
-
+    static uint16_t _offset;
     static void DrawTitle();
     static void DrawMemory();
     static void DrawFunctionKeys( CKeys & Keys );
@@ -42,7 +42,8 @@ private:
 public:
 
     static void Initialization();
-
+    static void ScrollDown();
+    static void ScrollUp();
     static void FormActivate();
     static void FormKeyDown( uint16_t Key );
 

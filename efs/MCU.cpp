@@ -19,15 +19,15 @@
 
 // -=[ Внешние ссылки ]=-
 
-PR_BEGIN_EXTERN_C
 extern FIFO( 16 ) uart_rx_fifo;
-PR_END_EXTERN_C
 
 
 // -=[ Постоянные во флеш-памяти ]=-
 
 
 // -=[ Переменные в ОЗУ ]=-
+
+volatile uint16_t Key = 0;
 
 // The elapsed time is stored as a DWORD value.
 // Therefore, the time will wrap around to zero
@@ -46,6 +46,17 @@ HWND hwndActiveWindow = HWND_COMMAND_SHELL;
 ************************/
 
 
+void FormKeyDown( uint16_t Key ) {
+
+    switch ( hwndActiveWindow ) {
+
+        case HWND_COMMAND_SHELL: { CCommandShell::FormKeyDown( Key ); break; }
+        case HWND_MEMORY_VIEWER: { CMemoryViewer::FormKeyDown( Key ); break; }
+    }
+
+}
+
+
 /**
  * Главный (основной) поток программы.
  */
@@ -56,6 +67,35 @@ HRESULT CMCU::MainThreadProcedure(){
 
     do {
 
+        if ( Key != NULL ) {
+
+            // Останавливаем счётчик.
+            TCCR2 = 0;
+
+            FormKeyDown(  Key );
+
+            Key = NULL;
+
+            // Восстанавливаем счётчик.
+            TCNT2 = 0xFF - F_CPU / 64000UL;
+
+            // Timer/Counter2 Control Register
+            // [ Регистр управления Таймером/Счётчиком 2 ][ATmega16]
+            //           00000000 - Initial Value
+            TCCR2 = BIN8(00000100); // BIN8() не зависит от уровня оптимизации
+            //           ||||||||
+            //           76543210
+            //           |||||||+- 0, rw, CS20:  -+ - Clock Select
+            //           ||||||+-- 1, rw, CS21:   |
+            //           |||||+--- 2, rw, CS22:  _|
+            //           ||||+---- 3, rw, WGM21:    - Waveform Generation Mode
+            //           |||+----- 4, rw, COM20: -+ - Compare Match Output Mode
+            //           ||+------ 5, rw, COM21: _|
+            //           |+------- 6, rw, WGM20:    - Waveform Generation Mode
+            //           +-------- 7, w,  FOC2:     - Force Output Compare
+            // Примечание:
+
+        }
 
     } while ( true );
 
@@ -981,17 +1021,6 @@ void CMCU::OnTimerCounter2CompareMatch(){
 }
 
 
-void FormKeyDown( uint16_t Key ) {
-
-    switch ( hwndActiveWindow ) {
-
-        case HWND_COMMAND_SHELL: { CCommandShell::FormKeyDown( Key ); break; }
-        case HWND_MEMORY_VIEWER: { CMemoryViewer::FormKeyDown( Key ); break; }
-    }
-
-}
-
-
 /**
  * Timer/Counter2 Overflow
  */
@@ -1001,9 +1030,6 @@ void CMCU::OnTimerCounter2Overflow(){
 
     Counter10ms++;
 
-    // Восстанавливаем счётчик.
-    TCNT2 = 0xFF - F_CPU / 64000UL;
-
     if ( Counter10ms == 10 ) {
 
         // Проверяем буфер приёмника.
@@ -1011,11 +1037,11 @@ void CMCU::OnTimerCounter2Overflow(){
 
             tmp = FIFO_FRONT( uart_rx_fifo );
 
+            // Удаляем символ из буфера.
+            FIFO_POP( uart_rx_fifo );
+
             // Если первый символ - ESC.
             if ( tmp == VK_ESCAPE ) {
-
-                // Удаляем символ из буфера.
-                FIFO_POP( uart_rx_fifo );
 
                 tmp = FIFO_FRONT( uart_rx_fifo );
 
@@ -1024,7 +1050,7 @@ void CMCU::OnTimerCounter2Overflow(){
                 if ( FIFO_IS_EMPTY( uart_rx_fifo ) || ( tmp == VK_ESCAPE ) ) {
 
                     // Создаём событие нажатия на клавишу.
-                    FormKeyDown( VK_ESCAPE );
+                    Key = VK_ESCAPE;
 
                     // Принимаем расширенный код клавиши.
                 } else if ( tmp == '[' ) {
@@ -1037,30 +1063,34 @@ void CMCU::OnTimerCounter2Overflow(){
                     // Удаляем символ из буфера.
                     FIFO_POP( uart_rx_fifo );
 
+                    switch ( tmp ) {
+
+                        case 0x41: Key = VK_UP; break;
+                        case 0x42: Key = VK_DOWN; break;
+                        case 0x43: Key = VK_LEFT; break;
+                        case 0x44: Key = VK_RIGHT; break;
+                        case 0x48: Key = VK_HOME; break;
+                        case 0x4B: Key = VK_END; break;
+
+                    }
+
                 }
 
-
             } else if ( tmp == VK_BACK ) {
-
-                // Удаляем символ из буфера.
-                FIFO_POP( uart_rx_fifo );
 
                 // Если буфер опустел или следующий символ опять BACK, то посылаем сообщение,
                 // что пришёл одиночный BACK.
                 if ( FIFO_IS_EMPTY( uart_rx_fifo ) || ( FIFO_FRONT( uart_rx_fifo ) == VK_BACK ) ) {
 
                     // Создаём событие нажатия на клавишу.
-                    FormKeyDown( VK_BACK );
+                    Key = VK_BACK;
 
                 };
 
             } else if ( tmp == VK_RETURN ) {
 
-                // Удаляем символ из буфера.
-                FIFO_POP( uart_rx_fifo );
-
                 // Создаём событие нажатия на клавишу.
-                FormKeyDown( VK_RETURN );
+                Key = VK_RETURN;
 
 
                 // CP866.
@@ -1069,12 +1099,7 @@ void CMCU::OnTimerCounter2Overflow(){
                 || ( ( tmp > 0xBF ) && ( tmp < 0xF2 ) ) ) {
 
                     // Создаём событие нажатия на клавишу.
-                    FormKeyDown( tmp );
-
-                    // Удаляем символ из буфера.
-                    FIFO_POP( uart_rx_fifo );
-
-            } else {
+                    Key = tmp;
 
             }
 
