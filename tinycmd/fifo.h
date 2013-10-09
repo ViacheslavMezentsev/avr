@@ -9,9 +9,9 @@
 // Размер должен быть степенью двойки: 4,8,16,32...128.
 #define FIFO( size )\
   struct {\
-    unsigned char buf[size];\
     unsigned char tail;\
     unsigned char head;\
+    unsigned char buf[size];\
   }
 
 // Количество элементов в очереди.

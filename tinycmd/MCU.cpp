@@ -880,21 +880,21 @@ void CMCU::OnTimerCounter0Overflow(){
 
     Counter10ms++;
 
-    // Восстанавливаем счётчик.
-    TCNT0 = 0xFF - F_CPU / 64000UL;
-
     if ( Counter10ms == 10 ) {
+
+        // Останавливаем счётчик.
+        TCCR0B = 0;
 
         // Проверяем буфер приёмника.
         if ( !FIFO_IS_EMPTY( uart_rx_fifo ) ) {
 
             tmp = FIFO_FRONT( uart_rx_fifo );
 
+            // Удаляем символ из буфера.
+            FIFO_POP( uart_rx_fifo );
+
             // Если первый символ - ESC.
             if ( tmp == VK_ESCAPE ) {
-
-                // Удаляем символ из буфера.
-                FIFO_POP( uart_rx_fifo );
 
                 tmp = FIFO_FRONT( uart_rx_fifo );
 
@@ -921,9 +921,6 @@ void CMCU::OnTimerCounter0Overflow(){
 
             } else if ( tmp == VK_BACK ) {
 
-                // Удаляем символ из буфера.
-                FIFO_POP( uart_rx_fifo );
-
                 // Если буфер опустел или следующий символ опять BACK, то посылаем сообщение,
                 // что пришёл одиночный BACK.
                 if ( FIFO_IS_EMPTY( uart_rx_fifo ) || ( FIFO_FRONT( uart_rx_fifo ) == VK_BACK ) ) {
@@ -931,33 +928,43 @@ void CMCU::OnTimerCounter0Overflow(){
                     // Создаём событие нажатия на клавишу.
                     CCommandShell::FormKeyDown( VK_BACK );
 
-                };
+                }
 
             } else if ( tmp == VK_RETURN ) {
-
-                // Удаляем символ из буфера.
-                FIFO_POP( uart_rx_fifo );
 
                 // Создаём событие нажатия на клавишу.
                 CCommandShell::FormKeyDown( VK_RETURN );
 
 
-                // CP866.
+            // CP866.
             } else if ( ( ( tmp > 0x19 ) && ( tmp < 0x7F ) )
                 || ( ( tmp > 0x7F ) && ( tmp < 0xB0 ) )
                 || ( ( tmp > 0xBF ) && ( tmp < 0xF2 ) ) ) {
 
-                    // Создаём событие нажатия на клавишу.
-                    CCommandShell::FormKeyDown( tmp );
-
-                    // Удаляем символ из буфера.
-                    FIFO_POP( uart_rx_fifo );
-
-            } else {
-
+                // Создаём событие нажатия на клавишу.
+                CCommandShell::FormKeyDown( tmp );
             }
 
         }
+
+        // Восстанавливаем счётчик.
+        TCNT0 = 0xFF - F_CPU / 64000UL;
+
+        // Timer/Counter 0 Control Register B
+        // [ Регистр управления B Таймером/Счётчиком 0 ][ATtiny2313]
+        //            00000000 - Initial Value
+        TCCR0B = BIN8(00000011); // BIN8() не зависит от уровня оптимизации
+        //            ||||||||
+        //            76543210
+        //            |||||||+- 0, rw, CS00:  -+ - Управление тактовым сигналом
+        //            ||||||+-- 1, rw, CS01:   |
+        //            |||||+--- 2, rw, CS02:  _|
+        //            ||||+---- 3, rw, WGM02:    - Waveform Generation Mode
+        //            |||+----- 4, r: 0
+        //            ||+------ 5, r: 0
+        //            |+------- 6, rw, FOC0B:    - Force Output Compare B
+        //            +-------- 7, rw, FOC0A:    - Force Output Compare A
+        // Примечание:
 
         Counter10ms = 0;
 
