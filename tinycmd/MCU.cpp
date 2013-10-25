@@ -23,14 +23,10 @@ extern FIFO( 16 ) uart_rx_fifo;
 
 // -=[ Постоянные во флеш-памяти ]=-
 
-volatile uint16_t Key = 0;
 
 // -=[ Переменные в ОЗУ ]=-
-// The elapsed time is stored as a DWORD value.
-// Therefore, the time will wrap around to zero
-// if the system is run continuously for 49.7 days.
-volatile uint32_t TickCounter = 0;
 
+volatile uint16_t Key = 0;
 uint16_t Counter10ms = 0;
 
 
@@ -50,14 +46,14 @@ HRESULT CMCU::MainThreadProcedure(){
 
     do {
 
-        if ( Key != NULL ) {
+        if ( Key != 0 ) {
 
             // Останавливаем счётчик.
             TCCR0B = 0;
 
             CCommandShell::FormKeyDown( Key );
 
-            Key = NULL;
+            Key = 0;
 
             // Восстанавливаем счётчик.
             TCNT0 = 0xFF - F_CPU / 64000UL;
@@ -99,7 +95,7 @@ void CMCU::Initialization(){
     __disable_interrupt();
 
     // Схема соединений (разводка выводов) [ATtiny2313]
-    PortsInit();
+    //PortsInit();
 
     // Настройка таймера/счётчика 0 [ATtiny2313]
     Timer0Init();
@@ -141,7 +137,7 @@ void CMCU::ControlRegistersInit(){
     // MCU Control Register
     // [ Регистр управления микроконтроллером ][ATtiny2313]
     //          00000000 - Initial Value
-    temp = BIN8(00000000);
+    //temp = BIN8(00000000);
     //          ||||||||
     //          76543210
     //          |||||||+- 0, rw, ISC00: -+ - Interrupt Sense Control 0 Bit 1 and Bit 0
@@ -156,8 +152,8 @@ void CMCU::ControlRegistersInit(){
     // Эти конструкции сохраняют младшую тетраду регистра MCUCR от случайного
     // изменения
     //temp &= ( 1 << SM1 ) | ( 1 << SM0 );
-    MCUCR &= ~( ( 1 << SE ) | ( 1 << SM1 ) | ( 1 << SM0 ) );
-    MCUCR |= temp;
+    //MCUCR &= ~( ( 1 << SE ) | ( 1 << SM1 ) | ( 1 << SM0 ) );
+    //MCUCR |= temp;
 
 
     // Timer/Counter Interrupt Mask Register
@@ -259,7 +255,7 @@ void CMCU::PortsInit(){
     // Port A Data Direction Register
     // [ Регистр направления порта A ][ATtiny2313]
     //          00000000 - Initial Value
-    DDRA = BIN8(00000000); // BIN8() не зависит от уровня оптимизации
+    //DDRA = BIN8(00000000); // BIN8() не зависит от уровня оптимизации
     //          ||||||||
     //          76543210
     //          |||||||+- 0, rw, DDA0: (XTAL1)     -
@@ -276,7 +272,7 @@ void CMCU::PortsInit(){
     // Port A Data Register
     // [ Регистр данных порта A ][ATtiny2313]
     //           00000000 - Initial Value
-    PORTA = BIN8(00000000); // BIN8() не зависит от уровня оптимизации
+    //PORTA = BIN8(00000000); // BIN8() не зависит от уровня оптимизации
     //           ||||||||
     //           76543210
     //           |||||||+- 0, rw, PORTA0: (XTAL1)     -
@@ -293,7 +289,7 @@ void CMCU::PortsInit(){
     // Port B Data Direction Register
     // [ Регистр направления порта B ][ATtiny2313]
     //          00000000 - Initial Value
-    DDRB = BIN8(00000000); // BIN8() не зависит от уровня оптимизации
+    //DDRB = BIN8(00000000); // BIN8() не зависит от уровня оптимизации
     //          ||||||||
     //          76543210
     //          |||||||+- 0, rw, DDB0: (AIN0/PCINT0)     -
@@ -310,7 +306,7 @@ void CMCU::PortsInit(){
     // Port B Data Register
     // [ Регистр данных порта B ][ATtiny2313]
     //           00000000 - Initial Value
-    PORTB = BIN8(00000000); // BIN8() не зависит от уровня оптимизации
+    //PORTB = BIN8(00000000); // BIN8() не зависит от уровня оптимизации
     //           ||||||||
     //           76543210
     //           |||||||+- 0, rw, PORTB0: (AIN0/PCINT0)     -
@@ -327,7 +323,7 @@ void CMCU::PortsInit(){
     // Port D Data Direction Register
     // [ Регистр направления порта D ][ATtiny2313]
     //          00000000 - Initial Value
-    DDRD = BIN8(00000000); // BIN8() не зависит от уровня оптимизации
+    //DDRD = BIN8(00000000); // BIN8() не зависит от уровня оптимизации
     //          ||||||||
     //          76543210
     //          |||||||+- 0, rw, DDD0: (RXD)            -
@@ -344,7 +340,7 @@ void CMCU::PortsInit(){
     // Port D Data Register
     // [ Регистр данных порта D ][ATtiny2313]
     //           00000000 - Initial Value
-    PORTD = BIN8(00000000); // BIN8() не зависит от уровня оптимизации
+    //PORTD = BIN8(00000000); // BIN8() не зависит от уровня оптимизации
     //           ||||||||
     //           76543210
     //           |||||||+- 0, rw, PORTD0: (RXD)            - RXD
@@ -460,8 +456,8 @@ void CMCU::Timer1Init(){
     // Примечание:
 
     // Устанавливаем значения для счётных регистров
-    TCNT1H = 0x00; // ( 0xFFFF - Delay * F_CPU / PrescaleValue ) >> 8
-    TCNT1L = 0x00; // ( 0xFFFF - Delay * F_CPU / PrescaleValue )
+    //TCNT1H = 0x00; // ( 0xFFFF - Delay * F_CPU / PrescaleValue ) >> 8
+    //TCNT1L = 0x00; // ( 0xFFFF - Delay * F_CPU / PrescaleValue )
     /*
     OCR1AH = 0x00;
     OCR1AL = 0x39;
@@ -560,7 +556,7 @@ void CMCU::USARTInit(){
     // USART Control and Status Register A.
     // [ Регистр управления UCSRA ][ATtiny2313]
     //           00100000 - Initial Value
-    UCSRA = BIN8(00100000); // BIN8() не зависит от уровня оптимизации.
+    //UCSRA = BIN8(00100000); // BIN8() не зависит от уровня оптимизации.
     //           ||||||||
     //           76543210
     //           |||||||+- 0, rw, MPCM: - Multi-processor Communication Mode
@@ -573,7 +569,7 @@ void CMCU::USARTInit(){
     //           +-------- 7, r, RXC:   - USART Receive Complete
     // Примечание:
 
-    UCSRB = 0x00; // отключаем, пока настраиваем скорость
+    //UCSRB = 0x00; // отключаем, пока настраиваем скорость
 
     // Определение BAUD см. в файле: "Configuration.h"
     UBRRL = ( uint8_t ) ( F_CPU / ( 16UL * BAUD ) - 1UL ); // устанавливаем скорость
