@@ -65,11 +65,11 @@ EnCommand CCommands::operator[] ( char * Text ) {
     // Пустая строка.
     if ( Text[0] == '\0' ) return cmdNone;
 
-    if ( strcmp_P( Text, ( PGM_P ) ( & szcmdHelp ) ) == 0 ) return cmdHelp;
+    if ( strcmp_P( Text, ( PGM_P ) szcmdHelp ) == 0 ) return cmdHelp;
 
-    if ( strcmp_P( Text, ( PGM_P ) ( & szcmdClearScreen ) ) == 0 ) return cmdClearScreen;
+    if ( strcmp_P( Text, ( PGM_P ) szcmdClearScreen ) == 0 ) return cmdClearScreen;
 
-    if ( strcmp_P( Text, ( PGM_P ) ( & szcmdMemoryViewer ) ) == 0 ) return cmdMemoryViewer;
+    if ( strcmp_P( Text, ( PGM_P ) szcmdMemoryViewer ) == 0 ) return cmdMemoryViewer;
 
     return cmdUnknown;
 
@@ -138,9 +138,7 @@ void CCommandShell::FormKeyDown( uint16_t Key ) {
 
         case VK_RETURN: {
 
-            EnCommand command = Commands[ CommandString ];
-
-            switch ( command ) {
+            switch ( Commands[ CommandString ] ) {
 
                 case cmdNone: { Prompt(); break; }
 

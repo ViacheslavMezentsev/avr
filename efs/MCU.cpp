@@ -28,12 +28,6 @@ extern FIFO( 16 ) uart_rx_fifo;
 // -=[ Переменные в ОЗУ ]=-
 
 volatile uint16_t Key = 0;
-
-// The elapsed time is stored as a DWORD value.
-// Therefore, the time will wrap around to zero
-// if the system is run continuously for 49.7 days.
-volatile uint32_t TickCounter = 0;
-
 uint16_t Counter10ms = 0;
 
 // Дескриптор активного окна.
@@ -67,14 +61,14 @@ HRESULT CMCU::MainThreadProcedure(){
 
     do {
 
-        if ( Key != NULL ) {
+        if ( Key != 0 ) {
 
             // Останавливаем счётчик.
             TCCR2 = 0;
 
             FormKeyDown(  Key );
 
-            Key = NULL;
+            Key = 0;
 
             // Восстанавливаем счётчик.
             TCNT2 = 0xFF - F_CPU / 64000UL;

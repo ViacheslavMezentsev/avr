@@ -29,7 +29,7 @@
 
 
 struct{
-    uint8_t entries_cache[0xf0];
+    uint8_t entries_cache[ 0xF0 ];
     uint8_t first_free_entry;
 } efs;
 
@@ -46,12 +46,13 @@ void CEFS::Initialization() {
 	
 	for ( n = 0; n < EFS_TOTAL_ENTRIES; n++ ) {
 
-		efs.entries_cache[n] = eeprom_read_byte( ( uint8_t * ) ( n * 16 ) );
+        _EEGET( efs.entries_cache[n], ( uint8_t * ) ( n * 16 ) );
 
 		if ( efs.first_free_entry == EFS_FULL && efs.entries_cache[n] == EFS_ENTRY_FREE ) efs.first_free_entry = n;
 	}
 	
 }
+
 
 /* - Description: Gets the next free entry on the EFS space
  *
@@ -61,7 +62,7 @@ uint8_t CEFS::GetNextFreeEntry() {
 	
 	uint8_t n;
 	
-	for ( n = efs.first_free_entry; n <EFS_TOTAL_ENTRIES; n++ ) {
+	for ( n = efs.first_free_entry; n < EFS_TOTAL_ENTRIES; n++ ) {
 
 		if ( efs.entries_cache[n] == EFS_ENTRY_FREE ) {
 
@@ -92,23 +93,23 @@ uint8_t CEFS::GetFileInfo( uint8_t number, uint8_t format, efs_file * file ) {
 
 			address = n * 16;
 
-			i = eeprom_read_byte( ( uint8_t * ) ( address + 1 ) );
+			_EEGET( i, ( uint8_t * ) ( address + 1 ) );
 
 			if ( i == format ) {
 
 				if ( counter == number ) {
 
-					//Get file info
+					// Get file info.
 					file->entry = n;
 					file->format = i;
-					file->size = eeprom_read_byte( ( uint8_t * ) ( address + 2 ) );
-					file->first_data_entry = eeprom_read_byte( ( uint8_t * ) ( address + 15 ) );
+					_EEGET( file->size, ( uint8_t * ) ( address + 2 ) );
+					_EEGET( file->first_data_entry, ( uint8_t * ) ( address + 15 ) );
 
 					return 0;
 
 				} else { 
 
-					//Keep counting
+					// Keep counting.
 					counter++;
 				}
 
@@ -134,30 +135,34 @@ uint8_t CEFS::ReadFile( efs_file * file, uint8_t * buffer, uint8_t pointer, uint
 	uint8_t n;
 	uint16_t address;
 	
-	/* Error if file length=0 or pointer is outside the file */
-	if((!file->size) || (pointer>file->size)) return 1;
+	// Error if file length=0 or pointer is outside the file.
+	if ( ( !file->size ) || ( pointer>file->size ) ) return 1;
 	
-	/* Fix requested length if necessary */
-	if((pointer+length) > file->size){
-		length=file->size-pointer;
+	// Fix requested length if necessary.
+	if ( ( pointer + length ) > file->size ) {
+		
+        length = file->size-pointer;
 	}
 	
-	/* Switch to working entry */
-	n=pointer/14;
-	address=file->first_data_entry*16;
-	while(n--){
-		address=eeprom_read_byte((uint8_t*)(address+15))*16;
+	// Switch to working entry.
+	n = pointer / 14;
+	address = file->first_data_entry * 16;
+
+	while ( n-- ) {
+
+		_EEGET( address, ( uint8_t * ) ( address + 15 ) ) * 16;
 	}
 	
-	address+=pointer%14;
+	address += pointer % 14;
 	
-	/* Read data */
+	// Read data.
 	while ( length ) {
 
 		n = ( length < 14 ) ? length : ( 14 -pointer % 14 );
 
-		eeprom_read_block(buffer, (const void*)(address+1), n);
-		address=(eeprom_read_byte((uint8_t*)(address+n+1))*16);
+		_EEGETBLOCK( buffer, address + 1, n );
+		_EEGET( address, ( uint8_t * ) ( address + n + 1 ) );
+        address *= 16;
 
 		buffer += n;
 		length -= n;
@@ -167,6 +172,7 @@ uint8_t CEFS::ReadFile( efs_file * file, uint8_t * buffer, uint8_t pointer, uint
 	
 }
 
+
 /* - Description: Gets the name of a file
  *
  * - Flags: 	*file 	-> File where to take the name
@@ -174,7 +180,7 @@ uint8_t CEFS::ReadFile( efs_file * file, uint8_t * buffer, uint8_t pointer, uint
  */
 void CEFS::GetName( efs_file * file, char * buffer ) {
 	
-	eeprom_read_block( ( void * ) buffer, ( const void * ) ( file->entry * 16 + 3 ), 12 );
+	_EEGETBLOCK( buffer, file->entry * 16 + 3, 12 );
 	
 }
 
@@ -192,14 +198,15 @@ uint8_t CEFS::AddDataEntry( uint8_t current_entry ) {
 
 	if ( n == EFS_FULL) return n;
 	
-	eeprom_write_byte( ( uint8_t * ) ( current_entry * 16 + 15 ), n );
-	eeprom_write_byte( ( uint8_t * ) ( n * 16 ), EFS_ENTRY_DATA );
+	_EEPUT( ( uint8_t * ) ( current_entry * 16 + 15 ), n );
+	_EEPUT( ( uint8_t * ) ( n * 16 ), EFS_ENTRY_DATA );
 
 	efs.entries_cache[n] = EFS_ENTRY_DATA;
 	
 	return n;
 	
 }
+
 
 /* - Description: Writes content to a file
  *
@@ -220,7 +227,7 @@ uint8_t CEFS::WriteFile( efs_file * file, uint8_t * buffer, uint8_t pointer, uin
 
 	while ( n-- ) {
 
-		current_entry = eeprom_read_byte( ( uint8_t * ) ( current_entry * 16 + 15 ) );
+		_EEGET( current_entry, ( uint8_t * ) ( current_entry * 16 + 15 ) );
 	}
 	
 	if ( current_entry == 0 ) {
@@ -235,7 +242,7 @@ uint8_t CEFS::WriteFile( efs_file * file, uint8_t * buffer, uint8_t pointer, uin
 
 		n = ( length < 14 ) ? length : ( 14 - pointer % 14 );
 
-		eeprom_write_block( ( const void * ) buffer, ( void * ) ( current_entry * 16 + ( pointer % 14 ) + 1 ), n );
+		_EEPUTBLOCK( buffer, current_entry * 16 + ( pointer % 14 ) + 1, n );
 
 		buffer += n;
 		pointer += n;
@@ -247,18 +254,18 @@ uint8_t CEFS::WriteFile( efs_file * file, uint8_t * buffer, uint8_t pointer, uin
 
 		} else {
 
-			current_entry = eeprom_read_byte( ( uint8_t * ) ( current_entry * 16 + 15 ) );
+			_EEGET( current_entry, ( uint8_t * ) ( current_entry * 16 + 15 ) );
 		}
 
 	}
 	
 	// Mark last entry.
-	eeprom_write_byte( ( uint8_t * ) ( current_entry * 16 + 15 ), EFS_EOF );
+	_EEPUT( ( uint8_t * ) ( current_entry * 16 + 15 ), EFS_EOF );
 	
 	// Update file size if necessary.
 	if ( pointer > file->size ) {
 
-		eeprom_write_byte( ( uint8_t * ) ( file->entry * 16 + 2 ), pointer );
+		_EEPUT( ( uint8_t * ) ( file->entry * 16 + 2 ), pointer );
 		file->size = pointer;
 	}
 	
@@ -280,11 +287,11 @@ void CEFS::DeleteFile( efs_file * file ) {
 		if ( file->entry < efs.first_free_entry ) efs.first_free_entry = file->entry;
 
 		// Mark entry as free & update cache.
-		eeprom_write_byte( ( uint8_t * ) ( file->entry * 16 ), EFS_ENTRY_FREE );
+		_EEPUT( ( uint8_t * ) ( file->entry * 16 ), EFS_ENTRY_FREE );
 		efs.entries_cache[ file->entry ] = EFS_ENTRY_FREE;
 
 		// Get next entry.
-		file->entry = eeprom_read_byte( ( uint8_t * ) ( file->entry * 16 + 15 ) );
+		_EEGET( file->entry, ( uint8_t * ) ( file->entry * 16 + 15 ) );
 
 	} while ( file->entry != EFS_EOF );
 	
@@ -316,17 +323,17 @@ uint8_t CEFS::CreateFile( efs_file * file, uint8_t format, char * name ) {
 
 	// Store file values.
 	// New file entry.
-	eeprom_write_byte( ( uint8_t * ) address, EFS_ENTRY_FILE );
+	_EEPUT( ( uint8_t * ) address, EFS_ENTRY_FILE );
 
 	// File format.
-	eeprom_write_byte( ( uint8_t * ) ( address + 1 ), format );
+	_EEPUT( ( uint8_t * ) ( address + 1 ), format );
 
 	// File length & first entry = 0.
-	eeprom_write_byte( ( uint8_t * ) ( address + 2 ), 0 );
-	eeprom_write_byte( ( uint8_t * ) ( address + 15 ), 0 );
+	_EEPUT( ( uint8_t * ) ( address + 2 ), 0 );
+	_EEPUT( ( uint8_t * ) ( address + 15 ), 0 );
 
 	// File name
-	eeprom_write_block( ( const void * ) name, ( void * ) ( address + 3 ), strlen( name ) + 1 );
+	_EEPUTBLOCK( name, address + 3, strlen( name ) + 1 );
 	
 	// Update cache.
 	efs.entries_cache[ file->entry ] = EFS_ENTRY_FILE;

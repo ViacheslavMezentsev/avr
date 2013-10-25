@@ -71,6 +71,20 @@
 
 Команды для сборки проекта (для VS2008):
 
+Для MHV AVR Tools 20131017 (binutils скопировать из WinAVR):
+
+build: C:\MHVAVRTools\utils\bin\make.exe build
+clean: C:\MHVAVRTools\utils\bin\make.exe clean
+build all: C:\MHVAVRTools\utils\bin\make.exe build all
+
+Для того, чтобы можно было в VS2008 (или аналогичных) автоматически прыгать на
+строку с ошибкой, нужно пропустить вывод через потоковый фильтр (sed). Эта операция
+корректирует вывод gcc компилятора, чтобы VS2008 могла его понять:
+
+build: C:\MHVAVRTools\utils\bin\make.exe build 2>&1 | C:\MHVAVRTools\utils\bin\sed.exe -e 's/\(\w\+\):\([0-9]\+\):/\1(\2):/'
+clean: C:\MHVAVRTools\utils\bin\make.exe clean
+build all: C:\MHVAVRTools\utils\bin\make.exe build all 2>&1 | C:\MHVAVRTools\utils\bin\sed.exe -e 's/\(\w\+\):\([0-9]\+\):/\1(\2):/'
+
 Для WinAVR-20100110 (последняя версия WinAVR уже в виде отдельного набора утилит
 в составе Atmel Studio):
 
@@ -97,6 +111,9 @@ Debug: __GNUC__;__AVR_ATmega16__;__DEBUG__
 Release: __GNUC__;__AVR_ATmega16__
 
 Дополнительные пути поиска:
+
+Для MHV AVR Tools 20131017 (binutils скопировать из WinAVR):
+"C:\MHVAVRTools\avr\include";"C:\MHVAVRTools\avr\include\util";"C:\MHVAVRTools\avr\include\compat";"C:\MHVAVRTools\avr\include\avr"
 
 Для WinAVR-20100110 (последняя версия в виде отдельного набора утилит):
 "C:\WinAVR-20100110\avr\include";"C:\WinAVR-20100110\avr\include\util";"C:\WinAVR-20100110\avr\include\compat";"C:\WinAVR-20100110\avr\include\avr"
