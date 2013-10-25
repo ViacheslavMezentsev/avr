@@ -108,13 +108,13 @@ public:
     inline const T operator *() const {
         
         union {
-                T value;
+                T value = 0;
                 uint8_t bytes[ sizeof(T) ];
         } data;
 
         for ( unsigned i = 0; i < sizeof(T); ++i ) {
          
-            data.bytes[i] = Accessor::Read( ( const uint8_t* const )( _address) + i );
+            data.bytes[i] = Accessor::Read( ( const uint8_t * const )( _address ) + i );
 
         }
 
@@ -122,15 +122,14 @@ public:
 
     }
 
+    explicit operator const T * () const {
+        
+        return _address;
+    }
+
     inline const T operator []( int value ) {
             
         return * Self( _address + value );
-
-    }
-
-    inline T * operator & () {
-
-        return ( T * ) _address;
 
     }
 
@@ -147,7 +146,7 @@ class FlashPtr: public BasePtr<T, FlashPtr<T> > {
 
         FlashPtr( T *address ): BasePtr< T, FlashPtr<T> >( address ) {}
 
-        static uint8_t Read( const uint8_t *addr ) {
+        static uint8_t Read( const uint8_t * const addr ) {
 
                 return pgm_read_byte( addr );
 
@@ -162,7 +161,7 @@ class EepromPtr: public BasePtr< T, EepromPtr<T> > {
 
         EepromPtr( T *address ): BasePtr< T, EepromPtr<T> >( address ) {}
 
-        static uint8_t Read( const uint8_t *addr ) {
+        static uint8_t Read( const uint8_t * const addr ) {
 
                 return eeprom_read_byte( addr );
 

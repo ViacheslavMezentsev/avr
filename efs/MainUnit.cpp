@@ -27,10 +27,10 @@
 #include "CommandShell.h"
 
 
-// Точка входа в основную программу
+// Точка входа в основную программу.
 int main() {
 
-    // Инициализация микроконтроллера
+    // Инициализация микроконтроллера.
     CMCU::Initialization();
     
     // Инициализация драйвера EFS.
@@ -41,7 +41,7 @@ int main() {
 
     CCommandShell::FormActivate();
 
-    // Запуск основного потока
+    // Запуск основного потока.
     HRESULT hResult = CMCU::MainThreadProcedure();
 
     return 0;

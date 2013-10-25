@@ -14,7 +14,7 @@
 
 #elif defined( __ICCAVR__ )
 
-    #define F_CPU 4000000UL
+    #define F_CPU 8000000UL
 
 #endif
 

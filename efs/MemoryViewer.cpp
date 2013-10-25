@@ -88,7 +88,7 @@ void CMemoryViewer::DrawMemory() {
 
         uint16_t addr = i * 16U + _offset;
 
-        ECHAR_PTR mptr( ( char * ) addr );
+        EEPROM_DECLARE( char, mptr, addr );
 
         CConsole::MoveTo( 1, i + 2 );
 
@@ -99,7 +99,7 @@ void CMemoryViewer::DrawMemory() {
         do {
 
             j--;
-            CConsole::PutChar( hexchars[ ( ( ( uint16_t ) & mptr ) >> ( j * 4 ) ) & 0xF ] );
+            CConsole::PutChar( hexchars[ ( ( uint16_t ) ( ( const char * ) mptr ) >> ( j * 4 ) ) & 0xF ] );
 
         } while ( j > 0 );
 
@@ -110,7 +110,7 @@ void CMemoryViewer::DrawMemory() {
         for ( j = 0; j < 16; j++ ) {
 
             // Адрес текущего элемента.
-            addr = ( uint16_t ) & mptr;
+            addr = ( uint16_t ) ( const char * ) mptr;
 
             if ( addr > E2END ) {
 
@@ -140,12 +140,12 @@ void CMemoryViewer::DrawMemory() {
 
         addr = i * 16U + _offset;
 
-        ECHAR_PTR eepch( ( char * ) addr );
+        EEPROM_DECLARE( char, eepch, addr );
 
         for ( j = 0; j < 16; j++ ) {
 
             // Адрес текущего элемента.
-            addr = ( uint16_t ) & eepch;
+            addr = ( uint16_t ) ( const char * ) eepch;
 
             if ( addr > E2END ) {
 
@@ -270,7 +270,7 @@ void CMemoryViewer::FormKeyDown( uint16_t Key ) {
                 // Очищаем EEPROM до смешения 240.
                 case '0': {
                 
-                    for ( uint16_t n = 0; n < 240; n++ ) eeprom_write_byte( ( uint8_t * ) n, 0 );
+                    for ( uint16_t n = 0; n < 240; n++ ) _EEPUT( n, 0 );
 
                     DrawMemory();
                     break;
@@ -279,10 +279,15 @@ void CMemoryViewer::FormKeyDown( uint16_t Key ) {
                 // Создать файл.
                 case '1': {
 
-                    CEFS::CreateFile( & afile, 0xCF, "Настройки" );
+                    strcpy_P( CommandString, ( PGM_P ) SPSTR( "Настройки" ) );
 
-                    CEFS::WriteFile( & afile, ( uint8_t * ) "-123456-", 0, 8 );
+                    CEFS::CreateFile( & afile, 0xCF, CommandString );
 
+                    strcpy_P( CommandString, ( PGM_P ) SPSTR( "-123456-" ) );
+
+                    CEFS::WriteFile( & afile, ( uint8_t * ) CommandString, 0, 8 );
+
+                    CommandString[0] = '\0';
                     DrawMemory();
                     break;
                 }

@@ -2032,6 +2032,9 @@
   <file>
     <name>$PROJ_DIR$\..\MCU.cpp</name>
   </file>
+  <file>
+    <name>$PROJ_DIR$\..\MemoryViewer.cpp</name>
+  </file>
 </project>
 
 
