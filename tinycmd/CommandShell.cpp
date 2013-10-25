@@ -60,11 +60,11 @@ EnCommand CCommands::operator[] ( char * Text ) {
     trim( Text );
 
     // Пустая строка.
-    if ( strlen( Text ) == 0 ) return cmdNone;
+    if ( Text[0] == '\0' ) return cmdNone;
 
-    if ( strcmp_P( Text, ( PGM_P ) ( & szHelp ) ) == 0 ) return cmdHelp;
+    if ( strcmp_P( Text, ( PGM_P ) szHelp ) == 0 ) return cmdHelp;
 
-    if ( strcmp_P( Text, ( PGM_P ) ( & szClearScreen ) ) == 0 ) return cmdClearScreen;
+    if ( strcmp_P( Text, ( PGM_P ) szClearScreen ) == 0 ) return cmdClearScreen;
 
     return cmdUnknown;
 
@@ -74,7 +74,7 @@ EnCommand CCommands::operator[] ( char * Text ) {
 void CCommandShell::Initialization() {
 
     // Очищаем командную строку.
-    CommandString[0] = 0;
+    CommandString[0] = '\0';
 
 }
 
@@ -122,24 +122,15 @@ void CCommandShell::FormActivate() {
 
 void CCommandShell::FormKeyDown( uint16_t Key ) {
 
-    uint8_t tmp = 0;
+    uint8_t tmp;
 
     switch ( Key ) {
 
         case VK_RETURN: {
 
-            EnCommand command = Commands[ CommandString ];
+            switch ( Commands[ CommandString ] ) {
 
-            switch ( command ) {
-
-                case cmdNone: { Prompt(); break; }
-
-                case cmdClearScreen: {
-
-                    Info();
-                    Prompt();
-                    break;
-                }
+                case cmdClearScreen: Info(); break;
 
                 case cmdHelp: {
 
@@ -147,29 +138,22 @@ void CCommandShell::FormKeyDown( uint16_t Key ) {
                     CConsole::SetForegroundColor( clLightRed );
                     CConsole::WriteString( szHelp );
                     CConsole::WriteString( szNewLine );
-                    CConsole::WriteString( szClearScreen );
-
-                    Prompt();
                     break;
                 }
 
-                // Выводим сообщение о неподдерживаемой команде.
-                case cmdUnknown: {
+                default:;
 
-                    Prompt();
-                    break;
-                }
+            }
 
-            } // switch
-
-            CommandString[0] = 0;
+            CommandString[0] = '\0';
+            Prompt();            
             break;
 
         }
 
         case VK_BACK: {
 
-            tmp = strlen( CommandString );
+	        tmp = strlen( CommandString );
 
             // Удаляем предыдущий символ, если буфер командной строки не пуст.
             if ( tmp > 0 ) {
@@ -177,7 +161,7 @@ void CCommandShell::FormKeyDown( uint16_t Key ) {
                 CConsole::PutChar( VK_BACK );
                 CConsole::ClearForward(1);
 
-                CommandString[ --tmp ] = 0;
+                CommandString[ --tmp ] = '\0';
 
             }
 
@@ -195,11 +179,10 @@ void CCommandShell::FormKeyDown( uint16_t Key ) {
             CConsole::PutChar( ( uint8_t ) Key );
 
             CommandString[ tmp++ ] = ( uint8_t ) Key;
-            CommandString[ tmp ] = 0;
+            CommandString[ tmp ] = '\0';
 
         }
 
     } // switch
 
 }
-

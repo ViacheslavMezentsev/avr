@@ -32,36 +32,35 @@
     // Ќабор шаблонов дл€ "типизации" указателей в AVR GCC
     #include "SmartPtr.h"
 
-    #define nop() asm volatile ("nop")
-    #define sleep() asm volatile ("sleep")
-
+    #define nop() _NOP()
+    #define sleep() _SLEEP()
     #define __disable_interrupt() cli()
     #define __enable_interrupt() sei()
     #define __save_interrupt() SREG
     #define __restore_interrupt(x) SREG = x
     #define __delay_cycles(x) _delay_loop_2(x)
 
-    #define FLASH_DECLARE(x) PROGMEM x
+    #define FLASH_DECLARE(x) const PROGMEM x
 
-    #define FCHAR_PTR FlashPtr< char >
-    #define FUCHAR_PTR FlashPtr< unsigned char >
+    #define FCHAR_PTR FlashPtr< const char >
+    #define FUCHAR_PTR FlashPtr< const unsigned char >
 
-    #define FU08T_PTR FlashPtr< uint8_t >
-    #define FS08T_PTR FlashPtr< int8_t >
+    #define FU08T_PTR FlashPtr< const uint8_t >
+    #define FS08T_PTR FlashPtr< const int8_t >
 
-    #define FU16T_PTR FlashPtr< uint16_t >
-    #define FS16T_PTR FlashPtr< int16_t >
+    #define FU16T_PTR FlashPtr< const uint16_t >
+    #define FS16T_PTR FlashPtr< const int16_t >
 
-    #define FU32T_PTR FlashPtr< uint32_t >
-    #define FS32T_PTR FlashPtr< int32_t >
+    #define FU32T_PTR FlashPtr< const uint32_t >
+    #define FS32T_PTR FlashPtr< const int32_t >
 
     #define FLASHSTR_DECLARE(type,name,init) \
-        static PROGMEM type _##name[] = init; \
-        FlashPtr<type> name(_##name);
+        const type _##name[] PROGMEM = init; \
+        FlashPtr< const type > name(_##name);
 
     #define SPSTR(s) (__extension__({ \
-        static char __c[] PROGMEM = (s); \
-        FlashPtr<char> _c(__c); _c; }))
+        static const char __c[] PROGMEM = (s); \
+        FlashPtr< const char > _c(__c); _c; }))
 
 #elif defined( __ICCAVR__ )
 
