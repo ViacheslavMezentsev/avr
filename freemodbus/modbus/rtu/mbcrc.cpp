@@ -34,7 +34,7 @@
 #ifdef __ICCAVR__
     __flash uint8_t aucCRCHi[] = {
 #elif defined __GNUC__
-    PROGMEM uint8_t _aucCRCHi[] = {
+    const PROGMEM uint8_t _aucCRCHi[] = {
 #endif
 
     0x00, 0xC1, 0x81, 0x40, 0x01, 0xC0, 0x80, 0x41, 0x01, 0xC0, 0x80, 0x41,
@@ -67,7 +67,7 @@
 #ifdef __ICCAVR__
     __flash uint8_t aucCRCLo[] = {
 #elif defined __GNUC__
-    PROGMEM uint8_t _aucCRCLo[] = {
+    const PROGMEM uint8_t _aucCRCLo[] = {
 #endif
 
     0x00, 0xC0, 0xC1, 0x01, 0xC3, 0x03, 0x02, 0xC2, 0xC6, 0x06, 0x07, 0xC7,
