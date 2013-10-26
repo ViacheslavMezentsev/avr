@@ -25,6 +25,7 @@
     #include <compat/deprecated.h>
 
     #include <avr/pgmspace.h>
+    #include <avr/eeprom.h>
     #include <avr/interrupt.h>
     #include <avr/io.h>
     #include <avr/iotn2313.h>
@@ -32,8 +33,8 @@
     // Набор шаблонов для "типизации" указателей в AVR GCC
     #include "SmartPtr.h"
 
-    #define nop() asm volatile ("nop")
-    #define sleep() asm volatile ("sleep")
+    #define nop() _NOP()
+    #define sleep() _SLEEP()
 
     #define __disable_interrupt() cli()
     #define __enable_interrupt() sei()
@@ -41,27 +42,34 @@
     #define __restore_interrupt(x) SREG = x
     #define __delay_cycles(x) _delay_loop_2(x)
 
-    #define FLASH_DECLARE(x) PROGMEM x
+    #define FLASH_DECLARE(x) const PROGMEM x
 
-    #define FCHAR_PTR FlashPtr< char >
-    #define FUCHAR_PTR FlashPtr< unsigned char >
+    #define FCHAR_PTR FlashPtr< const char >
+    #define FUCHAR_PTR FlashPtr< const unsigned char >
 
-    #define FU08T_PTR FlashPtr< uint8_t >
-    #define FS08T_PTR FlashPtr< int8_t >
+    #define FU08T_PTR FlashPtr< const uint8_t >
+    #define FS08T_PTR FlashPtr< const int8_t >
 
-    #define FU16T_PTR FlashPtr< uint16_t >
-    #define FS16T_PTR FlashPtr< int16_t >
+    #define FU16T_PTR FlashPtr< const uint16_t >
+    #define FS16T_PTR FlashPtr< const int16_t >
 
-    #define FU32T_PTR FlashPtr< uint32_t >
-    #define FS32T_PTR FlashPtr< int32_t >
+    #define FU32T_PTR FlashPtr< const uint32_t >
+    #define FS32T_PTR FlashPtr< const int32_t >
 
     #define FLASHSTR_DECLARE(type,name,init) \
-        static PROGMEM type _##name[] = init; \
-        FlashPtr<type> name(_##name);
+        const type _##name[] PROGMEM = init; \
+        FlashPtr< const type > name(_##name);
 
     #define SPSTR(s) (__extension__({ \
-        static char __c[] PROGMEM = (s); \
-        FlashPtr<char> _c(__c); _c; }))
+        static const char __c[] PROGMEM = (s); \
+        FlashPtr< const char > _c(__c); _c; }))
+
+    #define ECHAR_PTR EepromPtr< const char >
+
+    #define EEPROM_DECLARE(type,var,addr) EepromPtr< const type > var(( const type * )(addr));
+
+    #define _EEGETBLOCK(dst,src,n) eeprom_read_block(( void * )(dst),( const void * )(src),(n))
+    #define _EEPUTBLOCK(src,dst,n) eeprom_write_block(( const void * )(src), ( void * )(dst),(n))
 
 #elif defined( __ICCAVR__ )
 
@@ -152,6 +160,23 @@
 
     #define SPSTR(s) ( FCHAR_PTR )(s)
 
+    #define EEPROM_DECLARE(type,name,addr) type __eeprom * name = ( type __eeprom * ) (addr);
+
+    #define eeprom_read_block(dst,src,cnt)\
+    { \
+        for(uint16_t i=0;i<(cnt);i++)\
+        * ( ( unsigned char * ) ( (dst) + i ) ) = *((unsigned char __eeprom *)((src) + i));\
+    }
+
+    #define eeprom_write_block(src,dst,cnt)\
+    { \
+        for(uint16_t i=0;i<(cnt);i++)\
+        * ( ( unsigned char __eeprom * ) ( (dst) + i ) ) = *((unsigned char *)((src) + i));\
+    }
+
+    #define _EEGETBLOCK(dst,src,n) eeprom_read_block((dst),(src),(n))
+    #define _EEPUTBLOCK(src,dst,n) eeprom_write_block((src),(dst),(n))
+
 #endif
 
 /***********************************************************************
@@ -171,6 +196,7 @@
 // Описание типов, аналогичных в Windows
 #include "windows.h"
 
+// Работа с кольцевым буфером.
 #include "fifo.h"
 
 #define TOGGLE(x,y) ((x) ^= (1<<(y)))

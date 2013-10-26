@@ -353,7 +353,7 @@ void CMCU::PortsInit(){
     // Port D Data Direction Register
     // [ Регистр направления порта D ][ATtiny2313]
     //          00000000 - Initial Value
-    DDRD = BIN8(00000010); // BIN8() не зависит от уровня оптимизации
+    //DDRD = BIN8(00000000); // BIN8() не зависит от уровня оптимизации
     //          ||||||||
     //          76543210
     //          |||||||+- 0, rw, DDD0: (RXD)            - RXD
@@ -370,7 +370,7 @@ void CMCU::PortsInit(){
     // Port D Data Register
     // [ Регистр данных порта D ][ATtiny2313]
     //           00000000 - Initial Value
-    PORTD = BIN8(00000001); // BIN8() не зависит от уровня оптимизации
+    //PORTD = BIN8(00000000); // BIN8() не зависит от уровня оптимизации
     //           ||||||||
     //           76543210
     //           |||||||+- 0, rw, PORTD0: (RXD)            - RXD
@@ -1059,7 +1059,8 @@ void CMCU::OnAnalogComparator(){
 
                 // Сохраняем значение счётчика таймера 1 для текущей точки.
                 // Внимание. Порядок считывания байт регистра счётчика важен.
-                PointValues[ SamplePoint++ ] = TCNT1L + ( TCNT1H << 8 );
+                PointValues[ SamplePoint ] = TCNT1L;
+                PointValues[ SamplePoint++ ] = TCNT1H << 8;
 
                 // Запускаем таймер/счётчик 1.
                 TCCR1B |= ( 1 << CS11 );
@@ -1070,12 +1071,14 @@ void CMCU::OnAnalogComparator(){
             } else if ( SamplePoint == 1 ) {
 
                 // Сохраняем значение счётчика таймера 1 для текущей точки.
-                PointValues[ SamplePoint++ ] = TCNT1L + ( TCNT1H << 8 );
+                PointValues[ SamplePoint ] = TCNT1L;
+                PointValues[ SamplePoint++ ] = TCNT1H << 8;
 
             } else if ( SamplePoint == 2 ) {
 
                 // Сохраняем значение счётчика таймера 1 для текущей точки.
-                PointValues[ SamplePoint ] = TCNT1L + ( TCNT1H << 8 );
+                PointValues[ SamplePoint ] = TCNT1L;
+                PointValues[ SamplePoint ] = TCNT1H << 8;
 
                 SamplePoint = 0;
 
@@ -1083,7 +1086,7 @@ void CMCU::OnAnalogComparator(){
                 uint16_t temp = PointValues[0];
 
                 HalfPeriod = ( PointValues[2] - temp ) / 2U;
-                
+
                 // Время, оставшееся до ближайшего пересечения нуля.
                 temp = ( HalfPeriod +  ( PointValues[1] - temp ) ) / 2U;
 
