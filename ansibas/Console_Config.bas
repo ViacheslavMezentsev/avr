@@ -5,6 +5,22 @@ $nocompile
 Const MAX_X = 80
 Const MAX_Y = 25
 
+Const cp866 = 0
+Const cp1251 = 1
+
+Const ACS_ULCORNER = &HDA '/* upper left corner */
+Const ACS_LLCORNER = &HC0 '/* lower left corner */
+Const ACS_URCORNER = &HBF '/* upper right corner */
+Const ACS_LRCORNER = &HD9 '/* lower right corner */
+Const ACS_HLINE   = &HC4 '/* horizontal line */
+Const ACS_VLINE   = &HB3 '/* vertical line */
+
+Const ACS_DBL_ULCORNER = &HC9 '/* upper left corner */
+Const ACS_DBL_LLCORNER = &HC8 '/* lower left corner */
+Const ACS_DBL_URCORNER = &HBB '/* upper right corner */
+Const ACS_DBL_LRCORNER = &HBC '/* lower right corner */
+Const ACS_DBL_HLINE  = &HCD '/* horizontal line */
+Const ACS_DBL_VLINE  = &HBA '/* vertical line */
 
 Const atOff               = 0    '// Reset all attributes
 Const atIntensityBold     = 1
@@ -45,6 +61,27 @@ Const clLightCyan = 14
 Const clLightGray = 15
 
 
+' Cursor Up: Moves the cursor up by the specified number of lines without
+' changing columns. If the cursor is already on the top line, ANSI.SYS
+' ignores this sequence.
+Const mdUp = 0
+
+' Cursor Down: Moves the cursor down by the specified number of lines
+' without changing columns. If the cursor is already on the bottom line,
+' ANSI.SYS ignores this sequence.
+Const mdDown = 1
+
+' Cursor Forward: Moves the cursor forward by the specified number of
+' columns without changing lines. If the cursor is already in the
+' rightmost column, ANSI.SYS ignores this sequence.
+Const mdForward = 2
+
+' Cursor Backward: Moves the cursor back by the specified number of
+' columns without changing lines. If the cursor is already in the leftmost
+' column, ANSI.SYS ignores this sequence.
+Const mdBackward = 3
+
+
 Const cmFromCursorToEnd = 0
 Const cmFromBeginToCursor = 1
 Const cmAll = 2
@@ -52,18 +89,22 @@ Const cmAll = 2
 
 ' Функции для работы с ANSI терминалом.
 
-Declare Sub Console_PutChar( ByVal Ch As Byte )
-Declare Sub Console_WriteString( Text As String )
-Declare Sub Console_Beep( ByVal Frequency As Word, ByVal Duration As Byte  )
-Declare Sub Console_ClearScreen( ByVal Value As Byte )
-Declare Sub Console_ClearLine( ByVal Value As Byte )
-Declare Sub Console_ClearForward( ByVal Count As Byte )
+Declare Sub Console_PutChar( ByVal AChar As Byte, ByVal ACodePage As Byte )
+Declare Sub Console_WriteString( AText As String, ByVal ACodePage As Byte )
+Declare Sub Console_Beep( ByVal AFrequency As Word, ByVal ADuration As Byte  )
+Declare Sub Console_ClearScreen( ByVal AMode As Byte )
+Declare Sub Console_ClearLine( ByVal AMode As Byte )
+Declare Sub Console_ClearForward( ByVal ACount As Byte )
 Declare Sub Console_CursorOn
 Declare Sub Console_CursorOff
 Declare Sub Console_SaveCursor
 Declare Sub Console_RestoreCursor
-Declare Sub Console_SetForegroundColor( ByVal Color As Byte )
-Declare Sub Console_SetBackgroundColor( ByVal Color As Byte )
+Declare Sub Console_SetForegroundColor( ByVal AColor As Byte )
+Declare Sub Console_SetBackgroundColor( ByVal AColor As Byte )
 Declare Sub Console_SetTextAttributes( ByVal Attributes As Byte )
 Declare Sub Console_SetColor( ByVal AForegroundColor As Byte, ByVal ABackgroundColor As Byte )
 Declare Sub Console_MoveTo( ByVal ALeft As Byte, ByVal ATop As Byte )
+Declare Sub Console_Move( ByVal ADirection As Byte, ByVal ADelta As Byte )
+Declare Sub Console_DrawFrame( ByVal ALeft As Byte, ByVal ATop As Byte, _
+    ByVal AWidth As Byte, ByVal AHeight As Byte, ByVal AColor As Byte, _
+    ByVal ABgColor As Byte, ACaption As String )
