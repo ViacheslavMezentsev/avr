@@ -7,7 +7,6 @@
 
 #include "Defines.h"
 #include "Configuration.h"
-#include "kbd.h"
 #include "Console.h"
 
 
@@ -18,7 +17,7 @@
 #ifdef __ICCAVR__
     __flash uint8_t CP1251_TO_CP866[ 128 ] = {
 #elif defined __GNUC__
-    PROGMEM uint8_t _CP1251_TO_CP866[ 128 ] = {
+    const uint8_t _CP1251_TO_CP866[ 128 ] PROGMEM = {
 #endif
 //PROGMEM unsigned char CP1251_TO_CP866[ 128 ] = {
 /*         .0   .1   .2   .3   .4   .5   .6   .7   .8   .9   .A   .B   .C   .D   .E   .F   */
@@ -40,7 +39,9 @@ FLASHSTR_DECLARE( char, ESC, "\033[" );
 
 // -=[ Переменные в ОЗУ ]=-
 
-FIFO( 16 ) uart_rx_fifo;
+PR_BEGIN_EXTERN_C
+    FIFO( 16 ) uart_rx_fifo;
+PR_END_EXTERN_C
 
 
 /***********************
@@ -52,20 +53,18 @@ FIFO( 16 ) uart_rx_fifo;
 uint8_t CConsole::GetChar() {
 
     uint8_t ret = 0;
-
-    // запрещаем прерывания
+    
     __disable_interrupt();
 
     if ( !FIFO_IS_EMPTY( uart_rx_fifo ) ) {
 
-        // если в буфере есть данные, то извлекаем их
+        // Если в буфере есть данные, то извлекаем их.
         ret = FIFO_FRONT( uart_rx_fifo );
 
         FIFO_POP( uart_rx_fifo );
 
     }
-
-    // разрешаем прерывания
+    
     __enable_interrupt();
 
     return ret;
@@ -75,10 +74,10 @@ uint8_t CConsole::GetChar() {
 
 void CConsole::PutChar( uint8_t ch, EnCodePage CodePage ) {
 
-    // ждем окончания передачи предыдущего байта
+    // Ждём окончания передачи предыдущего байта.
     while ( !( UCSRA & ( 1 << UDRE ) ) );
 
-	// send character
+	// Выводим символ.
     switch ( CodePage ) {
 
         case cp866: {
@@ -95,7 +94,7 @@ void CConsole::PutChar( uint8_t ch, EnCodePage CodePage ) {
 
     }
 
-    // wait for char to be send
+    // Ожидаем окончания передачи.
     while ( !( UCSRA & ( 1 << TXC ) ) );
 
 	UCSRA &= ~( ( 1 << TXC ) || ( 1 << UDRE ) );
@@ -130,6 +129,33 @@ void CConsole::WriteString( const char * s, EnCodePage CodePage, uint8_t Length 
 
     }
 
+}
+
+
+/**
+ * Вывод звука.
+ */
+void CConsole::Beep( uint16_t Frequency, uint8_t Duration  ) {
+
+    // Настройка параметров (если используется).
+    WriteString( ESC );
+
+    PutChar( ( Frequency / 100 ) + '0' );
+
+    Frequency %= 100;
+
+    PutChar( ( Frequency / 10 ) + '0' );
+    PutChar( ( Frequency % 10 ) + '0' );
+
+    PutChar( ';' );
+
+    PutChar( ( Duration / 10 ) + '0' );
+    PutChar( ( Duration % 10 ) + '0' );
+
+    PutChar( 'B' );
+
+    // Вывод звука (BELL).
+    PutChar( '\a' );
 }
 
 
@@ -192,6 +218,8 @@ void CConsole::ClearLine( EnClearMode Mode ) {
  */
 void CConsole::ClearForward( uint8_t Count ) {
 
+    if ( Count == 0 ) return;
+
     WriteString( ESC );
     PutChar( ( Count / 10 ) + '0' );
     PutChar( ( Count % 10 ) + '0' );
@@ -201,7 +229,7 @@ void CConsole::ClearForward( uint8_t Count ) {
 
 
 /**
- * Спрятать курсор.
+ * Показать курсор.
  */
 void CConsole::CursorOn() {
 
@@ -211,7 +239,7 @@ void CConsole::CursorOn() {
 
 
 /**
- * Показать курсор.
+ * Спрятать курсор.
  */
 void CConsole::CursorOff() {
 
@@ -241,22 +269,13 @@ void CConsole::RestoreCursor() {
 
 
 /**
- *
+ * Установка параметров текста.
  */
 void CConsole::SetForegroundColor( EnColor Color ) {
 
-    if ( Color & 0x8 ) {
-
-        WriteString( ESC );
-        PutChar( '1' );
-        PutChar( 'm' );
-
-    } else {
-
-        WriteString( ESC );
-        PutChar( '2' );
-        PutChar( 'm' );
-    }
+    WriteString( ESC );
+    ( Color & 0x8 ) ? PutChar( '1' ) : PutChar( '2' ); 
+    PutChar( 'm' );
 
     WriteString( ESC );
     PutChar( '3' );
@@ -267,22 +286,13 @@ void CConsole::SetForegroundColor( EnColor Color ) {
 
 
 /**
- *
+ * Установка параметров фона.
  */
 void CConsole::SetBackgroundColor( EnColor Color ) {
 
-    if ( Color & 0x8 ) {
-
-        WriteString( ESC );
-        PutChar( '5' );
-        PutChar( 'm' );
-
-    } else {
-
-        WriteString( ESC );
-        PutChar( '6' );
-        PutChar( 'm' );
-    }
+    WriteString( ESC );
+    ( Color & 0x8 ) ? PutChar( '5' ) : PutChar( '6' ); 
+    PutChar( 'm' );
 
     WriteString( ESC );
     PutChar( '4' );
@@ -293,7 +303,7 @@ void CConsole::SetBackgroundColor( EnColor Color ) {
 
 
 /**
- *
+ * Установка параметров текста и фона.
  */
 void CConsole::SetColor( EnColor ForegroundColor, EnColor BackgroundColor ) {
 
@@ -337,7 +347,7 @@ void CConsole::MoveTo( uint8_t Left, uint8_t Top ) {
 
 
 /**
- *
+ * Относительное перемещение курсора по направлению.
  */
 void CConsole::Move( EnMoveDirection Direction, uint8_t Delta ) {
 
@@ -368,7 +378,7 @@ void CConsole::Move( EnMoveDirection Direction, uint8_t Delta ) {
 
 
 /**
- * Отрисовка окна с рамкой
+ * Вывод окна с рамкой и заголовком.
  */
 void CConsole::DrawFrame( uint8_t Left, uint8_t Top, uint8_t Width, uint8_t Height,
         EnColor Color, EnColor bgColor, char * Caption ) {
@@ -376,37 +386,31 @@ void CConsole::DrawFrame( uint8_t Left, uint8_t Top, uint8_t Width, uint8_t Heig
     SetColor( Color, bgColor );
     MoveTo( Left, Top );
 
-    // Отображаем путь в заголовке панели.
-    uint8_t len = Width - strlen( Caption );
-
-    len /= 2;
-
     PutChar( ACS_DBL_ULCORNER );
 
-    for ( uint8_t i = 0; i < len; i++ ) PutChar( ACS_DBL_HLINE );
+    // Верхняя граница.
+    if ( Caption != NULL ) {
 
-    Move( mdForward, Width - ( len << 1 ) );
+        uint8_t len = Width - strlen( Caption );
 
-    for ( uint8_t i = 0; i < len; i++ ) PutChar( ACS_DBL_HLINE );
+        len /= 2;
+
+        for ( uint8_t i = 0; i < len; i++ ) PutChar( ACS_DBL_HLINE );
+
+        PutChar( ' ' );
+
+        WriteString( Caption );
+
+        PutChar( ' ' );
+
+    } else {
+
+        PutChar( ACS_DBL_URCORNER );
+    }
 
     PutChar( ACS_DBL_URCORNER );
 
-    MoveTo( Left, Top + Height + 1 );
-
-    PutChar( ACS_DBL_LLCORNER );
-
-    for ( uint8_t i = 0; i < Width; i++ ) PutChar( ACS_DBL_HLINE );
-
-    PutChar( ACS_DBL_LRCORNER );
-
-    MoveTo( Left + len, Top );
-
-    PutChar( ' ' );
-
-    WriteString( Caption );
-
-    PutChar( ' ' );
-
+    // Вертикальные границы.
     for ( uint8_t i = 0; i < Height; i++ ) {
 
         MoveTo( Left, Top + i + 1 );
@@ -417,5 +421,14 @@ void CConsole::DrawFrame( uint8_t Left, uint8_t Top, uint8_t Width, uint8_t Heig
         PutChar( ACS_DBL_VLINE );
 
     }
+
+    // Нижняя граница.
+    MoveTo( Left, Top + Height + 1 );
+
+    PutChar( ACS_DBL_LLCORNER );
+
+    for ( uint8_t i = 0; i < Width; i++ ) PutChar( ACS_DBL_HLINE );
+
+    PutChar( ACS_DBL_LRCORNER );
 
 }
