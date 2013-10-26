@@ -25,17 +25,16 @@
     #include <compat/deprecated.h>
 
     #include <avr/pgmspace.h>
+    #include <avr/eeprom.h>
     #include <avr/interrupt.h>
     #include <avr/io.h>
     #include <avr/iom16.h>
 
     // Набор шаблонов для "типизации" указателей в AVR GCC
-    #ifdef __cplusplus
-        #include "SmartPtr.h"
-    #endif
+    #include "SmartPtr.h"
 
-    #define nop() asm volatile ("nop")
-    #define sleep() asm volatile ("sleep")
+    #define nop() _NOP()
+    #define sleep() _SLEEP()
 
     #define __disable_interrupt() cli()
     #define __enable_interrupt() sei()
@@ -43,58 +42,34 @@
     #define __restore_interrupt(x) SREG = x
     #define __delay_cycles(x) _delay_loop_2(x)
 
-    // Определения для работы с FLASH
-    #define FLASH_DECLARE(x) PROGMEM x
+    #define FLASH_DECLARE(x) const PROGMEM x
 
-    #define FCHAR_PTR FlashPtr< char >
-    #define FUCHAR_PTR FlashPtr< unsigned char >
+    #define FCHAR_PTR FlashPtr< const char >
+    #define FUCHAR_PTR FlashPtr< const unsigned char >
 
-    #define FU08T_PTR FlashPtr< uint8_t >
-    #define FS08T_PTR FlashPtr< int8_t >
+    #define FU08T_PTR FlashPtr< const uint8_t >
+    #define FS08T_PTR FlashPtr< const int8_t >
 
-    #define FU16T_PTR FlashPtr< uint16_t >
-    #define FS16T_PTR FlashPtr< int16_t >
+    #define FU16T_PTR FlashPtr< const uint16_t >
+    #define FS16T_PTR FlashPtr< const int16_t >
 
-    #define FU32T_PTR FlashPtr< uint32_t >
-    #define FS32T_PTR FlashPtr< int32_t >
-
-    #define FLASHVAR_DECLARE(type,name) \
-        static PROGMEM type _##name; \
-        FlashPtr<type> name(_##name);
+    #define FU32T_PTR FlashPtr< const uint32_t >
+    #define FS32T_PTR FlashPtr< const int32_t >
 
     #define FLASHSTR_DECLARE(type,name,init) \
-        static PROGMEM type _##name[] = init; \
-        FlashPtr<type> name(_##name);
+        const type _##name[] PROGMEM = init; \
+        FlashPtr< const type > name(_##name);
 
     #define SPSTR(s) (__extension__({ \
-        static char __c[] PROGMEM = (s); \
-        FlashPtr<char> _c(__c); _c; }))
+        static const char __c[] PROGMEM = (s); \
+        FlashPtr< const char > _c(__c); _c; }))
 
-    // Определения для работы с EEPROM
-    #define EEPROM_DECLARE(x) EEMEM x
+    #define ECHAR_PTR EepromPtr< const char >
 
-    #define ECHAR_PTR EepromPtr< char >
-    #define EUCHAR_PTR EepromPtr< unsigned char >
+    #define EEPROM_DECLARE(type,var,addr) EepromPtr< const type > var(( const type * )(addr));
 
-    #define EU08T_PTR EepromPtr< uint8_t >
-    #define ES08T_PTR EepromPtr< int8_t >
-
-    #define EU16T_PTR EepromPtr< uint16_t >
-    #define ES16T_PTR EepromPtr< int16_t >
-
-    #define EU32T_PTR EepromPtr< uint32_t >
-    #define ES32T_PTR EepromPtr< int32_t >
-
-    #define EEPROMVAR_DECLARE(type,name) \
-        static EEMEM type _##name; \
-        EepromPtr<type> name(&_##name);
-
-    #define EEPROMPTR_DECLARE(type,name,addr) \
-        EepromPtr<type> name(addr);
-
-    #define EEPROMSTR_DECLARE(type,name,init) \
-        static EEMEM type _##name[] = init; \
-        EepromPtr<type> name(_##name);
+    #define _EEGETBLOCK(dst,src,n) eeprom_read_block(( void * )(dst),( const void * )(src),(n))
+    #define _EEPUTBLOCK(src,dst,n) eeprom_write_block(( const void * )(src), ( void * )(dst),(n))
 
 #elif defined( __ICCAVR__ )
 
@@ -157,16 +132,16 @@
 
     // - Other characteristics of objects: __root and __no_init.
 
-    #define FLASHSTR_DECLARE( type, name, init ) \
-        static __flash type name[] = init;
-
-    #define FLASHARR_DECLARE( type, name, size, init ) \
-        __flash type name[size] = init;
+    #define PROGMEM __flash
+    #define prog_char char __flash
+    #define PGM_P prog_char *
+    #define PSTR(x) ( PGM_P ) x
 
     #define FLASH_DECLARE(x) __flash x
 
     #define FCHAR_PTR char __flash *
     #define FUCHAR_PTR unsigned char __flash *
+    #define FCHAR_PTR2(name) char __flash * (name)
 
     #define FU08T_PTR uint8_t __flash *
     #define FS08T_PTR int8_t __flash *
@@ -177,10 +152,30 @@
     #define FU32T_PTR uint32_t __flash *
     #define FS32T_PTR int32_t __flash *
 
-    #define PROGMEM __flash
-    #define prog_char char __flash
-    #define PGM_P prog_char *
-    #define PSTR(x) ( PGM_P ) x
+    #define FLASHSTR_DECLARE( type, name, init ) \
+        static __flash type name[] = init;
+
+    #define FLASHARR_DECLARE( type, name, size, init ) \
+        __flash type name[size] = init;
+
+    #define SPSTR(s) ( FCHAR_PTR )(s)
+
+    #define EEPROM_DECLARE(type,name,addr) type __eeprom * name = ( type __eeprom * ) (addr);
+
+    #define eeprom_read_block(dst,src,cnt)\
+    { \
+        for(uint16_t i=0;i<(cnt);i++)\
+        * ( ( unsigned char * ) ( (dst) + i ) ) = *((unsigned char __eeprom *)((src) + i));\
+    }
+
+    #define eeprom_write_block(src,dst,cnt)\
+    { \
+        for(uint16_t i=0;i<(cnt);i++)\
+        * ( ( unsigned char __eeprom * ) ( (dst) + i ) ) = *((unsigned char *)((src) + i));\
+    }
+
+    #define _EEGETBLOCK(dst,src,n) eeprom_read_block((dst),(src),(n))
+    #define _EEPUTBLOCK(src,dst,n) eeprom_write_block((src),(dst),(n))
 
 #endif
 
@@ -265,8 +260,6 @@
 	((x / 010000000ul) % 010)*(2<<6)                 \
 	)
 
-// Стандартные целые
-//#include <stdint.h>
 
 #define BIN16(x1,x2) \
     ((BIN(x1)<<8)+BIN(x2))

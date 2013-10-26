@@ -52,7 +52,7 @@ typedef struct _FILEINFO {
 
 typedef struct _ENTRIESCACHE {
 
-    uint8_t entries_cache[ 0xf0 ];
+    uint8_t entries_cache[ 0xF0 ];
     uint8_t first_free_entry;
 
 } ENTRIESCACHE;

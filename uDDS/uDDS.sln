@@ -10,14 +10,11 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
-		Debug|Win32 = Debug|Win32
-		Release|Win32 = Release|Win32
+		GCC|Win32 = GCC|Win32
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{79D9F497-BAD3-407E-A7C6-AA7B10F6C3EC}.Debug|Win32.ActiveCfg = Debug|Win32
-		{79D9F497-BAD3-407E-A7C6-AA7B10F6C3EC}.Debug|Win32.Build.0 = Debug|Win32
-		{79D9F497-BAD3-407E-A7C6-AA7B10F6C3EC}.Release|Win32.ActiveCfg = Release|Win32
-		{79D9F497-BAD3-407E-A7C6-AA7B10F6C3EC}.Release|Win32.Build.0 = Release|Win32
+		{79D9F497-BAD3-407E-A7C6-AA7B10F6C3EC}.GCC|Win32.ActiveCfg = GCC|Win32
+		{79D9F497-BAD3-407E-A7C6-AA7B10F6C3EC}.GCC|Win32.Build.0 = GCC|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

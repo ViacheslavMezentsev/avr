@@ -1,2 +1,3 @@
 @echo off
-cscript //NoLogo %1versionfile-update.js %1version.txt
+rem See: for /?
+cscript //NoLogo "%~dp0"versionfile-update.js "%~dp0"version.txt
