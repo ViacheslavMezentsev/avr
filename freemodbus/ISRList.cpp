@@ -366,7 +366,10 @@
 
     #endif
 
-        CMCU::OnADCConversionComplete();
+        uint16_t temp = ADCL;
+        temp += ( ADCH << 8 );
+
+        CMCU::OnADCConversionComplete( temp );
 
     } // ADC Conversion Complete
 

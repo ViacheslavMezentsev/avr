@@ -68,7 +68,7 @@
 
 //#define SPI_Serial_Transfer_Complete
 
-//#define ADC_Conversion_Complete
+#define ADC_Conversion_Complete
 
 //#define EEPROM_Ready
 

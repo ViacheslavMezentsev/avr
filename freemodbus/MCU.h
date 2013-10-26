@@ -45,7 +45,7 @@ public:
 	static void OnUSARTRxComplete( uint8_t );
 	static void OnUSARTDataRegisterEmpty();
 	static void OnUSARTTxComplete();
-	static void OnADCConversionComplete();
+	static void OnADCConversionComplete( uint16_t );
 	static void OnEEPROMReady();
 	static void OnAnalogComparator();
 	static void OnTWISerialInterface();

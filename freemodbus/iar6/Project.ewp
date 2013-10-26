@@ -1006,11 +1006,6 @@
       <archiveVersion>0</archiveVersion>
       <data/>
     </settings>
-    <settings>
-      <name>Coder</name>
-      <archiveVersion>0</archiveVersion>
-      <data/>
-    </settings>
   </configuration>
   <configuration>
     <name>Release</name>
@@ -2005,11 +2000,6 @@
     </settings>
     <settings>
       <name>BILINK</name>
-      <archiveVersion>0</archiveVersion>
-      <data/>
-    </settings>
-    <settings>
-      <name>Coder</name>
       <archiveVersion>0</archiveVersion>
       <data/>
     </settings>
