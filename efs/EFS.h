@@ -27,6 +27,9 @@
 #ifndef EFS_H_
 #define EFS_H_
 
+#define EFS_OK       0
+#define EFS_ERROR    1
+
 /* Types of entries */
 #define EFS_ENTRY_FREE	0x00
 #define EFS_ENTRY_FILE	0x01
@@ -37,17 +40,27 @@
 #define EFS_FULL			0xff
 #define EFS_EOF				0xfe
 
-struct efs_file {
+
+typedef struct _FILEINFO {
+
 	uint8_t entry;
 	uint8_t size;
 	uint8_t format;
 	uint8_t first_data_entry;
-};
+
+} FILEINFO;
+
+typedef struct _ENTRIESCACHE {
+
+    uint8_t entries_cache[ 0xF0 ];
+    uint8_t first_free_entry;
+
+} ENTRIESCACHE;
 
 
-/**
-* Класс CEFS
-************************/
+/***********************/
+/* Класс CEFS */
+/***********************/
 class CEFS {
 
 private:
@@ -58,12 +71,12 @@ private:
 public:
     
     static void Initialization();
-    static void GetName( efs_file * file, char * buffer);
-    static uint8_t GetFileInfo( uint8_t number, uint8_t format, efs_file * file);
-    static uint8_t WriteFile( efs_file * file, uint8_t * buffer, uint8_t pointer, uint8_t length );
-    static uint8_t ReadFile( efs_file * file, uint8_t * buffer, uint8_t pointer, uint8_t length );
-    static uint8_t CreateFile( efs_file * file, uint8_t format, char * name );
-    static void DeleteFile( efs_file * file);   
+    static void GetName( FILEINFO * file, char * buffer);
+    static uint8_t GetFileInfo( uint8_t number, uint8_t format, FILEINFO * file);
+    static uint8_t WriteFile( FILEINFO * file, uint8_t * buffer, uint8_t pointer, uint8_t length );
+    static uint8_t ReadFile( FILEINFO * file, uint8_t * buffer, uint8_t pointer, uint8_t length );
+    static uint8_t CreateFile( FILEINFO * file, uint8_t format, char * name );
+    static void DeleteFile( FILEINFO * file);   
 
 };
 

@@ -27,7 +27,7 @@ FLASHSTR_DECLARE( char, szViewMemory, "Просмотр памяти: EEPROM (CP1251)" );
 
 char hexchars[ 17 ] = "0123456789ABCDEF";
 
-struct efs_file afile;
+FILEINFO afile;
 CKeys Keys;
 
 uint16_t CMemoryViewer::_offset = 0;
