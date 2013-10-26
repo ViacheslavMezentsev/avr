@@ -17,38 +17,18 @@
 	</ToolFiles>
 	<Configurations>
 		<Configuration
-			Name="Debug|Win32"
+			Name="GCC|Win32"
 			OutputDirectory="$(ConfigurationName)"
 			IntermediateDirectory="$(ConfigurationName)"
 			ConfigurationType="0"
 			>
 			<Tool
 				Name="VCNMakeTool"
-				BuildCommandLine="C:\MHVAVRTools\utils\bin\make.exe build 2&gt;&amp;1 | C:\MHVAVRTools\utils\bin\sed.exe -e &apos;s/\(\w\+\):\([0-9]\+\):/\1(\2):/&apos;"
-				ReBuildCommandLine="C:\MHVAVRTools\utils\bin\make.exe build all 2&gt;&amp;1 | C:\MHVAVRTools\utils\bin\sed.exe -e &apos;s/\(\w\+\):\([0-9]\+\):/\1(\2):/&apos;"
-				CleanCommandLine="C:\MHVAVRTools\utils\bin\make.exe clean"
+				BuildCommandLine="$(ProjectDir)build.cmd"
+				ReBuildCommandLine="$(ProjectDir)buildall.cmd"
+				CleanCommandLine="$(ProjectDir)clean.cmd"
 				Output=""
 				PreprocessorDefinitions="__GNUC__;__AVR_ATmega16__;__DEBUG__"
-				IncludeSearchPath="&quot;C:\MHVAVRTools\avr\include&quot;;&quot;C:\MHVAVRTools\avr\include\util&quot;;&quot;C:\MHVAVRTools\avr\include\compat&quot;;&quot;C:\MHVAVRTools\avr\include\avr&quot;"
-				ForcedIncludes=""
-				AssemblySearchPath=""
-				ForcedUsingAssemblies=""
-				CompileAsManaged=""
-			/>
-		</Configuration>
-		<Configuration
-			Name="Release|Win32"
-			OutputDirectory="$(ConfigurationName)"
-			IntermediateDirectory="$(ConfigurationName)"
-			ConfigurationType="0"
-			>
-			<Tool
-				Name="VCNMakeTool"
-				BuildCommandLine="C:\MHVAVRTools\utils\bin\make.exe build 2&gt;&amp;1 | C:\MHVAVRTools\utils\bin\sed.exe -e &apos;s/\(\w\+\):\([0-9]\+\):/\1(\2):/&apos;"
-				ReBuildCommandLine="C:\MHVAVRTools\utils\bin\make.exe build all 2&gt;&amp;1 | C:\MHVAVRTools\utils\bin\sed.exe -e &apos;s/\(\w\+\):\([0-9]\+\):/\1(\2):/&apos;"
-				CleanCommandLine="C:\MHVAVRTools\utils\bin\make.exe clean"
-				Output=""
-				PreprocessorDefinitions="__GNUC__;__AVR_ATmega16__;WIN32;NDEBUG"
 				IncludeSearchPath="&quot;C:\MHVAVRTools\avr\include&quot;;&quot;C:\MHVAVRTools\avr\include\util&quot;;&quot;C:\MHVAVRTools\avr\include\compat&quot;;&quot;C:\MHVAVRTools\avr\include\avr&quot;"
 				ForcedIncludes=""
 				AssemblySearchPath=""
