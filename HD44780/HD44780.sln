@@ -5,14 +5,11 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "HD44780", "HD44780.vcproj",
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
-		Debug|Win32 = Debug|Win32
-		Release|Win32 = Release|Win32
+		GCC|Win32 = GCC|Win32
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{9A3D877B-982A-4CF5-979E-049A51BD429E}.Debug|Win32.ActiveCfg = Debug|Win32
-		{9A3D877B-982A-4CF5-979E-049A51BD429E}.Debug|Win32.Build.0 = Debug|Win32
-		{9A3D877B-982A-4CF5-979E-049A51BD429E}.Release|Win32.ActiveCfg = Release|Win32
-		{9A3D877B-982A-4CF5-979E-049A51BD429E}.Release|Win32.Build.0 = Release|Win32
+		{9A3D877B-982A-4CF5-979E-049A51BD429E}.GCC|Win32.ActiveCfg = GCC|Win32
+		{9A3D877B-982A-4CF5-979E-049A51BD429E}.GCC|Win32.Build.0 = GCC|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

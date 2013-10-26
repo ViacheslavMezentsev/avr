@@ -402,14 +402,6 @@
         <option>
           <name>newCCIncludePaths</name>
           <state>$PROJ_DIR$\..\</state>
-          <state>$PROJ_DIR$\..\modbus</state>
-          <state>$PROJ_DIR$\..\modbus\ascii</state>
-          <state>$PROJ_DIR$\..\modbus\functions</state>
-          <state>$PROJ_DIR$\..\modbus\include</state>
-          <state>$PROJ_DIR$\..\modbus\rtu</state>
-          <state>$PROJ_DIR$\..\modbus\tcp</state>
-          <state>$PROJ_DIR$\..\port</state>
-          <state>$PROJ_DIR$\..\modbus\</state>
         </option>
         <option>
           <name>CCStdIncCheck</name>
@@ -1003,11 +995,6 @@
     </settings>
     <settings>
       <name>BILINK</name>
-      <archiveVersion>0</archiveVersion>
-      <data/>
-    </settings>
-    <settings>
-      <name>Coder</name>
       <archiveVersion>0</archiveVersion>
       <data/>
     </settings>
@@ -2005,11 +1992,6 @@
     </settings>
     <settings>
       <name>BILINK</name>
-      <archiveVersion>0</archiveVersion>
-      <data/>
-    </settings>
-    <settings>
-      <name>Coder</name>
       <archiveVersion>0</archiveVersion>
       <data/>
     </settings>
