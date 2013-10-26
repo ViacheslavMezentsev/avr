@@ -1100,7 +1100,7 @@ void CMCU::OnUSARTTxComplete(){
 /**
  * ADC Conversion Complete
  */
-void CMCU::OnADCConversionComplete(){
+void CMCU::OnADCConversionComplete( uint16_t value ) {
 
 }
 

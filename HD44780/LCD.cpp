@@ -82,7 +82,7 @@
 #ifdef __ICCAVR__
     __flash uint8_t LcdCustomChar[136] = {
 #elif defined __GNUC__
-    PROGMEM uint8_t _LcdCustomChar[136] = {
+    const PROGMEM uint8_t _LcdCustomChar[136] = {
 #endif
 // Ўаблон дл€ формировани€ последовательности байт, описывающий
 // пользовательский символ:
@@ -142,7 +142,7 @@
 #ifdef __ICCAVR__
     __flash uint8_t CP1251_TO_CPHD44780[ 256 ] = {
 #elif defined __GNUC__
-    PROGMEM uint8_t _CP1251_TO_CPHD44780[ 256 ] = {
+    const PROGMEM uint8_t _CP1251_TO_CPHD44780[ 256 ] = {
 #endif
 //PROGMEM unsigned char CP1251_TO_CPHD44780[ 256 ] = {
       /* +---------------------------------------------------------------------------------------------------------------+
