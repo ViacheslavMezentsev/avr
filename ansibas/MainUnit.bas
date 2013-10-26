@@ -64,12 +64,10 @@ Declare Sub CommandShell_Prompt
 
     Console_SetColor clLightGray, clBlack
     Console_ClearScreen cmAll
-    Console_MoveTo 1, 25
 
     AText = LookupStr( 0, CommandShellInfo )
-    Console_WriteString AText
-    Console_PutChar &H0D
-    Console_PutChar &H0A
+
+    Console_DrawFrame 1, 1, 80, 24, clLightGray, clBlue, AText
 
     Do
 
@@ -86,12 +84,15 @@ Sub CommandShell_Prompt
 
     AText = LookupStr( 0, Prompt )
 
-    ' Выводим приглашение на новой строке.
-    Console_SetForegroundColor clLightGreen
-    Console_WriteString AText
+    Console_SetColor clLightGreen, clBlack
+    Console_MoveTo 1, 25
+    Console_WriteString AText, cp1251
 
     Console_SetForegroundColor clLightGray
+    Console_SaveCursor
     Console_ClearLine cmFromCursorToEnd
+    Console_RestoreCursor
+
     Console_CursorOn
 
 End Sub
@@ -113,4 +114,3 @@ Prompt:
 
 CommandShellInfo:
     Data "Командная оболочка, версия 0.1 (Bascom AVR)"
-
