@@ -602,30 +602,14 @@ void CFileManager::FormKeyDown( uint16_t Key ) {
                 // Если объект - файл.
                 } else {
 
+                    if ( strstr_P( pCurrentPanel->FileInfo.fname, ( PGM_P ) SPSTR( ".TXT" ) ) != NULL ) {
+                            
+                        CPLC::SetActiveWindow( HWND_VIEWER );
 
-                    #ifdef __GNUC__
-
-                        if ( strstr_P( pCurrentPanel->FileInfo.fname, ( PGM_P ) & SPSTR( ".TXT" ) ) != NULL ) {
-
-                    #elif defined( __ICCAVR__ )
-
-                        if ( strstr_P( pCurrentPanel->FileInfo.fname, SPSTR( ".TXT" ) ) != NULL ) {
-
-                    #endif
-                            CPLC::SetActiveWindow( HWND_VIEWER );
-
-                    #ifdef __GNUC__
-
-                        } else if ( strstr_P( pCurrentPanel->FileInfo.fname, ( PGM_P ) & SPSTR( ".WAV" ) ) != NULL ) {
-
-                    #elif defined( __ICCAVR__ )
-
-                        } else if ( strstr_P( pCurrentPanel->FileInfo.fname, SPSTR( ".WAV" ) ) != NULL ) {
-
-                    #endif
-                            CPLC::SetActiveWindow( HWND_PLAYER );
-
-                        }
+                    } else if ( strstr_P( pCurrentPanel->FileInfo.fname, ( PGM_P ) SPSTR( ".WAV" ) ) != NULL ) {
+                            
+                        CPLC::SetActiveWindow( HWND_PLAYER );
+                    }
 
                 }
 

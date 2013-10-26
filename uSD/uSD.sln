@@ -5,14 +5,11 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "uSD", "uSD.vcproj", "{025D8
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
-		Debug|Win32 = Debug|Win32
-		Release|Win32 = Release|Win32
+		GCC|Win32 = GCC|Win32
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{025D8427-3D23-4AF1-8F6B-75144C63E79F}.Debug|Win32.ActiveCfg = Debug|Win32
-		{025D8427-3D23-4AF1-8F6B-75144C63E79F}.Debug|Win32.Build.0 = Debug|Win32
-		{025D8427-3D23-4AF1-8F6B-75144C63E79F}.Release|Win32.ActiveCfg = Release|Win32
-		{025D8427-3D23-4AF1-8F6B-75144C63E79F}.Release|Win32.Build.0 = Release|Win32
+		{025D8427-3D23-4AF1-8F6B-75144C63E79F}.GCC|Win32.ActiveCfg = GCC|Win32
+		{025D8427-3D23-4AF1-8F6B-75144C63E79F}.GCC|Win32.Build.0 = GCC|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

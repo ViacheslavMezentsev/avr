@@ -1,4 +1,5 @@
-#pragma once
+#ifndef __WINDOWS_H__
+#define __WINDOWS_H__
 
 /*
  * ShowWindow() Commands
@@ -417,8 +418,47 @@ typedef struct tagSWINDOW {
     WNDPROC pfnWndProc;
 } SWINDOW;
 
-// Работа с ошибками HRESULT
-// Using Macros for Error Handling: http://msdn.microsoft.com/en-us/library/ms691242.aspx
+/*
+* Работа с ошибками HRESULT
+* ~~~~~~~~~~~~~~~~~~~~~~~~~
+* Using Macros for Error Handling: 
+* http://msdn.microsoft.com/en-us/library/ms691242.aspx
+*
+* COM defines a number of macros that make it easier to work with HRESULT values.
+* The error handling macros are described in the following table.
+*
+* MAKE_HRESULT - Returns an HRESULT given the severity bit, facility code, 
+* and error code that comprise the HRESULT.
+* Note: Calling MAKE_HRESULT for S_OK verification carries a performance penalty. 
+* You should not routinely use MAKE_HRESULT for successful results.
+*
+* MAKE_SCODE - Returns an SCODE given the severity bit, facility code, 
+* and error code that comprise the SCODE.
+*
+* HRESULT_CODE - Extracts the error code portion of the HRESULT.
+*
+* HRESULT_FACILITY - Extracts the facility code of the HRESULT.
+*
+* HRESULT_SEVERITY - Extracts the severity bit of the HRESULT.
+*
+* SCODE_CODE - Extracts the error code portion of the SCODE.
+*
+* SCODE_FACILITY - Extracts the facility code of the SCODE.
+*
+* SCODE_SEVERITY - Extracts the severity field of the SCODE.
+*
+* SUCCEEDED - Tests the severity bit of the SCODE or HRESULT;
+* returns TRUE if the severity is zero and FALSE if it is one.
+*
+* FAILED - Tests the severity bit of the SCODE or HRESULT; 
+* returns TRUE if the severity is one and FALSE if it is zero.
+*
+* IS_ERROR - Provides a generic test for errors on any status value.
+*
+* HRESULT_FROM_WIN32 - Maps a system error code to an HRESULT value.
+*
+* HRESULT_FROM_NT - Maps an NT status value to an HRESULT value.
+*/
 
 typedef ULONG HRESULT;
 
@@ -451,8 +491,8 @@ typedef ULONG HRESULT;
 //
 // Define the facility codes
 //
-#define FACILITY_NULL           0
-#define FACILITY_RTC            1
+#define FACILITY_NULL   0
+#define FACILITY_RTC    1
 
 //
 // Define the severity codes
@@ -466,10 +506,10 @@ typedef ULONG HRESULT;
 //
 //  The operation completed successfully.
 //
-#define ERROR_SUCCESS                    0L
+#define ERROR_SUCCESS   0L
 
-#define NO_ERROR    0L     // dderror
-#define SEC_E_OK    ((HRESULT)0x00000000L)
+#define NO_ERROR    0L  // dderror
+#define SEC_E_OK    ( ( HRESULT ) 0x00000000L )
 
 //
 // Severity values
@@ -516,3 +556,4 @@ typedef ULONG HRESULT;
 //
 #define RTC_NOT_RESPOND         1L
 
+#endif
