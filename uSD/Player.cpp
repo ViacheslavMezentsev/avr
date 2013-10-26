@@ -225,16 +225,7 @@ void CPlayer::FormActivate() {
     CConsole::CursorOff();           
 
     // Считываем заголовок WAV-файла.
-
-    #ifdef __GNUC__
-
-        strcpy_P( CommandString, ( PGM_P ) & SPSTR( "Media Info: " ) );
-
-    #elif defined( __ICCAVR__ )
-
-        strcpy_P( CommandString, SPSTR( "Media Info:" ) );
-
-    #endif
+    strcpy_P( CommandString, ( PGM_P ) SPSTR( "Media Info: " ) );
      
     // Присоединяем к пути имя выбранного файла.
     strcat( CommandString, CFileManager::pCurrentPanel->Path );

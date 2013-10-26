@@ -1366,7 +1366,7 @@ FRESULT CFAT::CreateName( DIR * DirObject, const char * * path ) {
 */
 FRESULT CFAT::CreateName( DIR * DirObject, FCHAR_PTR * path ) {
 	
-    BYTE c, d, ni, si, i, * sfn;
+    BYTE c, d, ni, si, i, * sfn;    
     FCHAR_PTR2(p);
 
 	// Create file name in directory form
@@ -1421,7 +1421,7 @@ FRESULT CFAT::CreateName( DIR * DirObject, FCHAR_PTR * path ) {
 	}
 	
     // Return pointer to the next segment
-    path[0] = ( FCHAR_PTR ) ( & p + si );
+    path[0] = ( FCHAR_PTR ) ( ( const char * ) p + si );
 
 	// Set last segment flag if end of path
     sfn[11] = ( c <= ' ' ) ? 1 : 0;
