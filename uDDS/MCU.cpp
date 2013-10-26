@@ -29,11 +29,6 @@ PR_END_EXTERN_C
 
 // -=[ Переменные в ОЗУ ]=-
 
-// The elapsed time is stored as a DWORD value.
-// Therefore, the time will wrap around to zero
-// if the system is run continuously for 49.7 days.
-volatile uint32_t TickCounter = 0;
-
 uint16_t Counter10ms = 0;
 
 // Дескриптор активного окна.
@@ -75,7 +70,7 @@ HRESULT CMCU::MainThreadProcedure(){
 
             cbi( SPCR, CPHA );
 
-            CDDS::Run( ( PGM_P ) ( & Signals[ Settings.Mode ] ), 
+            CDDS::Run( ( PGM_P ) ( const uint8_t * ) Signals[ Settings.Mode ], 
                 ( uint8_t ) ( ( uint32_t ) Settings.Accumulator >> 16 ), 
                 ( uint8_t ) ( ( uint32_t ) Settings.Accumulator >> 8 ), 
                 ( uint8_t ) Settings.Accumulator

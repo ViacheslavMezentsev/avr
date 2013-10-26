@@ -90,11 +90,11 @@ EnCommand CCommands::operator[] ( char * Text ) {
     // Пустая строка.
     if ( Text[0] == '\0' ) return cmdNone;
 
-    if ( strcmp_P( Text, ( PGM_P ) ( & szcmdHelp ) ) == 0 ) return cmdHelp;
+    if ( strcmp_P( Text, ( PGM_P ) szcmdHelp ) == 0 ) return cmdHelp;
 
-    if ( strcmp_P( Text, ( PGM_P ) ( & szcmdClearScreen ) ) == 0 ) return cmdClearScreen;
+    if ( strcmp_P( Text, ( PGM_P ) szcmdClearScreen ) == 0 ) return cmdClearScreen;
 
-    if ( strcmp_P( Text, ( PGM_P ) ( & szcmdRun ) ) == 0 ) return cmdRun;
+    if ( strcmp_P( Text, ( PGM_P ) szcmdRun ) == 0 ) return cmdRun;
 
     return cmdUnknown;
 

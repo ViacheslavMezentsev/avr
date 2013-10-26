@@ -402,14 +402,6 @@
         <option>
           <name>newCCIncludePaths</name>
           <state>$PROJ_DIR$\..\</state>
-          <state>$PROJ_DIR$\..\modbus</state>
-          <state>$PROJ_DIR$\..\modbus\ascii</state>
-          <state>$PROJ_DIR$\..\modbus\functions</state>
-          <state>$PROJ_DIR$\..\modbus\include</state>
-          <state>$PROJ_DIR$\..\modbus\rtu</state>
-          <state>$PROJ_DIR$\..\modbus\tcp</state>
-          <state>$PROJ_DIR$\..\port</state>
-          <state>$PROJ_DIR$\..\modbus\</state>
         </option>
         <option>
           <name>CCStdIncCheck</name>
@@ -711,8 +703,8 @@
       <name>BUILDACTION</name>
       <archiveVersion>1</archiveVersion>
       <data>
-        <prebuild>$PROJ_DIR$\..\prebuild.cmd $PROJ_DIR$\..\</prebuild>
-        <postbuild>$PROJ_DIR$\..\postbuild.cmd $PROJ_DIR$\..\</postbuild>
+        <prebuild>$PROJ_DIR$\..\prebuild.cmd</prebuild>
+        <postbuild>$PROJ_DIR$\..\postbuild.cmd</postbuild>
       </data>
     </settings>
     <settings>
@@ -2004,6 +1996,18 @@
       <data/>
     </settings>
   </configuration>
+  <file>
+    <name>$PROJ_DIR$\..\CommandShell.cpp</name>
+  </file>
+  <file>
+    <name>$PROJ_DIR$\..\Console.cpp</name>
+  </file>
+  <file>
+    <name>$PROJ_DIR$\..\DDS.cpp</name>
+  </file>
+  <file>
+    <name>$PROJ_DIR$\..\EFS.cpp</name>
+  </file>
   <file>
     <name>$PROJ_DIR$\..\ISRList.cpp</name>
   </file>
