@@ -1,7 +1,7 @@
 ///////////////////////////////////////////////////////////
 //  Version.h
 //  Implementation of the Class CVersion
-//  Created on:      25 октября 2013 г. 21:07:18
+//  Created on:      26 октября 2013 г. 15:16:55
 //  Original author: Мезенцев В. Н.
 ///////////////////////////////////////////////////////////
 
@@ -22,14 +22,14 @@ public:
 
     inline static uint32_t GetMajor() { return 0; }
     inline static uint32_t GetMinor() { return 1; }
-    inline static uint32_t GetBuild() { return 5046; }
-    inline static uint32_t GetRevision() { return 38019; }
+    inline static uint32_t GetBuild() { return 5047; }
+    inline static uint32_t GetRevision() { return 27507; }
 
     inline static FCHAR_PTR GetVersionString() {
-        return SPSTR( "0.1.5046.38019" );
+        return SPSTR( "0.1.5047.27507" );
     }
     inline static FCHAR_PTR GetBuildDateString() {
-        return SPSTR( "25 октября 2013 г." );
+        return SPSTR( "26 октября 2013 г." );
     }
 
 };
