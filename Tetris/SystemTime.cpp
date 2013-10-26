@@ -9,12 +9,13 @@
 #include "Configuration.h"
 #include "SystemTime.h"
 
+
 // -=[ Постоянные во флеш-памяти ]=-
 
 #ifdef __ICCAVR__
     __flash uint16_t DoM[12] = {
 #elif defined __GNUC__
-    PROGMEM uint16_t _DoM[12] = {
+    const PROGMEM uint16_t _DoM[12] = {
 #endif
         0, 31U, 59U, 90U, 120U, 151U, 181U, 212U, 243U, 273U, 304U, 334U
 };
