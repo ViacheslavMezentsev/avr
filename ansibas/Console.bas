@@ -1,16 +1,6 @@
 $nocompile
 
 
-Dim Ch As Byte
-Dim Code As Byte
-Dim I As Byte
-Dim J As Byte
-Dim ALen As Byte
-Dim ALeftLen As Byte
-Dim ARightLen As Byte
-Dim OneChar As String * 1
-
-
 ' Вывод символа из ОЗУ в кодировке CP866.
 Sub Console_PutChar( ByVal AChar As Byte, ByVal ACodePage As Byte )
 
@@ -38,7 +28,11 @@ End Sub
 ' Вывести данные из ОЗУ.
 Sub Console_WriteString( AText As String, ByVal ACodePage As Byte )
 
-    ' Если указатель равен нулю, то выходим.
+    Local I As Byte
+    Local Code As Byte
+    Local OneChar As String * 1
+
+    ' Если текст пустой, то выходим.
     If Len( AText ) = 0 Then Exit Sub
 
     ' Вывод данных
@@ -58,6 +52,8 @@ End Sub
 ' Вывод звука. Современные терминалы могут проигрывать звуковой файл вместо
 ' звукового сигнала определённой частоты и длительности.
 Sub Console_Beep( ByVal AFrequency As Word, ByVal ADuration As Byte  )
+
+    Local Ch As Byte
 
     ' -> "\033[" (ESC)
     Console_PutChar &H1B, cp866
@@ -105,6 +101,8 @@ End Sub
 ' Очистить экран.
 Sub Console_ClearScreen( ByVal AMode As Byte )
 
+    Local Ch As Byte
+
     ' -> "\033[" (ESC)
     Console_PutChar &H1B, cp866
     Console_PutChar &H5B, cp866
@@ -135,6 +133,8 @@ End Sub
 ' Очистка строки.
 Sub Console_ClearLine( ByVal AMode As Byte )
 
+    Local Ch As Byte
+
     ' -> "\033[" (ESC)
     Console_PutChar &H1B, cp866
     Console_PutChar &H5B, cp866
@@ -164,6 +164,8 @@ End Sub
 
 ' Очистить n знаков от позиции курсора.
 Sub Console_ClearForward( ByVal ACount As Byte )
+
+    Local Ch As Byte
 
     if ACount = 0 then Exit Sub
 
@@ -240,6 +242,8 @@ End Sub
 ' Установка параметров текста.
 Sub Console_SetForegroundColor( ByVal AColor As Byte )
 
+    Local Ch As Byte
+
     ' -> "\033[" (ESC)
     Console_PutChar &H1B, cp866
     Console_PutChar &H5B, cp866
@@ -265,6 +269,8 @@ End Sub
 
 ' Установка параметров фона.
 Sub Console_SetBackgroundColor( ByVal AColor As Byte )
+
+    Local Ch As Byte
 
     ' -> "\033[" (ESC)
     Console_PutChar &H1B, cp866
@@ -318,6 +324,8 @@ End Sub
 ' Переместить в позицию Left и строку Top.
 Sub Console_MoveTo( ByVal ALeft As Byte, ByVal ATop As Byte )
 
+    Local Ch As Byte
+
     if ALeft = 0 Or ATop = 0 then Exit Sub
 
     if ALeft > MAX_X Or ATop > MAX_Y then Exit Sub
@@ -357,6 +365,8 @@ End Sub
 
 ' Относительное перемещение курсора по направлению.
 Sub Console_Move( ByVal ADirection As Byte, ByVal ADelta As Byte )
+
+    Local Ch As Byte
 
     ' -> "\033[" (ESC)
     Console_PutChar &H1B, cp866
@@ -399,6 +409,12 @@ End Sub
 Sub Console_DrawFrame( ByVal ALeft As Byte, ByVal ATop As Byte, _
     ByVal AWidth As Byte, ByVal AHeight As Byte, ByVal AColor As Byte, _
     ByVal ABgColor As Byte, ACaption As String )
+
+    Local I As Byte, J As Byte
+    Local Ch As Byte
+    Local ALen As Byte
+    Local ALeftLen As Byte
+    Local ARightLen As Byte
 
     Console_SetColor AColor, ABgColor
     Console_MoveTo ALeft, ATop
