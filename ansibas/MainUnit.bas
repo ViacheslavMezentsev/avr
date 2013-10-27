@@ -39,17 +39,17 @@ Config Twi = 100000
 ' *  ~~~~~~~~~~~~~~~~~~~
 ' ***********************/
 
+' Подключаем заголовочные файлы модулей.
+$include "Delays_Header.bas"
+$include "Console_Header.bas"
+$include "RTC_Header.bas"
+$include "CommandShell_Header.bas"
+$include "MemoryViewer_Header.bas"
+$include "MCU_Header.bas"
 
-$include "Delays_Config.bas"
-$include "Console_Config.bas"
-$include "MCU_Config.bas"
 
-Declare Sub RTC_GetDatetime( ATime As Byte )
-Declare Sub CommandShell_ShowDate( ATime As Byte, ByVal ALeft As Byte, _
-    ByVal ATop As Byte )
-Declare Sub CommandShell_ShowTime( ATime As Byte, ByVal ALeft As Byte, _
-    ByVal ATop As Byte )
-Declare Sub CommandShell_Prompt
+Declare Sub PutByte( ByVal Addr As Word, ByVal AValue As Byte )
+Declare Function GetByte( ByVal Addr As Word ) As Byte
 
 
 'address of ds1307
@@ -59,6 +59,8 @@ Const Ds1307r = &HD1
 
 ' -=[ Переменные в ОЗУ ]=-
 
+Dim Temp As Byte
+Dim Ptr As Word
 Dim CurrTime(7) As Byte
 Dim Caption As String * 45
 
@@ -69,219 +71,123 @@ Dim Caption As String * 45
 ' ************************/
 
 
-    ' Инициализация всей периферии микроконтроллера
+    ' Инициализация всей периферии микроконтроллера.
     MCU_Initialization
 
+    ' Настройка TWI.
     I2cinit
 
-    ' Запуск основного потока программы
-    'MCU_MainThreadProcedure
+    ' Настройка интерпретатора.
+    CommandShell_Initialization
 
     'TODO: Как передать число > 255?
     'Console_Beep 255, 1
 
-    Console_SetColor clLightGray, clBlack
-    Console_ClearScreen cmAll
+    'Console_SetColor clLightGray, clBlack
+    'Console_ClearScreen cmAll
 
     ' Заголовок окна.
-    Caption = LookupStr( 0, CommandShellInfo )
-    Console_MoveTo 1, 1
-    Console_SetColor clBlack, clWhite
-    Console_WriteString Caption, cp1251
-    Console_ClearLine cmFromCursorToEnd
+    'Caption = LookupStr( 0, CommandShellInfo )
+    'Console_MoveTo 1, 1
+    'Console_SetColor clBlack, clWhite
+    'Console_WriteString Caption, cp1251
+    'Console_ClearLine cmFromCursorToEnd
 
     ' Рамка без заголовка.
-    Caption = ""
-    Console_DrawFrame 1, 2, 80, 23, clLightGray, clBlue, Caption
+    'Caption = ""
+    'Console_DrawFrame 1, 2, 80, 23, clLightGray, clBlue, Caption
 
     ' Окно даты и времени.
-    Console_DrawFrame 25, 10, 20, 4, clBlack, clWhite, Caption
+    'Console_DrawFrame 25, 10, 20, 4, clBlack, clWhite, Caption
 
-    Caption = LookupStr( 0, TimeStr )
-    Console_MoveTo 27, 11
-    Console_WriteString Caption, cp1251
+    'Caption = LookupStr( 0, TimeStr )
+    'Console_MoveTo 27, 11
+    'Console_WriteString Caption, cp1251
 
-    Caption = LookupStr( 0, DateStr )
-    Console_MoveTo 27, 12
-    Console_WriteString Caption, cp1251
+    'Caption = LookupStr( 0, DateStr )
+    'Console_MoveTo 27, 12
+    'Console_WriteString Caption, cp1251
+
+    'Ptr = &H90
+    'Temp = &H39
+    'PutByte Ptr, Temp
+
+    'Temp = 0
+
+    'Temp = GetByte( Ptr )
+    'Console_MoveTo 1, 2
+    'Console_PutChar Temp, cp866
 
     Do
+
+        CommandShell_Info
 
         ' Вывод приглашения командной строки.
         CommandShell_Prompt
 
-        _delay_ms 1000
+        Input Caption
 
         RTC_GetDatetime CurrTime(1)
 
-        Console_CursorOff
-        Console_SetColor clBlack, clWhite
-        CommandShell_ShowTime CurrTime(1), 33, 11
-        CommandShell_ShowDate CurrTime(1), 33, 12
+        if Caption = "time" then
+
+            RTC_ShowTime CurrTime(1)
+
+        elseif Caption = "date" then
+
+            RTC_ShowDate CurrTime(1)
+
+        elseif Caption = "ram" then
+
+            MemoryViewer_FormActivate
+
+            Do
+            Loop Until Inkey() = &H1B
+
+        end if
 
     Loop
 
 End
 
 
-Sub RTC_GetDatetime( ATime As Byte )
+Sub PutByte( ByVal Addr As Word, ByVal AValue As Byte )
 
-  I2cstart
-  I2cwbyte Ds1307w
-  I2cwbyte 0
+$ASM
 
-  I2cstart
-  I2cwbyte Ds1307r
-  I2crbyte ATime(1), Ack
-  I2crbyte ATime(2), Ack
-  I2crbyte ATime(3), Ack
-  I2crbyte ATime(4), Ack
-  I2crbyte ATime(5), Ack
-  I2crbyte ATime(6), Ack
-  I2crbyte ATime(7), Nack
-  I2cstop
+    LOADADR Addr, X
+    LD R30, X+
+    LD R31, X
+    LOADADR AValue, X
+    LD R24, X
+    ST Z, R24
+
+$END ASM
 
 End Sub
 
 
-Sub CommandShell_ShowDate( ATime As Byte, ByVal ALeft As Byte, _
-    ByVal ATop As Byte )
+Function GetByte( ByVal Addr As Word ) As Byte
 
-    Local Ch As Byte
-    Local AYear As Byte, AMonth As Byte, ADay As Byte
+$ASM
 
-    Console_MoveTo ALeft, ATop
+    LOADADR Addr, X
+    LD R30, X+
+    LD R31, X
+    LOADADR GetByte, X
+    LD R24, Z
+    ST X, R24
 
-    ADay = ATime(5)
-    ADay = MakeDec(ADay)
+$END ASM
 
-    AMonth = ATime(6)
-    AMonth = MakeDec(AMonth)
-
-    AYear = ATime(7)
-    AYear = MakeDec(AYear)
-
-    ' Вывод дней.
-    ' Десятки.
-    Ch = ADay \ 10
-    Ch = Ch + &H30
-    Console_PutChar Ch, cp866
-
-    ' Единицы.
-    Ch = ADay mod 10
-    Ch = Ch + &H30
-    Console_PutChar Ch, cp866
-
-    Ch = Asc( "-" )
-    Console_PutChar Ch, cp866
-
-    ' Вывод месяца.
-    ' Десятки.
-    Ch = AMonth \ 10
-    Ch = Ch + &H30
-    Console_PutChar Ch, cp866
-
-    ' Единицы.
-    Ch = AMonth mod 10
-    Ch = Ch + &H30
-    Console_PutChar Ch, cp866
-
-    Ch = Asc( "-" )
-    Console_PutChar Ch, cp866
-
-    ' Вывод года.
-    ' Десятки.
-    Ch = AYear \ 10
-    Ch = Ch + &H30
-    Console_PutChar Ch, cp866
-
-    ' Единицы.
-    Ch = AYear mod 10
-    Ch = Ch + &H30
-    Console_PutChar Ch, cp866
-
-End Sub
-
-
-Sub CommandShell_ShowTime( ATime As Byte, ByVal ALeft As Byte, _
-    ByVal ATop As Byte )
-
-    Local Ch As Byte
-    Local AHour As Byte, AMinutes As Byte, ASeconds As Byte
-
-    Console_MoveTo ALeft, ATop
-
-    ASeconds = ATime(1)
-    ASeconds = MakeDec(ASeconds)
-
-    AMinutes = ATime(2)
-    AMinutes = MakeDec(AMinutes)
-
-    AHour = ATime(3)
-    AHour = MakeDec(AHour)
-
-    ' Вывод часов.
-    ' Десятки.
-    Ch = AHour \ 10
-    Ch = Ch + &H30
-    Console_PutChar Ch, cp866
-
-    ' Единицы.
-    Ch = AHour mod 10
-    Ch = Ch + &H30
-    Console_PutChar Ch, cp866
-
-    Ch = Asc( ":" )
-    Console_PutChar Ch, cp866
-
-    ' Вывод минут.
-    ' Десятки.
-    Ch = AMinutes \ 10
-    Ch = Ch + &H30
-    Console_PutChar Ch, cp866
-
-    ' Единицы.
-    Ch = AMinutes mod 10
-    Ch = Ch + &H30
-    Console_PutChar Ch, cp866
-
-    Ch = Asc( ":" )
-    Console_PutChar Ch, cp866
-
-    ' Вывод секунд.
-    ' Десятки.
-    Ch = ASeconds \ 10
-    Ch = Ch + &H30
-    Console_PutChar Ch, cp866
-
-    ' Единицы.
-    Ch = ASeconds mod 10
-    Ch = Ch + &H30
-    Console_PutChar Ch, cp866
-
-End Sub
-
-
-Sub CommandShell_Prompt
-
-    Caption = LookupStr( 0, Prompt )
-
-    Console_SetColor clLightGreen, clBlack
-    Console_MoveTo 1, 25
-    Console_WriteString Caption, cp1251
-
-    Console_SetForegroundColor clLightGray
-    Console_SaveCursor
-    Console_ClearLine cmFromCursorToEnd
-    Console_RestoreCursor
-
-    Console_CursorOn
-
-End Sub
+End Function
 
 
 $include "Delays.bas"
 $include "Console.bas"
+$include "RTC.bas"
+$include "CommandShell.bas"
+$include "MemoryViewer.bas"
 $include "MCU.bas"
 
 
@@ -298,8 +204,3 @@ DateStr:
 TitleDS:
     Data "DS1307"
 
-Prompt:
-    Data "[ATmega16]$ "
-
-CommandShellInfo:
-    Data "Командная оболочка, версия 0.1 (Bascom AVR)"
