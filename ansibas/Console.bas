@@ -2,6 +2,13 @@ $nocompile
 
 
 Dim Ch As Byte
+Dim Code As Byte
+Dim I As Byte
+Dim J As Byte
+Dim ALen As Byte
+Dim ALeftLen As Byte
+Dim ARightLen As Byte
+Dim OneChar As String * 1
 
 
 ' Вывод символа из ОЗУ в кодировке CP866.
@@ -30,10 +37,6 @@ End Sub
 
 ' Вывести данные из ОЗУ.
 Sub Console_WriteString( AText As String, ByVal ACodePage As Byte )
-
-    Dim Code As Byte
-    Dim I As Byte
-    Dim OneChar As String * 1
 
     ' Если указатель равен нулю, то выходим.
     If Len( AText ) = 0 Then Exit Sub
@@ -397,27 +400,23 @@ Sub Console_DrawFrame( ByVal ALeft As Byte, ByVal ATop As Byte, _
     ByVal AWidth As Byte, ByVal AHeight As Byte, ByVal AColor As Byte, _
     ByVal ABgColor As Byte, ACaption As String )
 
-    Dim ALen As Byte
-    Dim ALeftLen As Byte
-    Dim ARightLen As Byte
-    Dim J As Byte
-
-
     Console_SetColor AColor, ABgColor
     Console_MoveTo ALeft, ATop
-
-    Console_PutChar ACS_DBL_ULCORNER, cp866
 
     ALen = Len( ACaption )
 
     AWidth = AWidth - 2
 
     ' Верхняя граница.
+    Console_PutChar ACS_DBL_ULCORNER, cp866
+
     if ALen <> 0 then
 
         ALeftLen = AWidth - ALen
 
         Shift ALeftLen, Right, 1
+
+        Decr ALeftLen
 
         For I = 1 To ALeftLen: Console_PutChar ACS_DBL_HLINE, cp866: Next
 
@@ -435,7 +434,7 @@ Sub Console_DrawFrame( ByVal ALeft As Byte, ByVal ATop As Byte, _
 
     else
 
-        Console_PutChar ACS_DBL_URCORNER, cp866
+        For I = 1 To AWidth: Console_PutChar ACS_DBL_HLINE, cp866: Next
 
     end if
 

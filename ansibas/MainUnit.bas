@@ -1,4 +1,4 @@
-'***********************************************************************************
+'*******************************************************************************
 '* Автор: Мезенцев Вячеслав
 '* Дата:  26.10.2013 г.
 '* CPU:  ATmega16
@@ -7,7 +7,7 @@
 '*
 '* Комментарии: тестовая версия программы - работа с ANSI терминалом
 '*
-'***********************************************************************************
+'*******************************************************************************
 
 
 ' /****************************
@@ -23,8 +23,8 @@ $crystal = 8000000
 ' Скорость работы внутреннего USART
 '$baud = 9600
 '$baud = 19200
-$baud = 38400
-'$baud = 57600
+'$baud = 38400
+$baud = 57600
 '$baud = 115200
 
 
@@ -65,9 +65,17 @@ Declare Sub CommandShell_Prompt
     Console_SetColor clLightGray, clBlack
     Console_ClearScreen cmAll
 
+    ' Заголовок окна.
     AText = LookupStr( 0, CommandShellInfo )
+    Console_MoveTo 1, 1
+    Console_SetColor clBlack, clWhite
+    Console_WriteString AText, cp1251
+    Console_ClearLine cmFromCursorToEnd
 
-    Console_DrawFrame 1, 1, 80, 24, clLightGray, clBlue, AText
+    ' Рамка без заголовка.
+    AText = ""
+    Console_DrawFrame 1, 2, 40, 23, clLightGray, clBlue, AText
+    Console_DrawFrame 41, 2, 40, 23, clLightGray, clBlue, AText
 
     Do
 
