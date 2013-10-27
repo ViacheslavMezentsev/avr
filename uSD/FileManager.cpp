@@ -74,13 +74,13 @@ void CFileManager::Initialization() {
     
     LeftPanel.Left = 1;
     LeftPanel.Top = 2;
-    LeftPanel.Width = 38;
-    LeftPanel.Height = 20;
+    LeftPanel.Width = 40;
+    LeftPanel.Height = 22;
 
     RightPanel.Left = 41;
     RightPanel.Top = 2;
-    RightPanel.Width = 38;
-    RightPanel.Height = 20;
+    RightPanel.Width = 40;
+    RightPanel.Height = 22;
 
     // Переменные для работы с текущим выбранным элементом.
     LeftPanel.ItemIndex = 0;
@@ -176,9 +176,9 @@ void CFileManager::HightlightPanel( CPanel & Panel ) {
     CConsole::SetColor( clLightGray, clBlue );
 
     // Отображаем путь в заголовке панели.
-    uint8_t len = ( Panel.Width - strlen( Panel.Path ) ) / 2;
+    uint8_t tmp = ( Panel.Width - 2 - strlen( Panel.Path ) ) / 2;
 
-    CConsole::MoveTo( Panel.Left + len, Panel.Top );
+    CConsole::MoveTo( Panel.Left + tmp, Panel.Top );
 
     CConsole::PutChar( ' ' );
 
@@ -191,7 +191,6 @@ void CFileManager::HightlightPanel( CPanel & Panel ) {
     } else {
 
         CConsole::WriteString( Panel.Path );
-
     }
 
     CConsole::PutChar( ' ' );
@@ -222,10 +221,10 @@ void CFileManager::HightlightPanel( CPanel & Panel ) {
             // Имя.
             CConsole::WriteString( Panel.FileInfo.fname );
 
-            len = 12 - strlen( Panel.FileInfo.fname );
+            tmp = 12 - strlen( Panel.FileInfo.fname );
 
-            CConsole::ClearForward( len );
-            CConsole::Move( mdForward, len );
+            CConsole::ClearForward( tmp );
+            CConsole::Move( mdForward, tmp );
 
             CConsole::MoveTo( Panel.Left + 14, Panel.ItemIndex + Panel.Top + 2 );
 
@@ -239,17 +238,17 @@ void CFileManager::HightlightPanel( CPanel & Panel ) {
             // Имя.
             CConsole::WriteString( Panel.FileInfo.fname );
 
-            len = 12 - strlen( Panel.FileInfo.fname );
+            tmp = 12 - strlen( Panel.FileInfo.fname );
 
-            CConsole::ClearForward( len );
-            CConsole::Move( mdForward, len );
+            CConsole::ClearForward( tmp );
+            CConsole::Move( mdForward, tmp );
 
             CConsole::MoveTo( Panel.Left + 14, Panel.ItemIndex + Panel.Top + 2 );
 
-            len = 9 - strlen( utoa_fast_div( Panel.FileInfo.fsize, buffer ) );
+            tmp = 9 - strlen( utoa_fast_div( Panel.FileInfo.fsize, buffer ) );
 
-            CConsole::ClearForward( ++len );
-            CConsole::Move( mdForward, len );
+            CConsole::ClearForward( ++tmp );
+            CConsole::Move( mdForward, tmp );
 
             CConsole::WriteString( utoa_fast_div( Panel.FileInfo.fsize, buffer ) );
 
@@ -286,7 +285,7 @@ void CFileManager::DrawPanel( CPanel & Panel ) {
     CConsole::SetForegroundColor( clLightGray );    
 
     // Отображаем разделительные линии таблицы.
-    for ( uint8_t i = Panel.Top + 1; i < Panel.Top + Panel.Height + 1; i++ ) {
+    for ( uint8_t i = Panel.Top + 1; i < Panel.Top + Panel.Height - 1; i++ ) {
 
         CConsole::MoveTo( Panel.Left + 13, i );
         CConsole::PutChar( ACS_VLINE );
