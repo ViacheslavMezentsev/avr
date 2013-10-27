@@ -53,7 +53,7 @@ PR_END_EXTERN_C
 uint8_t CConsole::GetChar() {
 
     uint8_t ret = 0;
-    
+
     __disable_interrupt();
 
     if ( !FIFO_IS_EMPTY( uart_rx_fifo ) ) {
@@ -64,7 +64,7 @@ uint8_t CConsole::GetChar() {
         FIFO_POP( uart_rx_fifo );
 
     }
-    
+
     __enable_interrupt();
 
     return ret;
@@ -274,7 +274,7 @@ void CConsole::RestoreCursor() {
 void CConsole::SetForegroundColor( EnColor Color ) {
 
     WriteString( ESC );
-    ( Color & 0x8 ) ? PutChar( '1' ) : PutChar( '2' ); 
+    ( Color & 0x8 ) ? PutChar( '1' ) : PutChar( '2' );
     PutChar( 'm' );
 
     WriteString( ESC );
@@ -291,7 +291,7 @@ void CConsole::SetForegroundColor( EnColor Color ) {
 void CConsole::SetBackgroundColor( EnColor Color ) {
 
     WriteString( ESC );
-    ( Color & 0x8 ) ? PutChar( '5' ) : PutChar( '6' ); 
+    ( Color & 0x8 ) ? PutChar( '5' ) : PutChar( '6' );
     PutChar( 'm' );
 
     WriteString( ESC );
@@ -388,14 +388,17 @@ void CConsole::DrawFrame( uint8_t Left, uint8_t Top, uint8_t Width, uint8_t Heig
 
     PutChar( ACS_DBL_ULCORNER );
 
+    uint8_t Len = strlen( Caption );
+    Width -= 2;
+
     // Верхняя граница.
     if ( Caption != NULL ) {
 
-        uint8_t len = Width - strlen( Caption );
+        uint8_t LeftSpace = Width - Len;
+        LeftSpace /= 2;
+        LeftSpace--;
 
-        len /= 2;
-
-        for ( uint8_t i = 0; i < len; i++ ) PutChar( ACS_DBL_HLINE );
+        for ( uint8_t i = 0; i < LeftSpace; i++ ) PutChar( ACS_DBL_HLINE );
 
         PutChar( ' ' );
 
@@ -403,27 +406,33 @@ void CConsole::DrawFrame( uint8_t Left, uint8_t Top, uint8_t Width, uint8_t Heig
 
         PutChar( ' ' );
 
+        uint8_t RightSpace = Width - LeftSpace - Len - 2; 
+
+        for ( uint8_t i = 0; i < RightSpace; i++ ) PutChar( ACS_DBL_HLINE );
+
     } else {
 
-        PutChar( ACS_DBL_URCORNER );
+        for ( uint8_t i = 0; i < Width; i++ ) PutChar( ACS_DBL_HLINE );
     }
 
     PutChar( ACS_DBL_URCORNER );
 
     // Вертикальные границы.
+    Height--;
+
     for ( uint8_t i = 0; i < Height; i++ ) {
 
         MoveTo( Left, Top + i + 1 );
         PutChar( ACS_DBL_VLINE );
 
-        for ( uint8_t i = 0; i < Width; i++ ) PutChar( ' ' );
+        for ( uint8_t j = 0; j < Width; j++ ) PutChar( ' ' );
 
         PutChar( ACS_DBL_VLINE );
 
     }
 
     // Нижняя граница.
-    MoveTo( Left, Top + Height + 1 );
+    MoveTo( Left, Top + Height );
 
     PutChar( ACS_DBL_LLCORNER );
 
