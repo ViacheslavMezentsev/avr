@@ -20,11 +20,9 @@ End Sub
 
 Sub CommandShell_Prompt
 
+    Console_NewLine
+
     Caption = LookupStr( 0, Prompt )
-
-    Console_PutChar &H0D, cp866
-    Console_PutChar &H0A, cp866
-
     Console_SetForegroundColor clLightGreen
     Console_WriteString Caption, cp1251
 

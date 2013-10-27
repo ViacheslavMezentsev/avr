@@ -62,8 +62,10 @@ Const Ds1307r = &HD1
 
 Dim Temp As Byte
 Dim Ptr As Word
+Dim AData(11) As Byte
 Dim CurrTime(7) As Byte
 Dim Caption As String * 46
+Dim NewLine As Word At AData Overlay
 
 
 ' /***********************
@@ -87,13 +89,6 @@ Dim Caption As String * 46
     'Console_SetColor clLightGray, clBlack
     'Console_ClearScreen cmAll
 
-    ' Заголовок окна.
-    'Caption = LookupStr( 0, CommandShellInfo )
-    'Console_MoveTo 1, 1
-    'Console_SetColor clBlack, clWhite
-    'Console_WriteString Caption, cp1251
-    'Console_ClearLine cmFromCursorToEnd
-
     ' Рамка без заголовка.
     'Caption = ""
     'Console_DrawFrame 1, 2, 80, 23, clLightGray, clBlue, Caption
@@ -109,19 +104,9 @@ Dim Caption As String * 46
     'Console_MoveTo 27, 12
     'Console_WriteString Caption, cp1251
 
-    'Ptr = &H90
-    'Temp = &H39
-    'PutByte Ptr, Temp
-
-    'Temp = 0
-
-    'Temp = GetByte( Ptr )
-    'Console_MoveTo 1, 2
-    'Console_PutChar Temp, cp866
+    CommandShell_Info
 
     Do
-
-        CommandShell_Info
 
         ' Вывод приглашения командной строки.
         CommandShell_Prompt
@@ -134,9 +119,11 @@ Dim Caption As String * 46
 
             RTC_ShowTime CurrTime(1)
 
+
         elseif Caption = "date" then
 
             RTC_ShowDate CurrTime(1)
+
 
         elseif Caption = "ram" then
 
@@ -148,22 +135,23 @@ Dim Caption As String * 46
 
             Loop Until Temp = &H1B
 
+            CommandShell_Info
+
+
         elseif Caption = "mcu" then
 
             Console_CursorOff
 
             For Temp = 0 To 22
 
-                Console_PutChar &H0D, cp866
-                Console_PutChar &H0A, cp866
+                Console_NewLine
 
                 Caption = LookupStr( Temp, MCUViewData )
                 Console_WriteString Caption, cp866
 
             Next
 
-            Console_PutChar &H0D, cp866
-            Console_PutChar &H0A, cp866
+            Console_NewLine
 
             DDRA = &HFF
             PORTA = &HAA
@@ -178,6 +166,8 @@ Dim Caption As String * 46
                 Temp = Inkey()
 
             Loop Until Temp = &H1B
+
+            CommandShell_Info
 
         end if
 
@@ -210,7 +200,7 @@ Sub ShowPinStates
             Console_SetForegroundColor clRed
         end if
 
-        Console_PutChar &HFE, cp866
+        PrintBin &HFE
 
     Next
 
@@ -240,7 +230,7 @@ Sub ShowPinStates
             Console_SetForegroundColor clRed
         end if
 
-        Console_PutChar &HFE, cp866
+        PrintBin &HFE
 
     Next
 
@@ -263,7 +253,7 @@ Sub ShowPinStates
             Console_SetForegroundColor clRed
         end if
 
-        Console_PutChar &HFE, cp866
+        PrintBin &HFE
 
     Next
 
@@ -286,7 +276,7 @@ Sub ShowPinStates
             Console_SetForegroundColor clRed
         end if
 
-        Console_PutChar &HFE, cp866
+        PrintBin &HFE
 
     Next
 
@@ -370,4 +360,3 @@ MCUViewData:
         "     (OC1A) PD5 -| 19        22 |- PC0 (SCL)  ", _
         "     (ICP1) PD6 -| 20        21 |- PD7 (OC2)  ", _
         "                 +--------------+             "
-
