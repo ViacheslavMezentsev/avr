@@ -1,7 +1,7 @@
 $nocompile
 
 
-' Вывод символа из ОЗУ в кодировке CP866.
+' Вывод символа из ОЗУ в кодировке ACodePage.
 Sub Console_PutChar( ByVal AChar As Byte, ByVal ACodePage As Byte )
 
     select case ACodePage
@@ -25,24 +25,48 @@ Sub Console_PutChar( ByVal AChar As Byte, ByVal ACodePage As Byte )
 End Sub
 
 
+' Переход на новую строку.
+Sub Console_NewLine
+
+    AData(1) = &H0D
+    AData(2) = &H0A
+    Console_WriteData AData(1), 2
+
+End Sub
+
+
 ' Вывести данные из ОЗУ.
-Sub Console_WriteString( AText As String, ByVal ACodePage As Byte )
+Sub Console_WriteData( ACmd As Byte, ByVal ACount As Byte )
 
     Local I As Byte
-    Local Code As Byte
-    Local OneChar As String * 1
-
-    ' Если текст пустой, то выходим.
-    If Len( AText ) = 0 Then Exit Sub
 
     ' Вывод данных
-    For I = 1 To Len( AText )
+    For I = 1 To ACount: PrintBin ACmd(I): Next
 
-        OneChar = Mid( AText, I, 1 )
+End Sub
 
-        Code = Asc( OneChar )
 
-        Console_PutChar Code, ACodePage
+' Вывести строку из ОЗУ.
+Sub Console_WriteString( AText As String, ByVal ACodePage As Byte )
+
+    Local I As Byte, Temp As Byte, Count As Byte
+    Local Ptr As Word
+
+    Count = Len( AText )
+
+    ' Если текст пустой, то выходим.
+    If Count = 0 Then Exit Sub
+
+    Ptr = VarPtr(AText)
+
+    ' Вывод данных
+    For I = 1 To Count
+
+        Temp = GetByte( Ptr )
+
+        Incr Ptr
+
+        Console_PutChar Temp, ACodePage
 
     Next
 
@@ -53,47 +77,42 @@ End Sub
 ' звукового сигнала определённой частоты и длительности.
 Sub Console_Beep( ByVal AFrequency As Word, ByVal ADuration As Byte  )
 
-    Local Ch As Byte
+    Local Temp As Byte
 
     ' -> "\033[" (ESC)
-    Console_PutChar &H1B, cp866
-    Console_PutChar &H5B, cp866
+    AData(1) = &H1B
+    AData(2) = &H5B
 
     ' Сотни.
-    Ch = AFrequency \ 100
-    Ch = Ch + &H30
-    Console_PutChar Ch, cp866
+    Temp = AFrequency \ 100
+    AData(3) = Temp + &H30
 
     ' Десятки.
     AFrequency = AFrequency mod 100
 
-    Ch = AFrequency \ 10
-    Ch = Ch + &H30
-    Console_PutChar Ch, cp866
+    Temp = AFrequency \ 10
+    AData(4) = Temp + &H30
 
     ' Единицы.
-    Ch = AFrequency mod 10
-    Ch = Ch + &H30
-    Console_PutChar Ch, cp866
+    Temp = AFrequency mod 10
+    AData(5) = Temp + &H30
 
-    Ch = Asc( ";" )
-    Console_PutChar Ch, cp866
+    AData(6) = Asc( ";" )
 
     ' Десятки.
-    Ch = ADuration \ 10
-    Ch = Ch + &H30
-    Console_PutChar Ch, cp866
+    Temp = ADuration \ 10
+    AData(7) = Temp + &H30
 
     ' Единицы.
-    Ch = ADuration mod 10
-    Ch = Ch + &H30
-    Console_PutChar Ch, cp866
+    Temp = ADuration mod 10
+    AData(8) = Temp + &H30
 
-    Ch = Asc( "B" )
-    Console_PutChar Ch, cp866
+    AData(9) = Asc( "B" )
 
     ' Вывод звука (BELL).
-    Console_PutChar &H07, cp866
+    AData(10) = &H07
+
+    Console_WriteData AData(1), 10
 
 End Sub
 
@@ -101,31 +120,30 @@ End Sub
 ' Очистить экран.
 Sub Console_ClearScreen( ByVal AMode As Byte )
 
-    Local Ch As Byte
-
-    ' -> "\033[" (ESC)
-    Console_PutChar &H1B, cp866
-    Console_PutChar &H5B, cp866
+    Local Temp As Byte
 
     select case AMode
 
         ' Очистить от курсора до конца экрана.
-        case cmFromCursorToEnd: Ch = Asc("0")
+        case cmFromCursorToEnd: Temp = Asc("0")
 
         ' Очистить от начала экрана до курсора.
-        case cmFromBeginToCursor: Ch = Asc("1")
+        case cmFromBeginToCursor: Temp = Asc("1")
 
         ' Очистить весь экран.
-        case cmAll: Ch = Asc("2")
+        case cmAll: Temp = Asc("2")
 
-        case else: Ch = Asc("2")
+        case else: Temp = Asc("2")
 
     end select
 
-    Console_PutChar Ch, cp866
-
+    ' -> "\033[" (ESC)
+    AData(1) = &H1B
+    AData(2) = &H5B
+    AData(3) = Temp
     ' -> "J"
-    Console_PutChar &H4A, cp866
+    AData(4) = &H4A
+    Console_WriteData AData(1), 4
 
 End Sub
 
@@ -133,31 +151,30 @@ End Sub
 ' Очистка строки.
 Sub Console_ClearLine( ByVal AMode As Byte )
 
-    Local Ch As Byte
-
-    ' -> "\033[" (ESC)
-    Console_PutChar &H1B, cp866
-    Console_PutChar &H5B, cp866
+    Local Temp As Byte
 
     select case AMode
 
         ' Очистить от курсора до конца строки.
-        case cmFromCursorToEnd: Ch = Asc("0")
+        case cmFromCursorToEnd: Temp = Asc("0")
 
         ' Очистить от начала строки до курсора.
-        case cmFromBeginToCursor: Ch = Asc("1")
+        case cmFromBeginToCursor: Temp = Asc("1")
 
         ' Очистить всю строку.
-        case cmAll: Ch = Asc("2")
+        case cmAll: Temp = Asc("2")
 
-        case else: Ch = Asc("0")
+        case else: Temp = Asc("0")
 
     end select
 
-    Console_PutChar Ch, cp866
-
+    ' -> "\033[" (ESC)
+    AData(1) = &H1B
+    AData(2) = &H5B
+    AData(3) = Temp
     ' -> "K"
-    Console_PutChar &H4B, cp866
+    AData(4) = &H4B
+    Console_WriteData AData(1), 4
 
 End Sub
 
@@ -165,26 +182,26 @@ End Sub
 ' Очистить n знаков от позиции курсора.
 Sub Console_ClearForward( ByVal ACount As Byte )
 
-    Local Ch As Byte
+    Local Temp As Byte
 
     if ACount = 0 then Exit Sub
 
     ' -> "\033[" (ESC)
-    Console_PutChar &H1B, cp866
-    Console_PutChar &H5B, cp866
+    AData(1) = &H1B
+    AData(2) = &H5B
 
     ' Десятки.
-    Ch = ACount \ 10
-    Ch = Ch + &H30
-    Console_PutChar Ch, cp866
+    Temp = ACount \ 10
+    AData(3) = Temp + &H30
 
     ' Единицы.
-    Ch = ACount mod 10
-    Ch = Ch + &H30
-    Console_PutChar Ch, cp866
+    Temp = ACount mod 10
+    AData(4) = Temp + &H30
 
     ' -> "X"
-    Console_PutChar &H58, cp866
+    AData(5) = &H58
+
+    Console_WriteData AData(1), 5
 
 End Sub
 
@@ -193,12 +210,14 @@ End Sub
 Sub Console_CursorOn
 
     ' -> "\033[?25h"
-    Console_PutChar &H1B, cp866
-    Console_PutChar &H5B, cp866
-    Console_PutChar &H3F, cp866
-    Console_PutChar &H32, cp866
-    Console_PutChar &H35, cp866
-    Console_PutChar &H68, cp866
+    AData(1) = &H1B
+    AData(2) = &H5B
+    AData(3) = &H3F
+    AData(4) = &H32
+    AData(5) = &H35
+    AData(6) = &H68
+
+    Console_WriteData AData(1), 6
 
 End Sub
 
@@ -207,12 +226,14 @@ End Sub
 Sub Console_CursorOff
 
     ' -> "\033[?25l"
-    Console_PutChar &H1B, cp866
-    Console_PutChar &H5B, cp866
-    Console_PutChar &H3F, cp866
-    Console_PutChar &H32, cp866
-    Console_PutChar &H35, cp866
-    Console_PutChar &H6C, cp866
+    AData(1) = &H1B
+    AData(2) = &H5B
+    AData(3) = &H3F
+    AData(4) = &H32
+    AData(5) = &H35
+    AData(6) = &H6C
+
+    Console_WriteData AData(1), 6
 
 End Sub
 
@@ -221,9 +242,11 @@ End Sub
 Sub Console_SaveCursor
 
     ' -> "\033[s"
-    Console_PutChar &H1B, cp866
-    Console_PutChar &H5B, cp866
-    Console_PutChar &H73, cp866
+    AData(1) = &H1B
+    AData(2) = &H5B
+    AData(3) = &H73
+
+    Console_WriteData AData(1), 3
 
 End Sub
 
@@ -232,9 +255,11 @@ End Sub
 Sub Console_RestoreCursor
 
     ' -> "\033[u"
-    Console_PutChar &H1B, cp866
-    Console_PutChar &H5B, cp866
-    Console_PutChar &H75, cp866
+    AData(1) = &H1B
+    AData(2) = &H5B
+    AData(3) = &H75
+
+    Console_WriteData AData(1), 3
 
 End Sub
 
@@ -242,27 +267,21 @@ End Sub
 ' Установка параметров текста.
 Sub Console_SetForegroundColor( ByVal AColor As Byte )
 
-    Local Ch As Byte
+    ' -> "\033[" (ESC)
+    AData(1) = &H1B
+    AData(2) = &H5B
+    AData(3) = &H32 - AColor.3
+    AData(4) = &H6D
 
     ' -> "\033[" (ESC)
-    Console_PutChar &H1B, cp866
-    Console_PutChar &H5B, cp866
-
-    if AColor.3 = 1 then Ch = Asc("1") else Ch = Asc("2")
-
-    Console_PutChar Ch, cp866
-    Console_PutChar &H6D, cp866
-
-    ' -> "\033[" (ESC)
-    Console_PutChar &H1B, cp866
-    Console_PutChar &H5B, cp866
-
-    Console_PutChar &H33, cp866
+    AData(5) = &H1B
+    AData(6) = &H5B
+    AData(7) = &H33
     AColor = AColor And &H07
-    AColor = AColor + &H30
-    Console_PutChar AColor, cp866
+    AData(8) = AColor + &H30
+    AData(9) = &H6D
 
-    Console_PutChar &H6D, cp866
+    Console_WriteData AData(1), 9
 
 End Sub
 
@@ -270,27 +289,21 @@ End Sub
 ' Установка параметров фона.
 Sub Console_SetBackgroundColor( ByVal AColor As Byte )
 
-    Local Ch As Byte
+    ' -> "\033[" (ESC)
+    AData(1) = &H1B
+    AData(2) = &H5B
+    AData(3) = &H36 - AColor.3
+    AData(4) = &H6D
 
     ' -> "\033[" (ESC)
-    Console_PutChar &H1B, cp866
-    Console_PutChar &H5B, cp866
-
-    if AColor.3 = 1 then Ch = Asc("5") else Ch = Asc("6")
-
-    Console_PutChar Ch, cp866
-    Console_PutChar &H6D, cp866
-
-    ' -> "\033[" (ESC)
-    Console_PutChar &H1B, cp866
-    Console_PutChar &H5B, cp866
-
-    Console_PutChar &H34, cp866
+    AData(5) = &H1B
+    AData(6) = &H5B
+    AData(7) = &H34
     AColor = AColor And &H07
-    AColor = AColor + &H30
-    Console_PutChar AColor, cp866
+    AData(8) = AColor + &H30
+    AData(9) = &H6D
 
-    Console_PutChar &H6D, cp866
+    Console_WriteData AData(1), 9
 
 End Sub
 
@@ -299,14 +312,13 @@ End Sub
 Sub Console_SetTextAttributes( ByVal Attributes As Byte )
 
     ' -> "\033[" (ESC)
-    Console_PutChar &H1B, cp866
-    Console_PutChar &H5B, cp866
-
+    AData(1) = &H1B
+    AData(2) = &H5B
     Attributes = Attributes And &H0F
-    Attributes = Attributes + &H30
-    Console_PutChar Attributes, cp866
+    AData(3) = Attributes + &H30
+    AData(4) = &H6D
 
-    Console_PutChar &H6D, cp866
+    Console_WriteData AData(1), 4
 
 End Sub
 
@@ -324,41 +336,38 @@ End Sub
 ' Переместить в позицию Left и строку Top.
 Sub Console_MoveTo( ByVal ALeft As Byte, ByVal ATop As Byte )
 
-    Local Ch As Byte
+    Local Temp As Byte
 
     if ALeft = 0 Or ATop = 0 then Exit Sub
 
     if ALeft > MAX_X Or ATop > MAX_Y then Exit Sub
 
     ' -> "\033[" (ESC)
-    Console_PutChar &H1B, cp866
-    Console_PutChar &H5B, cp866
+    AData(1) = &H1B
+    AData(2) = &H5B
 
     ' Десятки.
-    Ch = ATop \ 10
-    Ch = Ch + &H30
-    Console_PutChar Ch, cp866
+    Temp = ATop \ 10
+    AData(3) = Temp + &H30
 
     ' Единицы.
-    Ch = ATop mod 10
-    Ch = Ch + &H30
-    Console_PutChar Ch, cp866
+    Temp = ATop mod 10
+    AData(4) = Temp + &H30
 
-    Ch = Asc( ";" )
-    Console_PutChar Ch, cp866
+    AData(5) = Asc( ";" )
 
     ' Десятки.
-    Ch = ALeft \ 10
-    Ch = Ch + &H30
-    Console_PutChar Ch, cp866
+    Temp = ALeft \ 10
+    AData(6) = Temp + &H30
 
     ' Единицы.
-    Ch = ALeft mod 10
-    Ch = Ch + &H30
-    Console_PutChar Ch, cp866
+    Temp = ALeft mod 10
+    AData(7) = Temp + &H30
 
     ' -> "f"
-    Console_PutChar &H66, cp866
+    AData(8) = &H66
+
+    Console_WriteData AData(1), 8
 
 End Sub
 
@@ -366,41 +375,41 @@ End Sub
 ' Относительное перемещение курсора по направлению.
 Sub Console_Move( ByVal ADirection As Byte, ByVal ADelta As Byte )
 
-    Local Ch As Byte
+    Local Temp As Byte
 
     ' -> "\033[" (ESC)
-    Console_PutChar &H1B, cp866
-    Console_PutChar &H5B, cp866
+    AData(1) = &H1B
+    AData(2) = &H5B
 
     ' Десятки.
-    Ch = ADelta \ 10
-    Ch = Ch + &H30
-    Console_PutChar Ch, cp866
+    Temp = ADelta \ 10
+    AData(3) = Temp + &H30
 
     ' Единицы.
-    Ch = ADelta mod 10
-    Ch = Ch + &H30
-    Console_PutChar Ch, cp866
+    Temp = ADelta mod 10
+    AData(4) = Temp + &H30
 
     select case ADirection
 
         ' Вверх на n строк.
-        case mdUp: Ch = Asc("A")
+        case mdUp: Temp = Asc("A")
 
         ' Вниз на n строк.
-        case mdDown: Ch = Asc("B")
+        case mdDown: Temp = Asc("B")
 
         ' Вправо на n позиций.
-        case mdForward: Ch = Asc("C")
+        case mdForward: Temp = Asc("C")
 
         ' Влево на n позиций.
-        case mdBackward: Ch = Asc("D")
+        case mdBackward: Temp = Asc("D")
 
-        case else: Ch = Asc("C")
+        case else: Temp = Asc("C")
 
     end select
 
-    Console_PutChar Ch, cp866
+    AData(5) = Temp
+
+    Console_WriteData AData(1), 5
 
 End Sub
 
@@ -410,11 +419,8 @@ Sub Console_DrawFrame( ByVal ALeft As Byte, ByVal ATop As Byte, _
     ByVal AWidth As Byte, ByVal AHeight As Byte, ByVal AColor As Byte, _
     ByVal ABgColor As Byte, ACaption As String )
 
-    Local I As Byte, J As Byte
-    Local Ch As Byte
-    Local ALen As Byte
-    Local ALeftLen As Byte
-    Local ARightLen As Byte
+    Local I As Byte, J As Byte, Temp As Byte
+    Local ALen As Byte, ALeftLen As Byte, ARightLen As Byte
 
     Console_SetColor AColor, ABgColor
     Console_MoveTo ALeft, ATop
@@ -424,9 +430,13 @@ Sub Console_DrawFrame( ByVal ALeft As Byte, ByVal ATop As Byte, _
     AWidth = AWidth - 2
 
     ' Верхняя граница.
-    Console_PutChar ACS_DBL_ULCORNER, cp866
+    PrintBin ACS_DBL_ULCORNER
 
-    if ALen <> 0 then
+    if ALen = 0 then
+
+        For I = 1 To AWidth: PrintBin ACS_DBL_HLINE: Next
+
+    else
 
         ALeftLen = AWidth - ALen
 
@@ -434,53 +444,49 @@ Sub Console_DrawFrame( ByVal ALeft As Byte, ByVal ATop As Byte, _
 
         Decr ALeftLen
 
-        For I = 1 To ALeftLen: Console_PutChar ACS_DBL_HLINE, cp866: Next
+        For I = 1 To ALeftLen: PrintBin ACS_DBL_HLINE: Next
 
-        Console_PutChar &H20, cp866
+        PrintBin &H20
 
         Console_WriteString ACaption, cp1251
 
-        Console_PutChar &H20, cp866
+        PrintBin &H20
 
         ARightLen = AWidth - ALeftLen
         ARightLen = ARightLen - ALen
         ARightLen = ARightLen - 2
 
-        For I = 1 To ARightLen: Console_PutChar ACS_DBL_HLINE, cp866: Next
-
-    else
-
-        For I = 1 To AWidth: Console_PutChar ACS_DBL_HLINE, cp866: Next
+        For I = 1 To ARightLen: PrintBin ACS_DBL_HLINE: Next
 
     end if
 
-    Console_PutChar ACS_DBL_URCORNER, cp866
+    PrintBin ACS_DBL_URCORNER
 
     ' Вертикальные границы.
     Decr AHeight
 
     For I = 1 To AHeight
 
-        Ch = ATop + I
-        Console_MoveTo ALeft, Ch
+        Temp = ATop + I
+        Console_MoveTo ALeft, Temp
 
-        Console_PutChar ACS_DBL_VLINE, cp866
+        PrintBin ACS_DBL_VLINE
 
-        For J = 1 To AWidth: Console_PutChar &H20, cp866: Next
+        For J = 1 To AWidth: PrintBin &H20: Next
 
-        Console_PutChar ACS_DBL_VLINE, cp866
+        PrintBin ACS_DBL_VLINE
 
     Next
 
     ' Нижняя граница.
-    Ch = ATop + AHeight
-    Console_MoveTo ALeft, Ch
+    Temp = ATop + AHeight
+    Console_MoveTo ALeft, Temp
 
-    Console_PutChar ACS_DBL_LLCORNER, cp866
+    PrintBin ACS_DBL_LLCORNER
 
-    For I = 1 To AWidth: Console_PutChar ACS_DBL_HLINE, cp866: Next
+    For I = 1 To AWidth: PrintBin ACS_DBL_HLINE: Next
 
-    Console_PutChar ACS_DBL_LRCORNER, cp866
+    PrintBin ACS_DBL_LRCORNER
 
 End Sub
 
