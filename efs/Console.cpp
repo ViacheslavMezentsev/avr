@@ -53,7 +53,7 @@ PR_END_EXTERN_C
 uint8_t CConsole::GetChar() {
 
     uint8_t ret = 0;
-    
+
     __disable_interrupt();
 
     if ( !FIFO_IS_EMPTY( uart_rx_fifo ) ) {
@@ -64,7 +64,7 @@ uint8_t CConsole::GetChar() {
         FIFO_POP( uart_rx_fifo );
 
     }
-    
+
     __enable_interrupt();
 
     return ret;
@@ -274,7 +274,7 @@ void CConsole::RestoreCursor() {
 void CConsole::SetForegroundColor( EnColor Color ) {
 
     WriteString( ESC );
-    ( Color & 0x8 ) ? PutChar( '1' ) : PutChar( '2' ); 
+    ( Color & 0x8 ) ? PutChar( '1' ) : PutChar( '2' );
     PutChar( 'm' );
 
     WriteString( ESC );
@@ -291,7 +291,7 @@ void CConsole::SetForegroundColor( EnColor Color ) {
 void CConsole::SetBackgroundColor( EnColor Color ) {
 
     WriteString( ESC );
-    ( Color & 0x8 ) ? PutChar( '5' ) : PutChar( '6' ); 
+    ( Color & 0x8 ) ? PutChar( '5' ) : PutChar( '6' );
     PutChar( 'm' );
 
     WriteString( ESC );
@@ -416,7 +416,7 @@ void CConsole::DrawFrame( uint8_t Left, uint8_t Top, uint8_t Width, uint8_t Heig
         MoveTo( Left, Top + i + 1 );
         PutChar( ACS_DBL_VLINE );
 
-        for ( uint8_t i = 0; i < Width; i++ ) PutChar( ' ' );
+        for ( uint8_t j = 0; j < Width; j++ ) PutChar( ' ' );
 
         PutChar( ACS_DBL_VLINE );
 

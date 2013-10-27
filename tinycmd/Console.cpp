@@ -39,6 +39,8 @@ FLASHSTR_DECLARE( char, ESC, "\033[" );
 
 // -=[ Переменные в ОЗУ ]=-
 
+uint8_t Data[11];
+
 PR_BEGIN_EXTERN_C
     FIFO( 16 ) uart_rx_fifo;
 PR_END_EXTERN_C
@@ -53,7 +55,7 @@ PR_END_EXTERN_C
 uint8_t CConsole::GetChar() {
 
     uint8_t ret = 0;
-    
+
     __disable_interrupt();
 
     if ( !FIFO_IS_EMPTY( uart_rx_fifo ) ) {
@@ -64,7 +66,7 @@ uint8_t CConsole::GetChar() {
         FIFO_POP( uart_rx_fifo );
 
     }
-    
+
     __enable_interrupt();
 
     return ret;
@@ -102,6 +104,12 @@ void CConsole::PutChar( uint8_t ch, EnCodePage CodePage ) {
 }
 
 
+void CConsole::WriteData( uint8_t Count ) {
+
+    for ( uint8_t i = 0; i < Count; i++ ) PutChar( Data[i], cp866 );
+}
+
+
 void CConsole::WriteString( FCHAR_PTR s, EnCodePage CodePage, uint8_t Length ) {
 
     uint8_t index = 0;
@@ -135,27 +143,30 @@ void CConsole::WriteString( const char * s, EnCodePage CodePage, uint8_t Length 
 /**
  * Вывод звука.
  */
-void CConsole::Beep( uint16_t Frequency, uint8_t Duration  ) {
+void CConsole::Beep( uint16_t Frequency, uint8_t Duration  ) {  
 
     // Настройка параметров (если используется).
-    WriteString( ESC );
+    Data[0] = '\033';
+    Data[1] = '[';
 
-    PutChar( ( Frequency / 100 ) + '0' );
+    Data[2] = ( Frequency / 100 ) + '0';
 
     Frequency %= 100;
 
-    PutChar( ( Frequency / 10 ) + '0' );
-    PutChar( ( Frequency % 10 ) + '0' );
+    Data[3] = ( Frequency / 10 ) + '0';
+    Data[4] = ( Frequency % 10 ) + '0';
+    
+    Data[5] = ';';
 
-    PutChar( ';' );
+    Data[6] = ( Duration / 10 ) + '0';
+    Data[7] = ( Duration % 10 ) + '0';
 
-    PutChar( ( Duration / 10 ) + '0' );
-    PutChar( ( Duration % 10 ) + '0' );
-
-    PutChar( 'B' );
+    Data[8] = 'B';
 
     // Вывод звука (BELL).
-    PutChar( '\a' );
+    Data[9] = '\a';
+
+    WriteData( 10 );
 }
 
 
@@ -164,25 +175,27 @@ void CConsole::Beep( uint16_t Frequency, uint8_t Duration  ) {
  */
 void CConsole::ClearScreen( EnClearMode Mode ) {
 
-    WriteString( ESC );
+    Data[0] = '\033';
+    Data[1] = '[';
 
     switch ( Mode ) {
 
         // Очистить от курсора до конца экрана.
-        case cmFromCursorToEnd: { PutChar( '0' ); break; }
+        case cmFromCursorToEnd: { Data[2] = '0'; break; }
 
         // Очистить от начала экрана до курсора.
-        case cmFromBeginToCursor: { PutChar( '1' ); break; }
+        case cmFromBeginToCursor: { Data[2] = '1'; break; }
 
         // Очистить весь экран.
-        case cmAll: { PutChar( '2' ); break; }
+        case cmAll: { Data[2] = '2'; break; }
 
-        default: PutChar( '2' );
+        default: Data[2] = '2';
 
     }
 
-    PutChar( 'J' );
+    Data[3] = 'J';
 
+    WriteData(4);
 }
 
 
@@ -191,25 +204,27 @@ void CConsole::ClearScreen( EnClearMode Mode ) {
  */
 void CConsole::ClearLine( EnClearMode Mode ) {
 
-    WriteString( ESC );
+    Data[0] = '\033';
+    Data[1] = '[';
 
     switch ( Mode ) {
 
         // Очистить от курсора до конца строки.
-        case cmFromCursorToEnd: { PutChar( '0' ); break; }
+        case cmFromCursorToEnd: { Data[2] ='0'; break; }
 
         // Очистить от начала строки до курсора.
-        case cmFromBeginToCursor: { PutChar( '1' ); break; }
+        case cmFromBeginToCursor: { Data[2] = '1'; break; }
 
         // Очистить всю строку.
-        case cmAll: { PutChar( '2' ); break; }
+        case cmAll: { Data[2] = '2'; break; }
 
-        default: PutChar( '0' );
+        default: Data[2] = '0';
 
     }
 
-    PutChar( 'K' );
+    Data[3] = 'K';
 
+    WriteData(4);
 }
 
 
@@ -220,10 +235,12 @@ void CConsole::ClearForward( uint8_t Count ) {
 
     if ( Count == 0 ) return;
 
-    WriteString( ESC );
-    PutChar( ( Count / 10 ) + '0' );
-    PutChar( ( Count % 10 ) + '0' );
-    PutChar( 'X' );
+    Data[0] = '\033';
+    Data[1] = '[';
+    Data[2] = ( Count / 10 ) + '0';
+    Data[3] = ( Count % 10 ) + '0';
+    Data[4] = 'X';
+    WriteData(5);
 
 }
 
@@ -273,15 +290,18 @@ void CConsole::RestoreCursor() {
  */
 void CConsole::SetForegroundColor( EnColor Color ) {
 
-    WriteString( ESC );
-    ( Color & 0x8 ) ? PutChar( '1' ) : PutChar( '2' ); 
-    PutChar( 'm' );
+    Data[0] = '\033';
+    Data[1] = '[';
+    Data[2] = ( Color & 0x8 ) ? '1' : '2';
+    Data[3] = 'm';
 
-    WriteString( ESC );
-    PutChar( '3' );
-    PutChar( ( Color & 0x07 ) + '0' );
-    PutChar( 'm' );
+    Data[4] = '\033';
+    Data[5] = '[';
+    Data[6] = '3';
+    Data[7] = ( Color & 0x07 ) + '0';
+    Data[8] = 'm';
 
+    WriteData(9);
 }
 
 
@@ -290,15 +310,18 @@ void CConsole::SetForegroundColor( EnColor Color ) {
  */
 void CConsole::SetBackgroundColor( EnColor Color ) {
 
-    WriteString( ESC );
-    ( Color & 0x8 ) ? PutChar( '5' ) : PutChar( '6' ); 
-    PutChar( 'm' );
+    Data[0] = '\033';
+    Data[1] = '[';
+    Data[2] = ( Color & 0x8 ) ? '5' : '6';
+    Data[3] = 'm';
 
-    WriteString( ESC );
-    PutChar( '4' );
-    PutChar( ( Color & 0x07 ) + '0' );
-    PutChar( 'm' );
+    Data[4] = '\033';
+    Data[5] = '[';
+    Data[6] = '4';
+    Data[7] = ( Color & 0x07 ) + '0';
+    Data[8] = 'm';
 
+    WriteData(9);
 }
 
 
@@ -310,7 +333,6 @@ void CConsole::SetColor( EnColor ForegroundColor, EnColor BackgroundColor ) {
     SetTextAttributes( atOff );
     SetForegroundColor( ForegroundColor );
     SetBackgroundColor( BackgroundColor );
-
 }
 
 
@@ -319,10 +341,12 @@ void CConsole::SetColor( EnColor ForegroundColor, EnColor BackgroundColor ) {
  */
 void CConsole::SetTextAttributes( EnAttributes Attributes ) {
 
-    WriteString( ESC );
-    PutChar( ( Attributes & 0x0F ) + '0' );
-    PutChar( 'm' );
+    Data[0] = '\033';
+    Data[1] = '[';
+    Data[2] = ( Attributes & 0x0F ) + '0';
+    Data[3] = 'm';
 
+    WriteData(4);
 }
 
 
@@ -335,14 +359,16 @@ void CConsole::MoveTo( uint8_t Left, uint8_t Top ) {
 
     if ( Left > MAX_X || Top > MAX_Y ) return;
 
-    WriteString( ESC );
-    PutChar( ( Top / 10 ) + '0' );
-    PutChar( ( Top % 10 ) + '0' );
-    PutChar( ';' );
-    PutChar( ( Left / 10 ) + '0' );
-    PutChar( ( Left % 10 ) + '0' );
-    PutChar( 'f' );
+    Data[0] = '\033';
+    Data[1] = '[';
+    Data[2] = ( Top / 10 ) + '0';
+    Data[3] = ( Top % 10 ) + '0';
+    Data[4] = ';';
+    Data[5] = ( Left / 10 ) + '0';
+    Data[6] = ( Left % 10 ) + '0';
+    Data[7] = 'f';
 
+    WriteData(8);
 }
 
 
@@ -351,29 +377,31 @@ void CConsole::MoveTo( uint8_t Left, uint8_t Top ) {
  */
 void CConsole::Move( EnMoveDirection Direction, uint8_t Delta ) {
 
-    WriteString( ESC );
+    Data[0] = '\033';
+    Data[1] = '[';
 
-    PutChar( ( Delta / 10 ) + '0' );
-    PutChar( ( Delta % 10 ) + '0' );
+    Data[2] = ( Delta / 10 ) + '0';
+    Data[3] = ( Delta % 10 ) + '0';
 
     switch ( Direction ) {
 
         // Вверх на n строк.
-        case mdUp: { PutChar( 'A' ); break; }
+        case mdUp: { Data[4] = 'A'; break; }
 
         // Вниз на n строк.
-        case mdDown: { PutChar( 'B' ); break; }
+        case mdDown: { Data[4] = 'B'; break; }
 
         // Вправо на n позиций.
-        case mdForward: { PutChar( 'C' ); break; }
+        case mdForward: { Data[4] = 'C'; break; }
 
         // Влево на n позиций.
-        case mdBackward: { PutChar( 'D' ); break; }
+        case mdBackward: { Data[4] = 'D'; break; }
 
-        default: PutChar( 'C' );
+        default: Data[4] = 'C';
 
     }
 
+    WriteData(5);
 }
 
 
@@ -416,7 +444,7 @@ void CConsole::DrawFrame( uint8_t Left, uint8_t Top, uint8_t Width, uint8_t Heig
         MoveTo( Left, Top + i + 1 );
         PutChar( ACS_DBL_VLINE );
 
-        for ( uint8_t i = 0; i < Width; i++ ) PutChar( ' ' );
+        for ( uint8_t j = 0; j < Width; j++ ) PutChar( ' ' );
 
         PutChar( ACS_DBL_VLINE );
 

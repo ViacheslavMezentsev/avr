@@ -34,86 +34,86 @@ public:
             return *this;
 
     }
-        
+
     // постинкремент
     inline Self operator ++( int ) {
-            
+
         Self tmp = *this;
         _address++;
 
         return tmp;
 
     }
-        
+
     // предекремент
     inline Self& operator --() {
-            
+
         _address--;
-        
+
         return *this;
 
     }
-        
+
     // постдекремент
     inline Self operator --( int ) {
-            
+
         Self tmp = *this;
         _address--;
-        
+
         return tmp;
 
     }
 
     inline Self& operator +=( int value ) {
-            
+
         _address += value;
-        
+
         return *this;
 
     }
 
     inline Self& operator -=( int value ) {
-            
+
         _address -= value;
-        
+
         return *this;
 
     }
 
     inline Self operator +( int value ) {
-            
+
         return Self( _address + value );
 
     }
 
     inline Self operator -( int value ) {
-            
+
         return Self( _address - value );
 
     }
 
     inline bool operator !=( const Self &other ) const {
-            
+
         return _address != other._address;
 
     }
 
     inline bool operator ==( const Self &other ) const {
-            
+
         return _address == other._address;
 
     }
 
     // Операция разъименовывания указателя. Здесь осуществляется чтение по указателю.
     inline const T operator *() const {
-        
+
         union {
                 T value = 0;
                 uint8_t bytes[ sizeof(T) ];
         } data;
 
         for ( unsigned i = 0; i < sizeof(T); ++i ) {
-         
+
             data.bytes[i] = Accessor::Read( ( const uint8_t * const )( _address ) + i );
 
         }
@@ -123,12 +123,12 @@ public:
     }
 
     explicit operator const T * () const {
-        
+
         return _address;
     }
 
     inline const T operator []( int value ) {
-            
+
         return * Self( _address + value );
 
     }
@@ -156,7 +156,7 @@ class FlashPtr: public BasePtr<T, FlashPtr<T> > {
 
 template<class T>
 class EepromPtr: public BasePtr< T, EepromPtr<T> > {
-        
+
     public:
 
         EepromPtr( T *address ): BasePtr< T, EepromPtr<T> >( address ) {}
