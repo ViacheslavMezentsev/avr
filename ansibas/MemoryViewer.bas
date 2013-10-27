@@ -79,7 +79,7 @@ Sub MemoryViewer_DrawMemory
 
         Console_SetForegroundColor clWhite
 
-        For J = 0 To 16
+        For J = 0 To 15
 
             Tmp = GetByte( Addr )
             Ch = Tmp
@@ -116,7 +116,7 @@ Sub MemoryViewer_DrawMemory
         Addr = I * 16
         Addr = Addr + _offset
 
-        For J = 0 To 16
+        For J = 0 To 15
 
             Tmp = GetByte( Addr )
 
