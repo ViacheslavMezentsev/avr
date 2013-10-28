@@ -46,40 +46,40 @@ Sub RTC_ShowDate( ATime As Byte )
     ' Десятки.
     Ch = ADay \ 10
     Ch = Ch + &H30
-    Console_PutChar Ch, cp866
+    PrintBin Ch
 
     ' Единицы.
     Ch = ADay mod 10
     Ch = Ch + &H30
-    Console_PutChar Ch, cp866
+    PrintBin Ch
 
     Ch = Asc( "-" )
-    Console_PutChar Ch, cp866
+    PrintBin Ch
 
     ' Вывод месяца.
     ' Десятки.
     Ch = AMonth \ 10
     Ch = Ch + &H30
-    Console_PutChar Ch, cp866
+    PrintBin Ch
 
     ' Единицы.
     Ch = AMonth mod 10
     Ch = Ch + &H30
-    Console_PutChar Ch, cp866
+    PrintBin Ch
 
     Ch = Asc( "-" )
-    Console_PutChar Ch, cp866
+    PrintBin Ch
 
     ' Вывод года.
     ' Десятки.
     Ch = AYear \ 10
     Ch = Ch + &H30
-    Console_PutChar Ch, cp866
+    PrintBin Ch
 
     ' Единицы.
     Ch = AYear mod 10
     Ch = Ch + &H30
-    Console_PutChar Ch, cp866
+    PrintBin Ch
 
 End Sub
 
@@ -102,39 +102,39 @@ Sub RTC_ShowTime( ATime As Byte )
     ' Десятки.
     Ch = AHour \ 10
     Ch = Ch + &H30
-    Console_PutChar Ch, cp866
+    PrintBin Ch
 
     ' Единицы.
     Ch = AHour mod 10
     Ch = Ch + &H30
-    Console_PutChar Ch, cp866
+    PrintBin Ch
 
     Ch = Asc( ":" )
-    Console_PutChar Ch, cp866
+    PrintBin Ch
 
     ' Вывод минут.
     ' Десятки.
     Ch = AMinutes \ 10
     Ch = Ch + &H30
-    Console_PutChar Ch, cp866
+    PrintBin Ch
 
     ' Единицы.
     Ch = AMinutes mod 10
     Ch = Ch + &H30
-    Console_PutChar Ch, cp866
+    PrintBin Ch
 
     Ch = Asc( ":" )
-    Console_PutChar Ch, cp866
+    PrintBin Ch
 
     ' Вывод секунд.
     ' Десятки.
     Ch = ASeconds \ 10
     Ch = Ch + &H30
-    Console_PutChar Ch, cp866
+    PrintBin Ch
 
     ' Единицы.
     Ch = ASeconds mod 10
     Ch = Ch + &H30
-    Console_PutChar Ch, cp866
+    PrintBin Ch
 
 End Sub
