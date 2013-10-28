@@ -61,6 +61,7 @@ Sub Console_WriteData
 
     WEnd
 
+    'TODO: Разобраться почему не работает такой вариант.
     'Console_WriteString Command, cp866
 
 End Sub
@@ -69,26 +70,19 @@ End Sub
 ' Вывести строку из ОЗУ.
 Sub Console_WriteString( AText As String, ByVal ACodePage As Byte )
 
-    Local I As Byte, Temp As Byte, Count As Byte
+    Local Temp As Byte
     Local Ptr As Word
 
-    Count = Len( AText )
-
-    ' Если текст пустой, то выходим.
-    If Count = 0 Then Exit Sub
-
     Ptr = VarPtr(AText)
+    Temp = GetByte( Ptr )
 
-    ' Вывод данных
-    For I = 1 To Count
-
-        Temp = GetByte( Ptr )
-
-        Incr Ptr
+    While Temp > 0
 
         Console_PutChar Temp, ACodePage
+        Incr Ptr
+        Temp = GetByte( Ptr )
 
-    Next
+    WEnd
 
 End Sub
 
@@ -146,24 +140,22 @@ End Sub
 ' Очистить экран.
 Sub Console_ClearScreen( ByVal AMode As Byte )
 
-    Local Temp As Byte
+    ' Default value: cmAll
+    AData(3) = Asc("2")
 
     select case AMode
 
         ' Очистить от курсора до конца экрана.
-        case cmFromCursorToEnd: Temp = Asc("0")
+        case cmFromCursorToEnd: AData(3) = Asc("0")
 
         ' Очистить от начала экрана до курсора.
-        case cmFromBeginToCursor: Temp = Asc("1")
+        case cmFromBeginToCursor: AData(3) = Asc("1")
 
         ' Очистить весь экран.
-        case cmAll: Temp = Asc("2")
-
-        case else: Temp = Asc("2")
+        'case cmAll: AData(3) = Asc("2")
 
     end select
 
-    AData(3) = Temp
     ' -> "J"
     AData(4) = &H4A
     AData(5) = &H00
@@ -176,24 +168,22 @@ End Sub
 ' Очистка строки.
 Sub Console_ClearLine( ByVal AMode As Byte )
 
-    Local Temp As Byte
+    ' Default value: cmFromCursorToEnd
+    AData(3) = Asc("0")
 
     select case AMode
 
         ' Очистить от курсора до конца строки.
-        case cmFromCursorToEnd: Temp = Asc("0")
+        'case cmFromCursorToEnd: AData(3) = Asc("0")
 
         ' Очистить от начала строки до курсора.
-        case cmFromBeginToCursor: Temp = Asc("1")
+        case cmFromBeginToCursor: AData(3) = Asc("1")
 
         ' Очистить всю строку.
-        case cmAll: Temp = Asc("2")
-
-        case else: Temp = Asc("0")
+        case cmAll: AData(3) = Asc("2")
 
     end select
 
-    AData(3) = Temp
     ' -> "K"
     AData(4) = &H4B
     AData(5) = &H00
@@ -282,15 +272,15 @@ Sub Console_SetForegroundColor( ByVal AColor As Byte )
 
     AData(3) = &H32 - AColor.3
     AData(4) = &H6D
+    AData(5) = &H00
 
-    ' -> "\033[" (ESC)
-    AData(5) = &H1B
-    AData(6) = &H5B
-    AData(7) = &H33
+    Console_WriteData
+
+    AData(3) = &H33
     AColor = AColor And &H07
-    AData(8) = AColor + &H30
-    AData(9) = &H6D
-    AData(10) = &H00
+    AData(4) = AColor + &H30
+    AData(5) = &H6D
+    AData(6) = &H00
 
     Console_WriteData
 
@@ -302,15 +292,15 @@ Sub Console_SetBackgroundColor( ByVal AColor As Byte )
 
     AData(3) = &H36 - AColor.3
     AData(4) = &H6D
+    AData(5) = &H00
 
-    ' -> "\033[" (ESC)
-    AData(5) = &H1B
-    AData(6) = &H5B
-    AData(7) = &H34
+    Console_WriteData
+
+    AData(3) = &H34
     AColor = AColor And &H07
-    AData(8) = AColor + &H30
-    AData(9) = &H6D
-    AData(10) = &H00
+    AData(4) = AColor + &H30
+    AData(5) = &H6D
+    AData(6) = &H00
 
     Console_WriteData
 
