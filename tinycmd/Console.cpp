@@ -104,9 +104,12 @@ void CConsole::PutChar( uint8_t ch, EnCodePage CodePage ) {
 }
 
 
-void CConsole::WriteData( uint8_t Count ) {
+void CConsole::WriteData() {
 
-    for ( uint8_t i = 0; i < Count; i++ ) PutChar( Data[i], cp866 );
+    Data[0] = '\033';
+    Data[1] = '[';
+
+    WriteString( ( const char * ) Data, cp866 );
 }
 
 
@@ -146,9 +149,6 @@ void CConsole::WriteString( const char * s, EnCodePage CodePage, uint8_t Length 
 void CConsole::Beep( uint16_t Frequency, uint8_t Duration  ) {  
 
     // Настройка параметров (если используется).
-    Data[0] = '\033';
-    Data[1] = '[';
-
     Data[2] = ( Frequency / 100 ) + '0';
 
     Frequency %= 100;
@@ -165,8 +165,9 @@ void CConsole::Beep( uint16_t Frequency, uint8_t Duration  ) {
 
     // Вывод звука (BELL).
     Data[9] = '\a';
+    Data[10] = '\0';
 
-    WriteData( 10 );
+    WriteData();
 }
 
 
@@ -174,9 +175,6 @@ void CConsole::Beep( uint16_t Frequency, uint8_t Duration  ) {
  * Очистить экран.
  */
 void CConsole::ClearScreen( EnClearMode Mode ) {
-
-    Data[0] = '\033';
-    Data[1] = '[';
 
     switch ( Mode ) {
 
@@ -194,8 +192,9 @@ void CConsole::ClearScreen( EnClearMode Mode ) {
     }
 
     Data[3] = 'J';
+    Data[4] = '\0';
 
-    WriteData(4);
+    WriteData();
 }
 
 
@@ -203,9 +202,6 @@ void CConsole::ClearScreen( EnClearMode Mode ) {
  * Очистка строки.
  */
 void CConsole::ClearLine( EnClearMode Mode ) {
-
-    Data[0] = '\033';
-    Data[1] = '[';
 
     switch ( Mode ) {
 
@@ -223,8 +219,9 @@ void CConsole::ClearLine( EnClearMode Mode ) {
     }
 
     Data[3] = 'K';
+    Data[4] = '\0';
 
-    WriteData(4);
+    WriteData();
 }
 
 
@@ -235,12 +232,12 @@ void CConsole::ClearForward( uint8_t Count ) {
 
     if ( Count == 0 ) return;
 
-    Data[0] = '\033';
-    Data[1] = '[';
     Data[2] = ( Count / 10 ) + '0';
     Data[3] = ( Count % 10 ) + '0';
     Data[4] = 'X';
-    WriteData(5);
+    Data[5] = '\0';
+
+    WriteData();
 
 }
 
@@ -290,18 +287,18 @@ void CConsole::RestoreCursor() {
  */
 void CConsole::SetForegroundColor( EnColor Color ) {
 
-    Data[0] = '\033';
-    Data[1] = '[';
     Data[2] = ( Color & 0x8 ) ? '1' : '2';
     Data[3] = 'm';
+    Data[4] = '\0';
 
-    Data[4] = '\033';
-    Data[5] = '[';
-    Data[6] = '3';
-    Data[7] = ( Color & 0x07 ) + '0';
-    Data[8] = 'm';
+    WriteData();
 
-    WriteData(9);
+    Data[2] = '3';
+    Data[3] = ( Color & 0x07 ) + '0';
+    Data[4] = 'm';
+    Data[5] = '\0';
+
+    WriteData();
 }
 
 
@@ -310,18 +307,18 @@ void CConsole::SetForegroundColor( EnColor Color ) {
  */
 void CConsole::SetBackgroundColor( EnColor Color ) {
 
-    Data[0] = '\033';
-    Data[1] = '[';
     Data[2] = ( Color & 0x8 ) ? '5' : '6';
     Data[3] = 'm';
+    Data[4] = '\0';
 
-    Data[4] = '\033';
-    Data[5] = '[';
-    Data[6] = '4';
-    Data[7] = ( Color & 0x07 ) + '0';
-    Data[8] = 'm';
+    WriteData();
 
-    WriteData(9);
+    Data[2] = '4';
+    Data[3] = ( Color & 0x07 ) + '0';
+    Data[4] = 'm';
+    Data[5] = '\0';
+
+    WriteData();
 }
 
 
@@ -341,12 +338,11 @@ void CConsole::SetColor( EnColor ForegroundColor, EnColor BackgroundColor ) {
  */
 void CConsole::SetTextAttributes( EnAttributes Attributes ) {
 
-    Data[0] = '\033';
-    Data[1] = '[';
     Data[2] = ( Attributes & 0x0F ) + '0';
     Data[3] = 'm';
+    Data[4] = '\0';
 
-    WriteData(4);
+    WriteData();
 }
 
 
@@ -359,16 +355,15 @@ void CConsole::MoveTo( uint8_t Left, uint8_t Top ) {
 
     if ( Left > MAX_X || Top > MAX_Y ) return;
 
-    Data[0] = '\033';
-    Data[1] = '[';
     Data[2] = ( Top / 10 ) + '0';
     Data[3] = ( Top % 10 ) + '0';
     Data[4] = ';';
     Data[5] = ( Left / 10 ) + '0';
     Data[6] = ( Left % 10 ) + '0';
     Data[7] = 'f';
+    Data[8] = '\0';
 
-    WriteData(8);
+    WriteData();
 }
 
 
@@ -376,9 +371,6 @@ void CConsole::MoveTo( uint8_t Left, uint8_t Top ) {
  * Относительное перемещение курсора по направлению.
  */
 void CConsole::Move( EnMoveDirection Direction, uint8_t Delta ) {
-
-    Data[0] = '\033';
-    Data[1] = '[';
 
     Data[2] = ( Delta / 10 ) + '0';
     Data[3] = ( Delta % 10 ) + '0';
@@ -400,8 +392,10 @@ void CConsole::Move( EnMoveDirection Direction, uint8_t Delta ) {
         default: Data[4] = 'C';
 
     }
+    
+    Data[5] = '\0';
 
-    WriteData(5);
+    WriteData();
 }
 
 
