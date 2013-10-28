@@ -15,7 +15,7 @@
 ' *  ~~~~~~~~~~~~~~~~~~~~~~~
 ' ****************************/
 
-$version 0,0,4
+$version 0,0,7
 $regfile = "m16def.dat"
 $crystal = 8000000
 '$sim
@@ -57,7 +57,6 @@ Declare Function GetByte( ByVal Addr As Word ) As Byte
 
 Dim Temp As Byte
 Dim Ptr As Word
-Dim CurrTime(7) As Byte
 Dim Caption As String * 46
 
 

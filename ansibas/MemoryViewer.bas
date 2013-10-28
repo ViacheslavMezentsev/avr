@@ -68,14 +68,13 @@ Sub MemoryViewer_DrawMemory
 
             OneChar = Mid( HexChars, Ptr, 1 )
             Ch = Asc( OneChar )
-
-            Console_PutChar Ch, cp866
+            PrintBin Ch
 
         Loop Until J = 0
 
         Ch = Asc(":")
-        Console_PutChar Ch, cp866
-        Console_PutChar &H20, cp866
+        PrintBin Ch
+        PrintBin &H20
 
         Console_SetForegroundColor clWhite
 
@@ -87,30 +86,30 @@ Sub MemoryViewer_DrawMemory
             Incr Ch
             OneChar = Mid( HexChars, Ch, 1 )
             Ch = Asc( OneChar )
-            Console_PutChar Ch, cp866
+            PrintBin Ch
 
             Ch = Tmp and &H0F
             Incr Ch
             OneChar = Mid( HexChars, Ch, 1 )
             Ch = Asc( OneChar )
-            Console_PutChar Ch, cp866
+            PrintBin Ch
 
             Incr Addr
 
-            Console_PutChar &H20, cp866
+            PrintBin &H20
 
             if J = 7 then
 
                 Ch = Asc("-")
-                Console_PutChar Ch, cp866
-                Console_PutChar &H20, cp866
+                PrintBin Ch
+                PrintBin &H20
 
             end if
 
         Next
 
-        Console_PutChar ACS_VLINE, cp866
-        Console_PutChar &H20, cp866
+        PrintBin ACS_VLINE
+        PrintBin &H20
 
         ' Отображаем данные.
         Addr = I * 16
@@ -127,7 +126,7 @@ Sub MemoryViewer_DrawMemory
             else
 
                 Ch = Asc( "." )
-                Console_PutChar Ch, cp866
+                PrintBin Ch
 
             end if
 
