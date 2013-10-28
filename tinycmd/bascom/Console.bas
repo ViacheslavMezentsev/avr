@@ -99,24 +99,22 @@ End Sub
 ' Очистить экран.
 Sub Console_ClearScreen( ByVal AMode As Byte )
 
-    Local Temp As Byte
+    ' Default value: cmAll
+    AData(3) = Asc("2")
 
     select case AMode
 
         ' Очистить от курсора до конца экрана.
-        case cmFromCursorToEnd: Temp = Asc("0")
+        case cmFromCursorToEnd: AData(3) = Asc("0")
 
         ' Очистить от начала экрана до курсора.
-        case cmFromBeginToCursor: Temp = Asc("1")
+        case cmFromBeginToCursor: AData(3) = Asc("1")
 
         ' Очистить весь экран.
-        case cmAll: Temp = Asc("2")
-
-        case else: Temp = Asc("2")
+        'case cmAll: AData(3) = Asc("2")
 
     end select
 
-    AData(3) = Temp
     ' -> "J"
     AData(4) = &H4A
     AData(5) = &H00
@@ -129,24 +127,22 @@ End Sub
 ' Очистка строки.
 Sub Console_ClearLine( ByVal AMode As Byte )
 
-    Local Temp As Byte
+    ' Default value: cmFromCursorToEnd
+    AData(3) = Asc("0")
 
     select case AMode
 
         ' Очистить от курсора до конца строки.
-        case cmFromCursorToEnd: Temp = Asc("0")
+        'case cmFromCursorToEnd: AData(3) = Asc("0")
 
         ' Очистить от начала строки до курсора.
-        case cmFromBeginToCursor: Temp = Asc("1")
+        case cmFromBeginToCursor: AData(3) = Asc("1")
 
         ' Очистить всю строку.
-        case cmAll: Temp = Asc("2")
-
-        case else: Temp = Asc("0")
+        case cmAll: AData(3) = Asc("2")
 
     end select
 
-    AData(3) = Temp
     ' -> "K"
     AData(4) = &H4B
     AData(5) = &H00

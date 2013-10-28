@@ -88,8 +88,6 @@ Const cmAll = 2
 
 
 Dim AData(11) As Byte
-Dim NewLine As Word At AData Overlay
-Dim Command As String * 10 At AData Overlay
 
 
 ' Функции для работы с ANSI терминалом.
