@@ -15,7 +15,7 @@
 ' *  ~~~~~~~~~~~~~~~~~~~~~~~
 ' ****************************/
 
-
+$version 0,0,4
 $regfile = "m16def.dat"
 $crystal = 8000000
 '$sim
@@ -53,19 +53,12 @@ Declare Sub PutByte( ByVal Addr As Word, ByVal AValue As Byte )
 Declare Function GetByte( ByVal Addr As Word ) As Byte
 
 
-'address of ds1307
-Const Ds1307w = &HD0
-Const Ds1307r = &HD1
-
-
 ' -=[ Переменные в ОЗУ ]=-
 
 Dim Temp As Byte
 Dim Ptr As Word
-Dim AData(11) As Byte
 Dim CurrTime(7) As Byte
 Dim Caption As String * 46
-Dim NewLine As Word At AData Overlay
 
 
 ' /***********************
@@ -77,8 +70,8 @@ Dim NewLine As Word At AData Overlay
     ' Инициализация всей периферии микроконтроллера.
     MCU_Initialization
 
-    ' Настройка TWI.
-    I2cinit
+    ' Настройка RTC.
+    RTC_Initialization
 
     ' Настройка интерпретатора.
     CommandShell_Initialization

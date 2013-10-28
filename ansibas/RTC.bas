@@ -1,6 +1,13 @@
 $nocompile
 
 
+Sub RTC_Initialization
+
+    I2cinit
+
+End Sub
+
+
 Sub RTC_GetDatetime( ATime As Byte )
 
   I2cstart

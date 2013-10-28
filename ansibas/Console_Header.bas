@@ -87,11 +87,15 @@ Const cmFromBeginToCursor = 1
 Const cmAll = 2
 
 
+Dim AData(11) As Byte
+Dim NewLine As Word At AData Overlay
+
+
 ' Функции для работы с ANSI терминалом.
 
 Declare Sub Console_PutChar( ByVal AChar As Byte, ByVal ACodePage As Byte )
+Declare Sub Console_WriteData
 Declare Sub Console_NewLine
-Declare Sub Console_WriteData( ACmd As Byte, ByVal ACount As Byte )
 Declare Sub Console_WriteString( AText As String, ByVal ACodePage As Byte )
 Declare Sub Console_Beep( ByVal AFrequency As Word, ByVal ADuration As Byte  )
 Declare Sub Console_ClearScreen( ByVal AMode As Byte )
