@@ -32,7 +32,7 @@ End Sub
 Sub MemoryViewer_DrawMemory
 
     Local I As Byte, J As Byte
-    Local Tmp As Byte, Ch As Byte
+    Local Temp As Byte, Ch As Byte
     Local _offset As Word, Ptr As Word, Addr As Word
     Local OneChar As String * 1
 
@@ -45,8 +45,8 @@ Sub MemoryViewer_DrawMemory
         Addr = I * 16
         Addr = Addr + _offset
 
-        Tmp = I + 2
-        Console_MoveTo 1, Tmp
+        Temp = I + 2
+        Console_MoveTo 1, Temp
 
         Console_SetColor clYellow, clBlue
 
@@ -80,15 +80,15 @@ Sub MemoryViewer_DrawMemory
 
         For J = 0 To 15
 
-            Tmp = GetByte( Addr )
-            Ch = Tmp
+            Temp = GetByte( Addr )
+            Ch = Temp
             Shift Ch, Right, 4
             Incr Ch
             OneChar = Mid( HexChars, Ch, 1 )
             Ch = Asc( OneChar )
             PrintBin Ch
 
-            Ch = Tmp and &H0F
+            Ch = Temp and &H0F
             Incr Ch
             OneChar = Mid( HexChars, Ch, 1 )
             Ch = Asc( OneChar )
@@ -117,11 +117,11 @@ Sub MemoryViewer_DrawMemory
 
         For J = 0 To 15
 
-            Tmp = GetByte( Addr )
+            Temp = GetByte( Addr )
 
-            if Tmp > Asc( " " ) then
+            if Temp > Asc( " " ) then
 
-                Console_PutChar Tmp, cp1251
+                Console_PutChar Temp, cp1251
 
             else
 
