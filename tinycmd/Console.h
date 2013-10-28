@@ -152,7 +152,7 @@ public:
 
     static uint8_t GetChar();
     static void PutChar( uint8_t ch, EnCodePage CodePage = cp866 );
-    static void WriteData( uint8_t Count );
+    static void WriteData();
     static void WriteString( FCHAR_PTR Value, EnCodePage CodePage = cp866, uint8_t Length = 0 );
     static void WriteString( const char * Value, EnCodePage CodePage = cp866, uint8_t Length = 0 );
     static void Beep( uint16_t Frequency = 800U, uint8_t Duration = 1 );
