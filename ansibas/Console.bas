@@ -45,6 +45,10 @@ Sub Console_WriteData
 
     Local I As Byte, AByte As Byte
 
+    ' -> "\033[" (ESC)
+    AData(1) = &H1B
+    AData(2) = &H5B
+
     I = 1
 
     AByte = AData(I)
@@ -57,16 +61,7 @@ Sub Console_WriteData
 
     WEnd
 
-End Sub
-
-
-' Переход на новую строку.
-Sub Console_NewLine
-
-    AData(1) = &H0D
-    AData(2) = &H0A
-    AData(3) = &H00
-    Console_WriteData
+    'Console_WriteString Command, cp866
 
 End Sub
 
@@ -98,15 +93,20 @@ Sub Console_WriteString( AText As String, ByVal ACodePage As Byte )
 End Sub
 
 
+' Переход на новую строку.
+Sub Console_NewLine
+
+    PrintBin &H0D
+    PrintBin &H0A
+
+End Sub
+
+
 ' Вывод звука. Современные терминалы могут проигрывать звуковой файл вместо
 ' звукового сигнала определённой частоты и длительности.
 Sub Console_Beep( ByVal AFrequency As Word, ByVal ADuration As Byte  )
 
     Local Temp As Byte
-
-    ' -> "\033[" (ESC)
-    AData(1) = &H1B
-    AData(2) = &H5B
 
     ' Сотни.
     Temp = AFrequency \ 100
@@ -163,9 +163,6 @@ Sub Console_ClearScreen( ByVal AMode As Byte )
 
     end select
 
-    ' -> "\033[" (ESC)
-    AData(1) = &H1B
-    AData(2) = &H5B
     AData(3) = Temp
     ' -> "J"
     AData(4) = &H4A
@@ -196,9 +193,6 @@ Sub Console_ClearLine( ByVal AMode As Byte )
 
     end select
 
-    ' -> "\033[" (ESC)
-    AData(1) = &H1B
-    AData(2) = &H5B
     AData(3) = Temp
     ' -> "K"
     AData(4) = &H4B
@@ -215,10 +209,6 @@ Sub Console_ClearForward( ByVal ACount As Byte )
     Local Temp As Byte
 
     if ACount = 0 then Exit Sub
-
-    ' -> "\033[" (ESC)
-    AData(1) = &H1B
-    AData(2) = &H5B
 
     ' Десятки.
     Temp = ACount \ 10
@@ -240,9 +230,6 @@ End Sub
 ' Показать курсор.
 Sub Console_CursorOn
 
-    ' -> "\033[?25h"
-    AData(1) = &H1B
-    AData(2) = &H5B
     AData(3) = &H3F
     AData(4) = &H32
     AData(5) = &H35
@@ -257,9 +244,6 @@ End Sub
 ' Спрятать курсор.
 Sub Console_CursorOff
 
-    ' -> "\033[?25l"
-    AData(1) = &H1B
-    AData(2) = &H5B
     AData(3) = &H3F
     AData(4) = &H32
     AData(5) = &H35
@@ -274,9 +258,6 @@ End Sub
 ' Запомнить положение курсора.
 Sub Console_SaveCursor
 
-    ' -> "\033[s"
-    AData(1) = &H1B
-    AData(2) = &H5B
     AData(3) = &H73
     AData(4) = &H00
 
@@ -288,9 +269,6 @@ End Sub
 ' Восстановить запомненное положение курсора.
 Sub Console_RestoreCursor
 
-    ' -> "\033[u"
-    AData(1) = &H1B
-    AData(2) = &H5B
     AData(3) = &H75
     AData(4) = &H00
 
@@ -302,9 +280,6 @@ End Sub
 ' Установка параметров текста.
 Sub Console_SetForegroundColor( ByVal AColor As Byte )
 
-    ' -> "\033[" (ESC)
-    AData(1) = &H1B
-    AData(2) = &H5B
     AData(3) = &H32 - AColor.3
     AData(4) = &H6D
 
@@ -325,9 +300,6 @@ End Sub
 ' Установка параметров фона.
 Sub Console_SetBackgroundColor( ByVal AColor As Byte )
 
-    ' -> "\033[" (ESC)
-    AData(1) = &H1B
-    AData(2) = &H5B
     AData(3) = &H36 - AColor.3
     AData(4) = &H6D
 
@@ -348,9 +320,6 @@ End Sub
 ' Изменение атрибутов.
 Sub Console_SetTextAttributes( ByVal Attributes As Byte )
 
-    ' -> "\033[" (ESC)
-    AData(1) = &H1B
-    AData(2) = &H5B
     Attributes = Attributes And &H0F
     AData(3) = Attributes + &H30
     AData(4) = &H6D
@@ -379,10 +348,6 @@ Sub Console_MoveTo( ByVal ALeft As Byte, ByVal ATop As Byte )
     if ALeft = 0 Or ATop = 0 then Exit Sub
 
     if ALeft > MAX_X Or ATop > MAX_Y then Exit Sub
-
-    ' -> "\033[" (ESC)
-    AData(1) = &H1B
-    AData(2) = &H5B
 
     ' Десятки.
     Temp = ATop \ 10
@@ -415,10 +380,6 @@ End Sub
 Sub Console_Move( ByVal ADirection As Byte, ByVal ADelta As Byte )
 
     Local Temp As Byte
-
-    ' -> "\033[" (ESC)
-    AData(1) = &H1B
-    AData(2) = &H5B
 
     ' Десятки.
     Temp = ADelta \ 10

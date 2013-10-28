@@ -15,7 +15,7 @@
 ' *  ~~~~~~~~~~~~~~~~~~~~~~~
 ' ****************************/
 
-$version 0,0,7
+$version 0,0,24
 $regfile = "m16def.dat"
 $crystal = 8000000
 '$sim
@@ -55,7 +55,7 @@ Declare Function GetByte( ByVal Addr As Word ) As Byte
 
 ' -=[ Переменные в ОЗУ ]=-
 
-Dim Temp As Byte
+Dim Key As Byte
 Dim Ptr As Word
 Dim Caption As String * 46
 
@@ -123,27 +123,14 @@ Dim Caption As String * 46
 
             Do
 
-                Temp = Inkey()
+                Key = Inkey()
 
-            Loop Until Temp = &H1B
+            Loop Until Key = &H1B
 
             CommandShell_Info
 
 
         elseif Caption = "mcu" then
-
-            Console_CursorOff
-
-            For Temp = 0 To 22
-
-                Console_NewLine
-
-                Caption = LookupStr( Temp, MCUViewData )
-                Console_WriteString Caption, cp866
-
-            Next
-
-            Console_NewLine
 
             DDRA = &HFF
             PORTA = &HAA
@@ -151,13 +138,15 @@ Dim Caption As String * 46
             DDRB = &HFF
             PORTB = &H0F
 
+            Console_CursorOff
+            Console_ClearScreen cmAll
             ShowPinStates
 
             Do
 
-                Temp = Inkey()
+                Key = Inkey()
 
-            Loop Until Temp = &H1B
+            Loop Until Key = &H1B
 
             CommandShell_Info
 
@@ -170,8 +159,18 @@ End
 
 Sub ShowPinStates
 
-    Local I As Byte, Tmp As Byte, Top As Byte
-    Local Ch As Byte
+    Local I As Byte, Top As Byte, Temp As Byte
+
+    ' Выводим изображение микроконтроллера.
+    For Temp = 0 To 22
+
+        Top = Temp + 2
+        Console_MoveTo 1, Top
+
+        Caption = LookupStr( Temp, MCUViewData )
+        Console_WriteString Caption, cp866
+
+    Next
 
     ' Состояние порта B.
     For I = 0 To 7
@@ -179,11 +178,11 @@ Sub ShowPinStates
         Top = 4 + I
         Console_MoveTo 16, Top
 
-        Tmp = PINB
-        Shift Tmp, Right, I
-        Tmp = Tmp and &H01
+        Temp = PINB
+        Shift Temp, Right, I
+        Temp = Temp and &H01
 
-        if Tmp = 0 then
+        if Temp = 0 then
 
             Console_SetForegroundColor clBlue
 
@@ -209,11 +208,11 @@ Sub ShowPinStates
             Console_MoveTo 16, Top
         end if
 
-        Tmp = PIND
-        Shift Tmp, Right, I
-        Tmp = Tmp and &H01
+        Temp = PIND
+        Shift Temp, Right, I
+        Temp = Temp and &H01
 
-        if Tmp = 0 then
+        if Temp = 0 then
 
             Console_SetForegroundColor clBlue
 
@@ -232,11 +231,11 @@ Sub ShowPinStates
         Top = 4 + I
         Console_MoveTo 35, Top
 
-        Tmp = PINA
-        Shift Tmp, Right, I
-        Tmp = Tmp and &H01
+        Temp = PINA
+        Shift Temp, Right, I
+        Temp = Temp and &H01
 
-        if Tmp = 0 then
+        if Temp = 0 then
 
             Console_SetForegroundColor clBlue
 
@@ -255,11 +254,11 @@ Sub ShowPinStates
         Top = 22 - I
         Console_MoveTo 35, Top
 
-        Tmp = PINC
-        Shift Tmp, Right, I
-        Tmp = Tmp and &H01
+        Temp = PINC
+        Shift Temp, Right, I
+        Temp = Temp and &H01
 
-        if Tmp = 0 then
+        if Temp = 0 then
 
             Console_SetForegroundColor clBlue
 
