@@ -15,6 +15,18 @@ Sub CommandShell_Info
     Caption = LookupStr( 0, CommandShellInfo )
     Console_WriteString Caption, cp1251
 
+    ' Вывод номера версии.
+    Caption = Version(2)
+    Console_WriteString Caption, cp1251
+
+    Print " (";
+
+    ' Вывод даты сборки.
+    Caption = Version(1)
+    Console_WriteString Caption, cp1251
+
+    Print ")"
+
 End Sub
 
 
@@ -37,4 +49,4 @@ Prompt:
     Data "[ATmega16]$ "
 
 CommandShellInfo:
-    Data "Командная оболочка, версия 0.1 (Bascom AVR)"
+    Data "Командная оболочка (Bascom AVR), версия "

@@ -1,5 +1,20 @@
 $nocompile
 
+'*******************************************************************************
+'*
+'* Автор: Мезенцев Вячеслав Николаевич
+'* Электропочта: viacheslavmezentsev@gmail.com
+'* skype: viacheslavmezentsev
+'* Дата:  28.10.2013 г.
+'*
+'* Компилятор: BASCOM-AVR 2.0.7.1
+'* Описание: Модуль для работы с ANSI терминалом.
+'*
+'*******************************************************************************
+
+
+'$include "Console_Header.bas"
+
 
 ' Вывод символа из ОЗУ в кодировке ACodePage.
 Sub Console_PutChar( ByVal AChar As Byte, ByVal ACodePage As Byte )
@@ -25,23 +40,33 @@ Sub Console_PutChar( ByVal AChar As Byte, ByVal ACodePage As Byte )
 End Sub
 
 
+' Вывести данные из ОЗУ.
+Sub Console_WriteData
+
+    Local I As Byte, AByte As Byte
+
+    I = 1
+
+    AByte = AData(I)
+
+    While AByte > 0
+
+        PrintBin AByte
+        Incr I
+        AByte = AData(I)
+
+    WEnd
+
+End Sub
+
+
 ' Переход на новую строку.
 Sub Console_NewLine
 
     AData(1) = &H0D
     AData(2) = &H0A
-    Console_WriteData AData(1), 2
-
-End Sub
-
-
-' Вывести данные из ОЗУ.
-Sub Console_WriteData( ACmd As Byte, ByVal ACount As Byte )
-
-    Local I As Byte
-
-    ' Вывод данных
-    For I = 1 To ACount: PrintBin ACmd(I): Next
+    AData(3) = &H00
+    Console_WriteData
 
 End Sub
 
@@ -111,8 +136,9 @@ Sub Console_Beep( ByVal AFrequency As Word, ByVal ADuration As Byte  )
 
     ' Вывод звука (BELL).
     AData(10) = &H07
+    AData(11) = &H00
 
-    Console_WriteData AData(1), 10
+    Console_WriteData
 
 End Sub
 
@@ -143,7 +169,9 @@ Sub Console_ClearScreen( ByVal AMode As Byte )
     AData(3) = Temp
     ' -> "J"
     AData(4) = &H4A
-    Console_WriteData AData(1), 4
+    AData(5) = &H00
+
+    Console_WriteData
 
 End Sub
 
@@ -174,7 +202,9 @@ Sub Console_ClearLine( ByVal AMode As Byte )
     AData(3) = Temp
     ' -> "K"
     AData(4) = &H4B
-    Console_WriteData AData(1), 4
+    AData(5) = &H00
+
+    Console_WriteData
 
 End Sub
 
@@ -200,8 +230,9 @@ Sub Console_ClearForward( ByVal ACount As Byte )
 
     ' -> "X"
     AData(5) = &H58
+    AData(6) = &H00
 
-    Console_WriteData AData(1), 5
+    Console_WriteData
 
 End Sub
 
@@ -216,8 +247,9 @@ Sub Console_CursorOn
     AData(4) = &H32
     AData(5) = &H35
     AData(6) = &H68
+    AData(7) = &H00
 
-    Console_WriteData AData(1), 6
+    Console_WriteData
 
 End Sub
 
@@ -232,8 +264,9 @@ Sub Console_CursorOff
     AData(4) = &H32
     AData(5) = &H35
     AData(6) = &H6C
+    AData(7) = &H00
 
-    Console_WriteData AData(1), 6
+    Console_WriteData
 
 End Sub
 
@@ -245,8 +278,9 @@ Sub Console_SaveCursor
     AData(1) = &H1B
     AData(2) = &H5B
     AData(3) = &H73
+    AData(4) = &H00
 
-    Console_WriteData AData(1), 3
+    Console_WriteData
 
 End Sub
 
@@ -258,8 +292,9 @@ Sub Console_RestoreCursor
     AData(1) = &H1B
     AData(2) = &H5B
     AData(3) = &H75
+    AData(4) = &H00
 
-    Console_WriteData AData(1), 3
+    Console_WriteData
 
 End Sub
 
@@ -280,8 +315,9 @@ Sub Console_SetForegroundColor( ByVal AColor As Byte )
     AColor = AColor And &H07
     AData(8) = AColor + &H30
     AData(9) = &H6D
+    AData(10) = &H00
 
-    Console_WriteData AData(1), 9
+    Console_WriteData
 
 End Sub
 
@@ -302,8 +338,9 @@ Sub Console_SetBackgroundColor( ByVal AColor As Byte )
     AColor = AColor And &H07
     AData(8) = AColor + &H30
     AData(9) = &H6D
+    AData(10) = &H00
 
-    Console_WriteData AData(1), 9
+    Console_WriteData
 
 End Sub
 
@@ -317,8 +354,9 @@ Sub Console_SetTextAttributes( ByVal Attributes As Byte )
     Attributes = Attributes And &H0F
     AData(3) = Attributes + &H30
     AData(4) = &H6D
+    AData(5) = &H00
 
-    Console_WriteData AData(1), 4
+    Console_WriteData
 
 End Sub
 
@@ -366,8 +404,9 @@ Sub Console_MoveTo( ByVal ALeft As Byte, ByVal ATop As Byte )
 
     ' -> "f"
     AData(8) = &H66
+    AData(9) = &H00
 
-    Console_WriteData AData(1), 8
+    Console_WriteData
 
 End Sub
 
@@ -408,8 +447,9 @@ Sub Console_Move( ByVal ADirection As Byte, ByVal ADelta As Byte )
     end select
 
     AData(5) = Temp
+    AData(6) = &H00
 
-    Console_WriteData AData(1), 5
+    Console_WriteData
 
 End Sub
 
