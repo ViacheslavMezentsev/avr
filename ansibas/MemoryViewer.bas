@@ -50,7 +50,7 @@ Sub MemoryViewer_DrawMemory
 
         Console_SetColor clYellow, clBlue
 
-        J = 4
+        J = 8
 
         Do
 
