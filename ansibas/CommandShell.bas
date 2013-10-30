@@ -16,16 +16,28 @@ Sub CommandShell_Info
     Console_WriteString Caption, cp1251
 
     ' Вывод номера версии.
-    Caption = Version(2)
+    'Caption = Version(2)
+    Caption = Version_GetVersionString()
     Console_WriteString Caption, cp1251
 
     Print " (";
 
     ' Вывод даты сборки.
-    Caption = Version(1)
+    'Caption = Version(1)
+    Caption = Version_GetBuildDateString()
     Console_WriteString Caption, cp1251
 
     Print ")"
+
+'    Goto CommandShell_Info_End
+
+'CommandShellInfo:
+'    'DATA "Командная оболочка (Bascom AVR), версия "
+'$ASM
+'    .DB "Командная оболочка (Bascom AVR), версия "
+'$END ASM
+
+'CommandShell_Info_End:
 
 End Sub
 
@@ -42,11 +54,13 @@ Sub CommandShell_Prompt
     Console_ClearLine cmFromCursorToEnd
     Console_CursorOn
 
+'    Goto CommandShell_Prompt_End
+
+'Prompt:
+'$ASM
+'    .DB "[ATmega16]$ "
+'$END ASM
+
+'CommandShell_Prompt_End:
+
 End Sub
-
-
-Prompt:
-    Data "[ATmega16]$ "
-
-CommandShellInfo:
-    Data "Командная оболочка (Bascom AVR), версия "

@@ -9,50 +9,6 @@
 '*
 '*******************************************************************************
 
-
-' /****************************
-' *  К О Н Ф И Г У Р А Ц И Я
-' *  ~~~~~~~~~~~~~~~~~~~~~~~
-' ****************************/
-
-$version 0,0,39
-$regfile = "m16def.dat"
-$crystal = 8000000
-'$sim
-
-' Скорость работы внутреннего USART
-'$baud = 9600
-'$baud = 19200
-'$baud = 38400
-$baud = 57600
-'$baud = 115200
-
-$lib "i2c_twi.lbx"
-
-Config Scl = PortC.0
-Config Sda = PortC.1
-Config Twi = 100000
-
-
-' /***********************
-' *  Д Е К Л А Р А Ц И Я
-' *  ~~~~~~~~~~~~~~~~~~~
-' ***********************/
-
-' Подключаем заголовочные файлы модулей.
-$include "Delays_Header.bas"
-$include "Console_Header.bas"
-$include "RTC_Header.bas"
-$include "CommandShell_Header.bas"
-$include "MemoryViewer_Header.bas"
-$include "MCU_Header.bas"
-
-
-Declare Sub ShowPinStates
-Declare Sub PutByte( ByVal Addr As Word, ByVal AValue As Byte )
-Declare Function GetByte( ByVal Addr As Word ) As Byte
-
-
 ' -=[ Переменные в ОЗУ ]=-
 
 Dim Key As Byte
@@ -61,16 +17,49 @@ Dim Caption As String * 46
 
 
 ' /***********************
+' *  Д Е К Л А Р А Ц И Я
+' *  ~~~~~~~~~~~~~~~~~~~
+' ***********************/
+
+Declare Sub Main
+Declare Sub ShowPinStates
+Declare Sub PutByte( ByVal Addr As Word, ByVal AValue As Byte )
+Declare Function GetByte( ByVal Addr As Word ) As Byte
+
+' Точка входа в основную программу.
+Main: End
+
+' Подключаем заголовочные файлы модулей.
+$include "Config_Header.bas"
+$include "Version_Header.bas"
+$include "Delays_Header.bas"
+$include "RTC_Header.bas"
+$include "Console_Header.bas"
+$include "CommandShell_Header.bas"
+$include "MemoryViewer_Header.bas"
+$include "MCU_Header.bas"
+
+' Подключаем модули.
+$include "Delays.bas"
+$include "RTC.bas"
+$include "CommandShell.bas"
+$include "MemoryViewer.bas"
+$include "Console.bas"
+$include "MCU.bas"
+
+
+' /***********************
 ' *  Р Е А Л И З А Ц И Я
 ' *  ~~~~~~~~~~~~~~~~~~~
 ' ************************/
 
+Sub Main
 
     ' Инициализация всей периферии микроконтроллера.
     MCU_Initialization
 
     ' Настройка RTC.
-    RTC_Initialization
+    RTC_Initialization RTC_DS1307
 
     ' Настройка интерпретатора.
     CommandShell_Initialization
@@ -154,7 +143,7 @@ Dim Caption As String * 46
 
     Loop
 
-End
+End Sub
 
 
 Sub ShowPinStates
@@ -306,18 +295,20 @@ $END ASM
 End Function
 
 
-$include "Delays.bas"
-$include "Console.bas"
-$include "RTC.bas"
-$include "CommandShell.bas"
-$include "MemoryViewer.bas"
-$include "MCU.bas"
-
-
 ' /****************
 ' *  Д А Н Н Ы Е
 ' *  ~~~~~~~~~~~
 ' ****************/
+
+CommandShellInfo:
+    Data "Командная оболочка (Bascom AVR), версия "
+
+Prompt:
+    Data "[ATmega16]$ "
+
+ViewMemoryData:
+    Data "Просмотр памяти: ОЗУ (CP1251)"
+
 TimeStr:
     Data "Time: "
 
