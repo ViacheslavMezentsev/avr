@@ -26,6 +26,15 @@ Sub MemoryViewer_DrawTitle
     Console_WriteString Caption, cp1251
     Console_ClearLine cmFromCursorToEnd
 
+'    Goto MemoryViewer_DrawTitle_End
+
+'ViewMemoryData:
+'$ASM
+'    .DB "Просмотр памяти: ОЗУ (CP1251)"
+'$END ASM
+
+'MemoryViewer_DrawTitle_End:
+
 End Sub
 
 
@@ -138,6 +147,15 @@ Sub MemoryViewer_DrawMemory
 
     Next
 
+    Goto MemoryViewer_DrawMemory_End
+
+HexCharsData:
+    'Data "0123456789ABCDEF"
+$ASM
+    .DB &H30, &H31, &H32, &H33, &H34, &H35, &H36, &H37, &H38, &H39, &H41, &H42, &H43, &H44, &H45, &H46, &H00
+$END ASM
+
+MemoryViewer_DrawMemory_End:
 
 End Sub
 
@@ -153,10 +171,3 @@ Sub MemoryViewer_DrawFuncKeys
     Console_ClearLine cmFromCursorToEnd
 
 End Sub
-
-
-ViewMemoryData:
-    Data "Просмотр памяти: ОЗУ (CP1251)"
-
-HexCharsData:
-    Data "0123456789ABCDEF"

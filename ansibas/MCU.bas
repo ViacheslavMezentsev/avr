@@ -42,6 +42,9 @@ Sub MCU_Initialization
     ' Настройка последовательного интерфейса SPI [ATmega16]
     'MCU_SPIInit()
 
+    ' Настройка TWI [ATmega16]
+    I2cinit
+
     ' Настройка работы с внешними прерываниями [ATmega16]
     'MCU_ExternalInterruptsInit
 
@@ -192,7 +195,7 @@ Sub MCU_PortsInit
 '    sbi( SFIOR, PUD );
 '    //cbi( SFIOR, PUD );
 
-    Reset SFIOR.2
+    Reset SFIOR.PUD
 '
 '    // Настройка портов: A, B, C, D. Начальная инициализация уровней
 

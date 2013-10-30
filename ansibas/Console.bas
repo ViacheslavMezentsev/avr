@@ -12,11 +12,16 @@ $nocompile
 '*
 '*******************************************************************************
 
-
 '$include "Console_Header.bas"
 
 
-' Вывод символа из ОЗУ в кодировке ACodePage.
+' /***********************
+' *  Р Е А Л И З А Ц И Я
+' *  ~~~~~~~~~~~~~~~~~~~
+' ************************/
+
+
+' Вывод символа из ОЗУ.
 Sub Console_PutChar( ByVal AChar As Byte, ByVal ACodePage As Byte )
 
     select case ACodePage
@@ -36,6 +41,23 @@ Sub Console_PutChar( ByVal AChar As Byte, ByVal ACodePage As Byte )
 
     ' Выводим символ, который соответствует кодовой таблице CP866.
     PrintBin AChar
+
+    Goto Console_PutChar_End
+
+CP1251_TO_CP866:
+
+$ASM
+    .DB &H20,&H20,&H2C,&H20,&H20,&H20,&H20,&H20,&H20,&H20,&H20,&H3C,&H20,&H20,&H20,&H20
+    .DB &H20,&H27,&H27,&H22,&H22,&HF9,&H2D,&H2D,&H20,&H20,&H20,&H3E,&H20,&H20,&H20,&H20
+    .DB &HFF,&H20,&H20,&H6A,&H20,&H20,&H7C,&H20,&HF0,&H20,&H20,&H22,&H20,&H20,&H20,&H20
+    .DB &HF8,&H20,&H49,&H69,&H20,&H20,&H20,&HFA,&HF1,&H23,&H20,&H22,&H6A,&H53,&H73,&H20
+    .DB &H80,&H81,&H82,&H83,&H84,&H85,&H86,&H87,&H88,&H89,&H8A,&H8B,&H8C,&H8D,&H8E,&H8F
+    .DB &H90,&H91,&H92,&H93,&H94,&H95,&H96,&H97,&H98,&H99,&H9A,&H9B,&H9C,&H9D,&H9E,&H9F
+    .DB &HA0,&HA1,&HA2,&HA3,&HA4,&HA5,&HA6,&HA7,&HA8,&HA9,&HAA,&HAB,&HAC,&HAD,&HAE,&HAF
+    .DB &HE0,&HE1,&HE2,&HE3,&HE4,&HE5,&HE6,&HE7,&HE8,&HE9,&HEA,&HEB,&HEC,&HED,&HEE,&HEF
+$END ASM
+
+Console_PutChar_End:
 
 End Sub
 
@@ -480,19 +502,3 @@ Sub Console_DrawFrame( ByVal ALeft As Byte, ByVal ATop As Byte, _
     PrintBin ACS_DBL_LRCORNER
 
 End Sub
-
-
-' /****************
-' *  Д А Н Н Ы Е
-' *  ~~~~~~~~~~~
-' ****************/
-
-CP1251_TO_CP866:
-    Data &H20,&H20,&H2C,&H20,&H20,&H20,&H20,&H20,&H20,&H20,&H20,&H3C,&H20,&H20,&H20,&H20
-    Data &H20,&H27,&H27,&H22,&H22,&HF9,&H2D,&H2D,&H20,&H20,&H20,&H3E,&H20,&H20,&H20,&H20
-    Data &HFF,&H20,&H20,&H6A,&H20,&H20,&H7C,&H20,&HF0,&H20,&H20,&H22,&H20,&H20,&H20,&H20
-    Data &HF8,&H20,&H49,&H69,&H20,&H20,&H20,&HFA,&HF1,&H23,&H20,&H22,&H6A,&H53,&H73,&H20
-    Data &H80,&H81,&H82,&H83,&H84,&H85,&H86,&H87,&H88,&H89,&H8A,&H8B,&H8C,&H8D,&H8E,&H8F
-    Data &H90,&H91,&H92,&H93,&H94,&H95,&H96,&H97,&H98,&H99,&H9A,&H9B,&H9C,&H9D,&H9E,&H9F
-    Data &HA0,&HA1,&HA2,&HA3,&HA4,&HA5,&HA6,&HA7,&HA8,&HA9,&HAA,&HAB,&HAC,&HAD,&HAE,&HAF
-    Data &HE0,&HE1,&HE2,&HE3,&HE4,&HE5,&HE6,&HE7,&HE8,&HE9,&HEA,&HEB,&HEC,&HED,&HEE,&HEF

@@ -1,46 +1,69 @@
 $nocompile
 
 
-Sub RTC_Initialization
+Sub RTC_Initialization( ByVal AType As Byte )
 
-    I2cinit
-
-End Sub
-
-
-Sub RTC_GetDatetime( ATime As Byte )
-
-  I2cstart
-  I2cwbyte Ds1307w
-  I2cwbyte 0
-
-  I2cstart
-  I2cwbyte Ds1307r
-  I2crbyte ATime(1), Ack
-  I2crbyte ATime(2), Ack
-  I2crbyte ATime(3), Ack
-  I2crbyte ATime(4), Ack
-  I2crbyte ATime(5), Ack
-  I2crbyte ATime(6), Ack
-  I2crbyte ATime(7), Nack
-  I2cstop
+    RTCType = AType
 
 End Sub
 
 
-Sub RTC_ShowDate( ATime As Byte )
+Sub RTC_GetDatetime( ADateTime As Byte )
+
+    Local Minu As Byte
+    Local Hour As Byte
+    Local Datt As Byte
+    Local Mont As Byte
+    Local Year As Byte
+    Local I As Byte
+    Local J As Byte
+
+    if RTCType = RTC_NONE then
+
+        Exit Sub
+
+    elseif RTCType = RTC_DS1307 Or RTCType = RTC_VS1307 then
+
+        I2cstart
+        I2cwbyte Ds1307w
+        I2cwbyte 0
+
+        I2cstart
+        I2cwbyte Ds1307r
+        I2crbyte ADateTime(1), Ack
+        I2crbyte ADateTime(2), Ack
+        I2crbyte ADateTime(3), Ack
+        I2crbyte ADateTime(4), Ack
+        I2crbyte ADateTime(5), Ack
+        I2crbyte ADateTime(6), Ack
+        I2crbyte ADateTime(7), Nack
+        I2cstop
+
+    elseif RTCType = RTC_PCF8583 then
+
+    End If
+
+End Sub
+
+
+Sub RTC_PutDatetime( ADateTime As Byte )
+
+End Sub
+
+
+Sub RTC_ShowDate( ADateTime As Byte )
 
     Local Ch As Byte
     Local AYear As Byte, AMonth As Byte, ADay As Byte
 
-    ADay = ATime(5)
-    ADay = MakeDec(ADay)
+    ADay = ADateTime(5)
+    ADay = MakeDec( ADay )
 
-    AMonth = ATime(6)
-    AMonth = MakeDec(AMonth)
+    AMonth = ADateTime(6)
+    AMonth = MakeDec( AMonth )
 
-    AYear = ATime(7)
-    AYear = MakeDec(AYear)
+    AYear = ADateTime(7)
+    AYear = MakeDec( AYear )
 
     ' Вывод дней.
     ' Десятки.
@@ -84,19 +107,19 @@ Sub RTC_ShowDate( ATime As Byte )
 End Sub
 
 
-Sub RTC_ShowTime( ATime As Byte )
+Sub RTC_ShowTime( ADateTime As Byte )
 
     Local Ch As Byte
     Local AHour As Byte, AMinutes As Byte, ASeconds As Byte
 
-    ASeconds = ATime(1)
-    ASeconds = MakeDec(ASeconds)
+    ASeconds = ADateTime(1)
+    ASeconds = MakeDec( ASeconds )
 
-    AMinutes = ATime(2)
-    AMinutes = MakeDec(AMinutes)
+    AMinutes = ADateTime(2)
+    AMinutes = MakeDec( AMinutes )
 
-    AHour = ATime(3)
-    AHour = MakeDec(AHour)
+    AHour = ADateTime(3)
+    AHour = MakeDec( AHour )
 
     ' Вывод часов.
     ' Десятки.
