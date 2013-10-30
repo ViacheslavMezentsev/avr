@@ -16,18 +16,20 @@ Dim Ptr As Word
 Dim Caption As String * 46
 
 
+' Точка входа в основную программу.
+Declare Sub Main : Main : End
+
+
 ' /***********************
 ' *  Д Е К Л А Р А Ц И Я
 ' *  ~~~~~~~~~~~~~~~~~~~
 ' ***********************/
 
-Declare Sub Main
+
 Declare Sub ShowPinStates
 Declare Sub PutByte( ByVal Addr As Word, ByVal AValue As Byte )
 Declare Function GetByte( ByVal Addr As Word ) As Byte
 
-' Точка входа в основную программу.
-Main: End
 
 ' Подключаем заголовочные файлы модулей.
 $include "Config_Header.bas"
