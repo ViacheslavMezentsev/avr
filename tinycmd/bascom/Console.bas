@@ -12,11 +12,16 @@ $nocompile
 '*
 '*******************************************************************************
 
-
 '$include "Console_Header.bas"
 
 
-' Вывод символа из ОЗУ в кодировке ACodePage.
+' /***********************
+' *  Р Е А Л И З А Ц И Я
+' *  ~~~~~~~~~~~~~~~~~~~
+' ************************/
+
+
+' Вывод символа из ОЗУ.
 Sub Console_PutChar( ByVal AChar As Byte, ByVal ACodePage As Byte )
 
     select case ACodePage
@@ -36,6 +41,23 @@ Sub Console_PutChar( ByVal AChar As Byte, ByVal ACodePage As Byte )
 
     ' Выводим символ, который соответствует кодовой таблице CP866.
     PrintBin AChar
+
+    Goto Console_PutChar_End
+
+CP1251_TO_CP866:
+
+$ASM
+    .DB &H20,&H20,&H2C,&H20,&H20,&H20,&H20,&H20,&H20,&H20,&H20,&H3C,&H20,&H20,&H20,&H20
+    .DB &H20,&H27,&H27,&H22,&H22,&HF9,&H2D,&H2D,&H20,&H20,&H20,&H3E,&H20,&H20,&H20,&H20
+    .DB &HFF,&H20,&H20,&H6A,&H20,&H20,&H7C,&H20,&HF0,&H20,&H20,&H22,&H20,&H20,&H20,&H20
+    .DB &HF8,&H20,&H49,&H69,&H20,&H20,&H20,&HFA,&HF1,&H23,&H20,&H22,&H6A,&H53,&H73,&H20
+    .DB &H80,&H81,&H82,&H83,&H84,&H85,&H86,&H87,&H88,&H89,&H8A,&H8B,&H8C,&H8D,&H8E,&H8F
+    .DB &H90,&H91,&H92,&H93,&H94,&H95,&H96,&H97,&H98,&H99,&H9A,&H9B,&H9C,&H9D,&H9E,&H9F
+    .DB &HA0,&HA1,&HA2,&HA3,&HA4,&HA5,&HA6,&HA7,&HA8,&HA9,&HAA,&HAB,&HAC,&HAD,&HAE,&HAF
+    .DB &HE0,&HE1,&HE2,&HE3,&HE4,&HE5,&HE6,&HE7,&HE8,&HE9,&HEA,&HEB,&HEC,&HED,&HEE,&HEF
+$END ASM
+
+Console_PutChar_End:
 
 End Sub
 
@@ -94,6 +116,51 @@ Sub Console_NewLine
     PrintBin &H0A
 
 End Sub
+
+
+#if Console_Beep_Enabled = 1
+
+' Вывод звука. Современные терминалы могут проигрывать звуковой файл вместо
+' звукового сигнала определённой частоты и длительности.
+Sub Console_Beep( ByVal AFrequency As Word, ByVal ADuration As Byte  )
+
+    Local Temp As Byte
+
+    ' Сотни.
+    Temp = AFrequency \ 100
+    AData(3) = Temp + &H30
+
+    ' Десятки.
+    AFrequency = AFrequency mod 100
+
+    Temp = AFrequency \ 10
+    AData(4) = Temp + &H30
+
+    ' Единицы.
+    Temp = AFrequency mod 10
+    AData(5) = Temp + &H30
+
+    AData(6) = Asc( ";" )
+
+    ' Десятки.
+    Temp = ADuration \ 10
+    AData(7) = Temp + &H30
+
+    ' Единицы.
+    Temp = ADuration mod 10
+    AData(8) = Temp + &H30
+
+    AData(9) = Asc( "B" )
+
+    ' Вывод звука (BELL).
+    AData(10) = &H07
+    AData(11) = &H00
+
+    Console_WriteData
+
+End Sub
+
+#endif
 
 
 ' Очистить экран.
@@ -204,6 +271,28 @@ Sub Console_CursorOff
 End Sub
 
 
+' Запомнить положение курсора.
+Sub Console_SaveCursor
+
+    AData(3) = &H73
+    AData(4) = &H00
+
+    Console_WriteData
+
+End Sub
+
+
+' Восстановить запомненное положение курсора.
+Sub Console_RestoreCursor
+
+    AData(3) = &H75
+    AData(4) = &H00
+
+    Console_WriteData
+
+End Sub
+
+
 ' Установка параметров текста.
 Sub Console_SetForegroundColor( ByVal AColor As Byte )
 
@@ -303,17 +392,125 @@ Sub Console_MoveTo( ByVal ALeft As Byte, ByVal ATop As Byte )
 End Sub
 
 
-' /****************
-' *  Д А Н Н Ы Е
-' *  ~~~~~~~~~~~
-' ****************/
+#if Console_Move_Enabled = 1
 
-CP1251_TO_CP866:
-    Data &H20,&H20,&H2C,&H20,&H20,&H20,&H20,&H20,&H20,&H20,&H20,&H3C,&H20,&H20,&H20,&H20
-    Data &H20,&H27,&H27,&H22,&H22,&HF9,&H2D,&H2D,&H20,&H20,&H20,&H3E,&H20,&H20,&H20,&H20
-    Data &HFF,&H20,&H20,&H6A,&H20,&H20,&H7C,&H20,&HF0,&H20,&H20,&H22,&H20,&H20,&H20,&H20
-    Data &HF8,&H20,&H49,&H69,&H20,&H20,&H20,&HFA,&HF1,&H23,&H20,&H22,&H6A,&H53,&H73,&H20
-    Data &H80,&H81,&H82,&H83,&H84,&H85,&H86,&H87,&H88,&H89,&H8A,&H8B,&H8C,&H8D,&H8E,&H8F
-    Data &H90,&H91,&H92,&H93,&H94,&H95,&H96,&H97,&H98,&H99,&H9A,&H9B,&H9C,&H9D,&H9E,&H9F
-    Data &HA0,&HA1,&HA2,&HA3,&HA4,&HA5,&HA6,&HA7,&HA8,&HA9,&HAA,&HAB,&HAC,&HAD,&HAE,&HAF
-    Data &HE0,&HE1,&HE2,&HE3,&HE4,&HE5,&HE6,&HE7,&HE8,&HE9,&HEA,&HEB,&HEC,&HED,&HEE,&HEF
+' Относительное перемещение курсора по направлению.
+Sub Console_Move( ByVal ADirection As Byte, ByVal ADelta As Byte )
+
+    Local Temp As Byte
+
+    ' Десятки.
+    Temp = ADelta \ 10
+    AData(3) = Temp + &H30
+
+    ' Единицы.
+    Temp = ADelta mod 10
+    AData(4) = Temp + &H30
+
+    select case ADirection
+
+        ' Вверх на n строк.
+        case mdUp: Temp = Asc("A")
+
+        ' Вниз на n строк.
+        case mdDown: Temp = Asc("B")
+
+        ' Вправо на n позиций.
+        case mdForward: Temp = Asc("C")
+
+        ' Влево на n позиций.
+        case mdBackward: Temp = Asc("D")
+
+        case else: Temp = Asc("C")
+
+    end select
+
+    AData(5) = Temp
+    AData(6) = &H00
+
+    Console_WriteData
+
+End Sub
+
+#endif
+
+
+#if Console_DrawFrame_Enabled = 1
+
+' Вывод окна с рамкой и заголовком.
+Sub Console_DrawFrame( ByVal ALeft As Byte, ByVal ATop As Byte, _
+    ByVal AWidth As Byte, ByVal AHeight As Byte, ByVal AColor As Byte, _
+    ByVal ABgColor As Byte, ACaption As String )
+
+    Local I As Byte, J As Byte, Temp As Byte
+    Local ALen As Byte, ALeftLen As Byte, ARightLen As Byte
+
+    Console_SetColor AColor, ABgColor
+    Console_MoveTo ALeft, ATop
+
+    ALen = Len( ACaption )
+
+    AWidth = AWidth - 2
+
+    ' Верхняя граница.
+    PrintBin ACS_DBL_ULCORNER
+
+    if ALen = 0 then
+
+        For I = 1 To AWidth: PrintBin ACS_DBL_HLINE: Next
+
+    else
+
+        ALeftLen = AWidth - ALen
+
+        Shift ALeftLen, Right, 1
+
+        Decr ALeftLen
+
+        For I = 1 To ALeftLen: PrintBin ACS_DBL_HLINE: Next
+
+        PrintBin &H20
+
+        Console_WriteString ACaption, cp1251
+
+        PrintBin &H20
+
+        ARightLen = AWidth - ALeftLen
+        ARightLen = ARightLen - ALen
+        ARightLen = ARightLen - 2
+
+        For I = 1 To ARightLen: PrintBin ACS_DBL_HLINE: Next
+
+    end if
+
+    PrintBin ACS_DBL_URCORNER
+
+    ' Вертикальные границы.
+    Decr AHeight
+
+    For I = 1 To AHeight
+
+        Temp = ATop + I
+        Console_MoveTo ALeft, Temp
+
+        PrintBin ACS_DBL_VLINE
+
+        For J = 1 To AWidth: PrintBin &H20: Next
+
+        PrintBin ACS_DBL_VLINE
+
+    Next
+
+    ' Нижняя граница.
+    Temp = ATop + AHeight
+    Console_MoveTo ALeft, Temp
+
+    PrintBin ACS_DBL_LLCORNER
+
+    For I = 1 To AWidth: PrintBin ACS_DBL_HLINE: Next
+
+    PrintBin ACS_DBL_LRCORNER
+
+End Sub
+
+#endif

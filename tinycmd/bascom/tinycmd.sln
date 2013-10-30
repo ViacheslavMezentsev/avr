@@ -1,0 +1,17 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 10.00
+# Visual Studio 2008
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "tinycmd", "tinycmd.vcproj", "{CE43D9CB-43EE-4B6A-AA7B-784545DF6799}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		bascom|Win32 = bascom|Win32
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{CE43D9CB-43EE-4B6A-AA7B-784545DF6799}.bascom|Win32.ActiveCfg = bascom|Win32
+		{CE43D9CB-43EE-4B6A-AA7B-784545DF6799}.bascom|Win32.Build.0 = bascom|Win32
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal

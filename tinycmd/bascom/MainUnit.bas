@@ -1,7 +1,7 @@
 '*******************************************************************************
 '* Автор: Мезенцев Вячеслав
 '* Дата:  28.10.2013 г.
-'* CPU:  ATtiny2313
+'* MCU:  ATtiny2313
 '* Тактовая частота:  8000000  Hz
 '* Компилятор: BASCOM-AVR 2.0.7.1
 '*
@@ -10,14 +10,11 @@
 '*******************************************************************************
 
 
-' /****************************
-' *  К О Н Ф И Г У Р А Ц И Я
-' *  ~~~~~~~~~~~~~~~~~~~~~~~
-' ****************************/
-
-$version 0,0,35
 $regfile = "attiny2313.dat"
 $crystal = 8000000
+$hwstack = 40
+$swstack = 16
+$framesize = 32
 '$sim
 
 ' Скорость работы внутреннего USART
@@ -28,10 +25,20 @@ $baud = 38400
 '$baud = 115200
 
 
+' -=[ Переменные в ОЗУ ]=-
+Dim Caption As String * 16
+
+
+' Точка входа в основную программу.
+Declare Sub Main : Main : End
+
+
 ' /***********************
 ' *  Д Е К Л А Р А Ц И Я
 ' *  ~~~~~~~~~~~~~~~~~~~
 ' ***********************/
+
+Declare Function GetByte( ByVal Addr As Word ) As Byte
 
 ' Подключаем заголовочные файлы модулей.
 
@@ -39,19 +46,27 @@ $include "Console_Header.bas"
 $include "CommandShell_Header.bas"
 
 
-Declare Function GetByte( ByVal Addr As Word ) As Byte
-
-' -=[ Переменные в ОЗУ ]=-
-
-Dim Caption As String * 16
-
-
 ' /***********************
 ' *  Р Е А Л И З А Ц И Я
 ' *  ~~~~~~~~~~~~~~~~~~~
 ' ************************/
 
+' Подключаем модули.
+$include "Console.bas"
+$include "CommandShell.bas"
+
+
+Sub Main
+
+    $ASM
+        ldi r16, &B00000110
+        out $03, r16
+    $END ASM
+
     CommandShell_Info
+    'Console_NewLine
+
+    Enable Interrupts
 
     Do
 
@@ -62,7 +77,7 @@ Dim Caption As String * 16
 
     Loop
 
-End
+End Sub
 
 
 Function GetByte( ByVal Addr As Word ) As Byte
@@ -79,13 +94,3 @@ $ASM
 $END ASM
 
 End Function
-
-
-$include "Console.bas"
-$include "CommandShell.bas"
-
-
-' /****************
-' *  Д А Н Н Ы Е
-' *  ~~~~~~~~~~~
-' ****************/
