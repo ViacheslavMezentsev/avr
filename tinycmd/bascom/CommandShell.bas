@@ -1,5 +1,7 @@
 $nocompile
 
+'$include "CommandShell_Header.bas"
+
 
 Sub CommandShell_Info
 
@@ -7,12 +9,13 @@ Sub CommandShell_Info
     Console_ClearScreen cmAll
     Console_MoveTo 1, 25
 
+    'Caption = LookupStr( 0, CommandShellInfo )
+    'Console_WriteString Caption, cp1251
+
 End Sub
 
 
 Sub CommandShell_Prompt
-
-    Console_NewLine
 
     Caption = LookupStr( 0, Prompt )
     Console_SetForegroundColor clLightGreen
@@ -27,3 +30,6 @@ End Sub
 
 Prompt:
     Data "[ATtiny2313]$ "
+
+CommandShellInfo:
+    Data "Command shell"
