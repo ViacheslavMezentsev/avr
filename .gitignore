@@ -62,9 +62,5 @@ bascom/bascomp/
 !bascom/bascomp/objdump.exe
 !bascom/bascomp/head.exe
 
-bascom/objdump/
-
 bascom/objdump/bin/
-!bascom/objdump/bin/Release/objdump.bin
-
 bascom/objdump/obj/
