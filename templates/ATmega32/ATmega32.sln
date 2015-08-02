@@ -1,0 +1,17 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 10.00
+# Visual Studio 2008
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ATmega32", "ATmega32.vcproj", "{B8C259FC-BECE-49D3-A1DC-AA8E2A930132}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		GCC|Win32 = GCC|Win32
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{B8C259FC-BECE-49D3-A1DC-AA8E2A930132}.GCC|Win32.ActiveCfg = GCC|Win32
+		{B8C259FC-BECE-49D3-A1DC-AA8E2A930132}.GCC|Win32.Build.0 = GCC|Win32
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal
