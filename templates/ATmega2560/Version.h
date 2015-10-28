@@ -1,8 +1,8 @@
 ///////////////////////////////////////////////////////////
 //  Version.h
 //  Implementation of the Class CVersion
-//  Created on:      28 октября 2015 г. 21:24:41
-//  Original author: Мезенцев В. Н.
+//  Created on:      28 РѕРєС‚СЏР±СЂСЏ 2015 Рі. 22:20:30
+//  Original author: РњРµР·РµРЅС†РµРІ Р’. Рќ.
 ///////////////////////////////////////////////////////////
 
 #if !defined(EA_E62E5FD4_3D22_4581_B2F7_BE7DF95D3FBC__INCLUDED_)
@@ -11,10 +11,10 @@
 #include "Defines.h"
 
 /**
- * Образ для работы с версией программы.
+ * РћР±СЂР°Р· РґР»СЏ СЂР°Р±РѕС‚С‹ СЃ РІРµСЂСЃРёРµР№ РїСЂРѕРіСЂР°РјРјС‹.
  *
- * Внимание. Этот файл формируется автоматически. Любые внесённые
- * здесь изменения пропадут перед компиляцией.
+ * Р’РЅРёРјР°РЅРёРµ. Р­С‚РѕС‚ С„Р°Р№Р» С„РѕСЂРјРёСЂСѓРµС‚СЃСЏ Р°РІС‚РѕРјР°С‚РёС‡РµСЃРєРё. Р›СЋР±С‹Рµ РІРЅРµСЃС‘РЅРЅС‹Рµ
+ * Р·РґРµСЃСЊ РёР·РјРµРЅРµРЅРёСЏ РїСЂРѕРїР°РґСѓС‚ РїРµСЂРµРґ РєРѕРјРїРёР»СЏС†РёРµР№.
  */
 class CVersion {
 
@@ -23,13 +23,13 @@ public:
     inline static uint32_t GetMajor() { return 0; }
     inline static uint32_t GetMinor() { return 0; }
     inline static uint32_t GetBuild() { return 0; }
-    inline static uint32_t GetRevision() { return 31; }
+    inline static uint32_t GetRevision() { return 43; }
 
     inline static FCHAR_PTR GetVersionString() {
-        return SPSTR( "0.0.0.31" );
+        return SPSTR( "0.0.0.43" );
     }
     inline static FCHAR_PTR GetBuildDateString() {
-        return SPSTR( "28 октября 2015 г." );
+        return SPSTR( "28 РѕРєС‚СЏР±СЂСЏ 2015 Рі." );
     }
 
 };

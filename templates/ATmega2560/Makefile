@@ -1,6 +1,6 @@
 # Hey Emacs, this is a -*- makefile -*-
 #----------------------------------------------------------------------------
-# WinAVR Makefile Template written by Eric B. Weddington, Jörg Wunsch, et al.
+# WinAVR Makefile Template written by Eric B. Weddington, JÑ†rg Wunsch, et al.
 #
 # Released to the Public Domain
 #
@@ -190,7 +190,7 @@ CPPFLAGS += -Wundef
 CPPFLAGS += -Wa,-adhlns=$(<:%.cpp=$(OBJDIR)/%.lst)
 CPPFLAGS += $(patsubst %,-I%,$(EXTRAINCDIRS))
 #CPPFLAGS += $(CSTANDARD)
-# Âíèìàíèå. Òå ôóíêöèè, êîòîðûå íå âûçûâàþòñÿ, íå âêëþ÷àþòñÿ â îáúåêòíûé ôàéë.
+# Ð’Ð½Ð¸Ð¼Ð°Ð½Ð¸Ðµ. Ð¢Ðµ Ñ„ÑƒÐ½ÐºÑ†Ð¸Ð¸, ÐºÐ¾Ñ‚Ð¾Ñ€Ñ‹Ðµ Ð½Ðµ Ð²Ñ‹Ð·Ñ‹Ð²Ð°ÑŽÑ‚ÑÑ, Ð½Ðµ Ð²ÐºÐ»ÑŽÑ‡Ð°ÑŽÑ‚ÑÑ Ð² Ð¾Ð±ÑŠÐµÐºÑ‚Ð½Ñ‹Ð¹ Ñ„Ð°Ð¹Ð».
 CPPFLAGS += -ffunction-sections
 CPPFLAGS += -fdata-sections
 
@@ -265,7 +265,7 @@ LDFLAGS += $(EXTMEMOPTS)
 LDFLAGS += $(patsubst %,-L%,$(EXTRALIBDIRS))
 LDFLAGS += $(PRINTF_LIB) $(SCANF_LIB) $(MATH_LIB)
 #LDFLAGS += -T linker_script.x
-# Âíèìàíèå. Òå ôóíêöèè, êîòîðûå íå âûçûâàþòñÿ, íå âêëþ÷àþòñÿ â îáúåêòíûé ôàéë.
+# Ð’Ð½Ð¸Ð¼Ð°Ð½Ð¸Ðµ. Ð¢Ðµ Ñ„ÑƒÐ½ÐºÑ†Ð¸Ð¸, ÐºÐ¾Ñ‚Ð¾Ñ€Ñ‹Ðµ Ð½Ðµ Ð²Ñ‹Ð·Ñ‹Ð²Ð°ÑŽÑ‚ÑÑ, Ð½Ðµ Ð²ÐºÐ»ÑŽÑ‡Ð°ÑŽÑ‚ÑÑ Ð² Ð¾Ð±ÑŠÐµÐºÑ‚Ð½Ñ‹Ð¹ Ñ„Ð°Ð¹Ð».
 LDFLAGS += -Wl,-gc-sections
 
 
