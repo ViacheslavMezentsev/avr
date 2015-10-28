@@ -112,7 +112,7 @@ DEBUG = dwarf-2
 #     Each directory must be seperated by a space.
 #     Use forward slashes for directory separators.
 #     For a directory that has spaces, enclose it in quotes.
-EXTRAINCDIRS =
+EXTRAINCDIRS = ../base
 
 # Compiler flag to set the C Standard level.
 #     c89   = "ANSI" C
@@ -120,8 +120,8 @@ EXTRAINCDIRS =
 #     c99   = ISO C99 standard (not yet fully implemented)
 #     gnu99 = c99 plus GCC extensions
 #CSTANDARD = -std=gnu99
-CSTANDARD = -std=gnu++11
-#CSTANDARD = -std=c++11
+#CSTANDARD = -std=gnu++11
+CSTANDARD = -std=c++11
 
 
 # Place -D or -U options here for C sources
@@ -420,11 +420,11 @@ build: genver elf hex eep lss sym updver
 
 genver: 
 	@echo Generating Version.h file ...
-	cscript //NoLogo versionfile-gen.js Version version.txt
+	cscript //NoLogo ../versionfile-gen.js Version version.txt
 
 updver:
 	@echo Updating version ...
-	cscript //NoLogo versionfile-update.js version.txt
+	cscript //NoLogo ../versionfile-update.js version.txt
 	
 buildiar: $(SRC:.c=.d90)
 	

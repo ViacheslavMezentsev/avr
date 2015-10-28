@@ -1,12 +1,4 @@
-///////////////////////////////////////////////////////////
-//  LCD.h
-//  Implementation of the Class CLCD
-//  Created on:      16-июл-2011 6:53:35
-//  Original author: Слава
-///////////////////////////////////////////////////////////
-
-#if !defined(EA_1284B123_896C_4fe7_BEC6_A67623960ADF__INCLUDED_)
-#define EA_1284B123_896C_4fe7_BEC6_A67623960ADF__INCLUDED_
+#pragma once
 
 // TODO: Переписать под свой класс
 
@@ -362,4 +354,3 @@ private:	/**
 	inline static uint8_t ReadLow4bits();
 	
 };
-#endif // !defined(EA_1284B123_896C_4fe7_BEC6_A67623960ADF__INCLUDED_)

@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="windows-1251"?>
+<VisualStudioProject
+	ProjectType="Visual C++"
+	Version="9,00"
+	Name="ATmega2560"
+	ProjectGUID="{8421B340-BC26-42E6-BB3D-DC726324D455}"
+	Keyword="MakeFileProj"
+	TargetFrameworkVersion="131072"
+	>
+	<Platforms>
+		<Platform
+			Name="Win32"
+		/>
+	</Platforms>
+	<ToolFiles>
+	</ToolFiles>
+	<Configurations>
+		<Configuration
+			Name="GCC|Win32"
+			OutputDirectory="$(ConfigurationName)"
+			IntermediateDirectory="$(ConfigurationName)"
+			ConfigurationType="0"
+			>
+			<Tool
+				Name="VCNMakeTool"
+				BuildCommandLine="$(ProjectDir)\..\build.cmd $(ProjectDir)"
+				ReBuildCommandLine="$(ProjectDir)\..\buildall.cmd $(ProjectDir)"
+				CleanCommandLine="$(ProjectDir)\..\clean.cmd $(ProjectDir)"
+				Output=""
+				PreprocessorDefinitions="__GNUC__;__AVR_ATmega2560__;__DEBUG__"
+				IncludeSearchPath="&quot;C:\avr-gcc\avr\include&quot;;&quot;C:\avr-gcc\avr\include\util&quot;;&quot;C:\avr-gcc\avr\include\compat&quot;;&quot;C:\avr-gcc\avr\include\avr&quot;;..\base\"
+				ForcedIncludes=""
+				AssemblySearchPath=""
+				ForcedUsingAssemblies=""
+				CompileAsManaged=""
+			/>
+		</Configuration>
+	</Configurations>
+	<References>
+	</References>
+	<Files>
+		<Filter
+			Name="Source Files"
+			Filter="cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx"
+			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}"
+			>
+			<File
+				RelativePath=".\ISRList.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\MainUnit.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\MCU.cpp"
+				>
+			</File>
+		</Filter>
+		<Filter
+			Name="Header Files"
+			Filter="h;hpp;hxx;hm;inl;inc;xsd"
+			UniqueIdentifier="{93995380-89BD-4b04-88EB-625FBE52EBFB}"
+			>
+			<File
+				RelativePath=".\Configuration.h"
+				>
+			</File>
+			<File
+				RelativePath=".\Defines.h"
+				>
+			</File>
+			<File
+				RelativePath=".\MCU.h"
+				>
+			</File>
+			<File
+				RelativePath=".\Version.h"
+				>
+			</File>
+		</Filter>
+		<Filter
+			Name="Resource Files"
+			Filter="rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav"
+			UniqueIdentifier="{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}"
+			>
+		</Filter>
+		<File
+			RelativePath=".\Makefile"
+			>
+		</File>
+		<File
+			RelativePath=".\readme.txt"
+			>
+		</File>
+	</Files>
+	<Globals>
+	</Globals>
+</VisualStudioProject>

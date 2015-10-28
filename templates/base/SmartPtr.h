@@ -1,5 +1,4 @@
-#ifndef __SMARTPTR_H__
-#define __SMARTPTR_H__
+#pragma once
 
 // "AVR, С++ и умные указатели"
 // Ссылка: http://we.easyelectronics.ru/Soft/avr-s-i-umnye-ukazateli.html
@@ -168,5 +167,3 @@ class EepromPtr: public BasePtr< T, EepromPtr<T> > {
         }
 
 };
-
-#endif

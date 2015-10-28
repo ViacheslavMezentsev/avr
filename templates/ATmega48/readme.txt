@@ -3,21 +3,18 @@
         Проект: Шаблон для ATmega48
         Контроллер: ATmega48
 
-        Хранилище проекта: https://mysvn.ru/avr/templates/ATmega48/
+        Хранилище проекта: 
+        https://github.com/ViacheslavMezentsev/avr/tree/master/templates/ATmega48
 
-        Автор: Мезенцев В. Н.
-        Почта: mailto:unihomelab@ya.ru
+        Автор: Вячеслав Мезенцев
+        Почта: mailto:viacheslavmezentsev@ya.ru
         ICQ UIN: 10333578
         Skype: viacheslavmezentsev
         Сайт: http://vkontakte.ru/viacheslavmezentsev
 
-        Вы всегда можете предложить мне небольшую работу тут:
-        http://www.free-lance.ru/users/unni/
-        или связавшись со мной по почте или скайпу.
+        Портфолио: https://github.com/ViacheslavMezentsev
 
-        Портфолио: https://mysvn.ru/cop/portfolio/
-
-        Екатеринбург, 2012-2013 г.
+        Екатеринбург, 2012-2015 г.
 
 ========================================================================
 

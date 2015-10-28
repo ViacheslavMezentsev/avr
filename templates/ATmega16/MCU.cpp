@@ -37,7 +37,7 @@ HRESULT CMCU::MainThreadProcedure(){
     // Разрешаем прерывания
     __enable_interrupt();
 
-    do {
+	do {
 
 
     } while ( true );

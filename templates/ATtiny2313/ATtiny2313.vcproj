@@ -24,12 +24,12 @@
 			>
 			<Tool
 				Name="VCNMakeTool"
-				BuildCommandLine="$(ProjectDir)build.cmd"
-				ReBuildCommandLine="$(ProjectDir)buildall.cmd"
-				CleanCommandLine="$(ProjectDir)clean.cmd"
+				BuildCommandLine="$(ProjectDir)\..\build.cmd $(ProjectDir)"
+				ReBuildCommandLine="$(ProjectDir)\..\buildall.cmd $(ProjectDir)"
+				CleanCommandLine="$(ProjectDir)\..\clean.cmd $(ProjectDir)"
 				Output=""
 				PreprocessorDefinitions="__GNUC__;__AVR_ATtiny2313__;__DEBUG__"
-				IncludeSearchPath="&quot;C:\MHVAVRTools\avr\include&quot;;&quot;C:\MHVAVRTools\avr\include\util&quot;;&quot;C:\MHVAVRTools\avr\include\compat&quot;;&quot;C:\MHVAVRTools\avr\include\avr&quot;"
+				IncludeSearchPath="&quot;C:\avr-gcc\avr\include&quot;;&quot;C:\avr-gcc\avr\include\util&quot;;&quot;C:\avr-gcc\avr\include\compat&quot;;&quot;C:\avr-gcc\avr\include\avr&quot;"
 				ForcedIncludes=""
 				AssemblySearchPath=""
 				ForcedUsingAssemblies=""
@@ -72,15 +72,7 @@
 				>
 			</File>
 			<File
-				RelativePath=".\SmartPtr.h"
-				>
-			</File>
-			<File
 				RelativePath=".\Version.h"
-				>
-			</File>
-			<File
-				RelativePath=".\windows.h"
 				>
 			</File>
 		</Filter>

@@ -1,12 +1,4 @@
-///////////////////////////////////////////////////////////
-//  MessagesQueue.h
-//  Implementation of the Class CMessagesQueue
-//  Created on:      19-шўы-2011 13:37:20
-//  Original author: быртр
-///////////////////////////////////////////////////////////
-
-#if !defined(EA_83780553_4E82_4cd8_925E_2BADA3A75F20__INCLUDED_)
-#define EA_83780553_4E82_4cd8_925E_2BADA3A75F20__INCLUDED_
+#pragma once
 
 #include "Defines.h"
 
@@ -40,4 +32,3 @@ private:
 	inline uint16_t space();
 
 };
-#endif // !defined(EA_83780553_4E82_4cd8_925E_2BADA3A75F20__INCLUDED_)

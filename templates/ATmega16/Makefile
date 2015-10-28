@@ -39,7 +39,6 @@
 # To rebuild project do "make clean" then "make all".
 #----------------------------------------------------------------------------
 
-
 # MCU name
 MCU = atmega16
 
@@ -112,7 +111,7 @@ DEBUG = dwarf-2
 #     Each directory must be seperated by a space.
 #     Use forward slashes for directory separators.
 #     For a directory that has spaces, enclose it in quotes.
-EXTRAINCDIRS =
+EXTRAINCDIRS = ../base
 
 # Compiler flag to set the C Standard level.
 #     c89   = "ANSI" C
@@ -420,11 +419,11 @@ build: genver elf hex eep lss sym updver
 
 genver: 
 	@echo Generating Version.h file ...
-	cscript //NoLogo versionfile-gen.js Version version.txt
+	cscript //NoLogo ../versionfile-gen.js Version version.txt
 
 updver:
 	@echo Updating version ...
-	cscript //NoLogo versionfile-update.js version.txt
+	cscript //NoLogo ../versionfile-update.js version.txt
 	
 buildiar: $(SRC:.c=.d90)
 	
@@ -456,12 +455,11 @@ ELFSIZE = $(SIZE) --mcu=$(MCU) --format=avr $(TARGET).elf
 
 sizebefore:
 	@if test -f $(TARGET).elf; then echo; echo $(MSG_SIZE_BEFORE); $(ELFSIZE); \
-	2>/dev/null; echo; fi
+	2>/dev/null; fi
 
 sizeafter:
 	@if test -f $(TARGET).elf; then echo; echo $(MSG_SIZE_AFTER); $(ELFSIZE); \
 	2>/dev/null; echo; fi
-
 
 
 # Display compiler version information.

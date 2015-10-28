@@ -24,8 +24,7 @@
  * 
  **************************************************************************/
 
-#ifndef EFS_H_
-#define EFS_H_
+#pragma once
 
 #define EFS_OK       0
 #define EFS_ERROR    1
@@ -80,5 +79,3 @@ public:
 
 };
 
-
-#endif /*EFS_H_*/
